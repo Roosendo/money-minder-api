@@ -1,0 +1,9 @@
+{
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+  ],
+  "[astro]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}
