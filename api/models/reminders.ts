@@ -19,7 +19,7 @@ export default class Reminder {
       args: [email]
     })
 
-    return reminders
+    return reminders.rows
   }
 
   static async deleteReminder (

@@ -41,6 +41,7 @@ export default class ExitController {
       const { email, month, year } = req.body as monthlyExpense
       if (!email || !month || !year) return next(new Error('Email, month, and year are required'))
       const expenses = await Exit.getMonthlySummary({ email, month, year })
+      if (!expenses[0]?.totalExpenses) return res.json({ totalExpenses: 0 })
       res.json(expenses)
     } catch (err) {
       next(err)
@@ -52,6 +53,7 @@ export default class ExitController {
       const { email, year } = req.body as yearlyExpense
       if (!email || !year) return next(new Error('Email and year are required'))
       const expenses = await Exit.getYearlySummary({ email, year })
+      if (!expenses[0]?.totalExpenses) return res.json({ totalExpenses: 0 })
       res.json(expenses)
     } catch (err) {
       next(err)

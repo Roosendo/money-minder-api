@@ -19,7 +19,7 @@ export default class Exit {
       args: [email]
     })
 
-    return expenses
+    return expenses.rows
   }
 
   static async getExpensesByCategoryMonthly (
@@ -30,7 +30,7 @@ export default class Exit {
       args: [email, month, year]
     })
 
-    return expenses
+    return expenses.rows
   }
 
   static async getMonthlySummary (
@@ -41,7 +41,7 @@ export default class Exit {
       args: [email, month, year]
     })
 
-    return expenses
+    return expenses.rows
   }
 
   static async getYearlySummary (
@@ -52,7 +52,7 @@ export default class Exit {
       args: [email, year]
     })
 
-    return expenses
+    return expenses.rows
   }
 
   static async getExpenseCashFlow (
@@ -63,7 +63,7 @@ export default class Exit {
       args: [email, year]
     })
 
-    return expenses
+    return expenses.rows
   }
 
   static async getExpensesByCategoryYearly (
@@ -74,6 +74,6 @@ export default class Exit {
       args: [email, year]
     })
 
-    return expenses
+    return expenses.rows
   }
 }

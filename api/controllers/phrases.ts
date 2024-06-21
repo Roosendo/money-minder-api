@@ -5,7 +5,7 @@ export default class PhrasesController {
   async getDailyPhrase (_req: Request, res: Response, next: NextFunction) {
     try {
       const phrase = await Phrases.getDailyPhrase()
-      res.json({ phrase })
+      res.json(phrase)
     } catch (err) {
       next(err)
     }

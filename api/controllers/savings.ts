@@ -16,7 +16,7 @@ export default class SavingsController {
 
   async getSavings (req: Request, res: Response, next: NextFunction) {
     try {
-      const { email }: { email: string } = req.body
+      const { email } = req.query as unknown as { email: string }
       if (!email) return next(new Error('Email is required'))
       const savings = await Savings.getSavings({ email })
       res.json(savings)
@@ -27,7 +27,7 @@ export default class SavingsController {
 
   async deleteSaving (req: Request, res: Response, next: NextFunction) {
     try {
-      const { email, id }: singleGoal = req.body
+      const { email, id }: singleGoal = req.query as unknown as singleGoal
       if (!email || !id) return next(new Error('Email and id are required'))
       await Savings.deleteSaving({ email, id })
       res.json({ message: 'Saving goal deleted successfully' })

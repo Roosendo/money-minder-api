@@ -19,7 +19,7 @@ export default class Savings {
       args: [email]
     })
 
-    return savings
+    return savings.rows
   }
 
   static async deleteSaving (
