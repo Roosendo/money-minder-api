@@ -23,6 +23,4 @@ app.use('/savings', routerSavings)
 
 app.use(errorMiddleware)
 
-const PORT = process.env.PORT || 7373
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`))
 export const handler = ServerlessHttp(app)
