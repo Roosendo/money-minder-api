@@ -1,11 +1,28 @@
-import express, { Router } from 'express'
-import serverless from 'serverless-http'
+import express from 'express'
+import cors from 'cors'
+import { errorMiddleware } from '../../api/middlewares/error.js'
+import ServerlessHttp from 'serverless-http'
+import 'dotenv/config'
 
-const api = express()
+import routerEntry from '../../api/routes/entries.js'
+import routerExit from '../../api/routes/exits.js'
+import routerPhrase from '../../api/routes/phrases.js'
+import routerReminders from '../../api/routes/reminders.js'
+import routerSavings from '../../api/routes/savings.js'
 
-const router = Router()
-router.get('/', (_req, res) => res.send('Hi there you fantastic person!'))
+const app = express()
+app.use(express.json())
+app.use(cors())
 
-api.use('/api/', router)
+app.get('/', (_req, res) => res.send(`Hi there you fantastic person!`))
+app.use('/entries', routerEntry)
+app.use('/exits', routerExit)
+app.use('/phrases', routerPhrase)
+app.use('/reminders', routerReminders)
+app.use('/savings', routerSavings)
 
-export const handler = serverless(api)
+app.use(errorMiddleware)
+
+const PORT = process.env.PORT || 7373
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`))
+export const handler = ServerlessHttp(app)
