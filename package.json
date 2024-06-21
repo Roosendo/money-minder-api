@@ -15,9 +15,11 @@
   "license": "ISC",
   "dependencies": {
     "@libsql/client": "0.6.2",
+    "@netlify/functions": "^2.8.0",
     "cors": "2.8.5",
     "dotenv": "^16.4.5",
-    "express": "4.19.2"
+    "express": "4.19.2",
+    "serverless-http": "^3.2.0"
   },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.5.7",
