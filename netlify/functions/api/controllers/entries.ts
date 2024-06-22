@@ -36,41 +36,6 @@ export default class EntryController {
     }
   }
 
-  async getMonthlySummary (req: Request, res: Response, next: NextFunction) {
-    try {
-      const { email, month, year } = req.query as unknown as monthlyEntry
-      if (!email || !month || !year) return next(new Error('Email, month, and year are required'))
-      const entries = await Entry.getMonthlySummary({ email, month, year })
-      if (!entries[0]?.totalEntries) return res.json({ totalEntries: 0 })
-      res.json(entries[0])
-    } catch (err) {
-      next(err)
-    }
-  }
-
-  async getYearlySummary (req: Request, res: Response, next: NextFunction) {
-    try {
-      const { email, year } = req.query as unknown as yearlyEntry
-      if (!email || !year) return next(new Error('Email and year are required'))
-      const entries = await Entry.getYearlySummary({ email, year })
-      if (!entries[0]?.totalEntries) return res.json({ totalEntries: 0 })
-      res.json(entries[0])
-    } catch (err) {
-      next(err)
-    }
-  }
-
-  async getEntryCashFlow (req: Request, res: Response, next: NextFunction) {
-    try {
-      const { email, year } = req.query as unknown as yearlyEntry
-      if (!email || !year) return next(new Error('Email, month, and year are required'))
-      const entries = await Entry.getEntryCashFlow({ email, year })
-      res.json(entries)
-    } catch (err) {
-      next(err)
-    }
-  }
-
   async getEntriesByCategoryYearly (req: Request, res: Response, next: NextFunction) {
     try {
       const { email, year } = req.query as unknown as yearlyEntry

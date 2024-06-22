@@ -24,8 +24,8 @@
     "allowJs": true,
     "strict": true,
     "outDir": "./dist",
-    "rootDir": "./api",
+    "rootDir": "./netlify/functions",
   },
-  "include": ["api/**/*"],
+  "include": ["netlify/functions/**/*"],
   "exclude": ["prettier.config.cjs", "node_modules"]
 }

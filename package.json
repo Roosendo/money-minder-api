@@ -2,10 +2,10 @@
   "name": "money-minder-api",
   "version": "1.0.0",
   "description": "",
-  "main": "app.ts",
+  "main": "api.ts",
   "type": "module",
   "scripts": {
-    "start": "node dist/app.js",
+    "start": "node dist/api.js",
     "clean": "rimraf ./dist",
     "build": "npm run clean && tsc --project tsconfig.json",
     "test": "echo \"Error: no test specified\" && exit 1"
