@@ -14,12 +14,12 @@ const app = express()
 app.use(express.json())
 app.use(cors())
 
-app.get('/', (_req, res) => res.send(`Hi there you fantastic person!`))
-app.use('/entries', routerEntry)
-app.use('/exits', routerExit)
-app.use('/phrases', routerPhrase)
-app.use('/reminders', routerReminders)
-app.use('/savings', routerSavings)
+app.get('/api/', (_req, res) => res.send(`Hi there you fantastic person!`))
+app.use('/api/entries', routerEntry)
+app.use('/api/exits', routerExit)
+app.use('/api/phrases', routerPhrase)
+app.use('/api/reminders', routerReminders)
+app.use('/api/savings', routerSavings)
 
 app.use(errorMiddleware)
 
