@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express'
 import Entry from '../models/entries.js'
 import Exit from '../models/exits.js'
+import Special from '../models/specials.js'
 
 export default class SpecialController {
   async financialSumaryYearly (req: Request, res: Response, next: NextFunction) {
@@ -39,15 +40,9 @@ export default class SpecialController {
     try {
       const { email, year } = req.query as unknown as { email: string, year: string }
       if (!email || !year) return next(new Error('Email and year are required'))
-      const entries = await Entry.getEntryCashFlow({ email, year })
-      const exits = await Exit.getExpenseCashFlow({ email, year })
+      const cashFlow = await Special.getCashFlow({ email, year })
 
-      if (entries.length === 0 && exits.length === 0) return next(new Error('Both entries and exits are empty'))
-
-      if (entries.length === 0) return res.json({ exits })
-      if (exits.length === 0) return res.json({ entries })
-
-      res.json([ ...entries, ...exits ])
+      res.json(cashFlow)
     } catch (err) {
       next(err)
     }
@@ -57,15 +52,9 @@ export default class SpecialController {
     try {
       const { email, year } = req.query as unknown as { email: string, year: string }
       if (!email || !year) return next(new Error('Email and year are required'))
-      const entries = await Entry.getEntriesByCategoryYearly({ email, year })
-      const exits = await Exit.getExpensesByCategoryYearly({ email, year })
+      const yearlyCategories = await Special.getYearlyCategories({ email, year })
 
-      if (entries.length === 0 && exits.length === 0) return next(new Error('Both entries and exits are empty'))
-
-      if (entries.length === 0) return res.json({ exits })
-      if (exits.length === 0) return res.json({ entries })
-
-      res.json([ ...entries, ...exits ])
+      res.json(yearlyCategories)
     } catch (err) {
       next(err)
     }

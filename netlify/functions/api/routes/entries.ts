@@ -9,6 +9,5 @@ const entryController = new EntryController()
 routerEntry.post('/new-entry', cors(corsOptions), entryController.newEntry)
 routerEntry.get('/get-entries', cors(corsOptions), entryController.getEntries)
 routerEntry.get('/get-entries-by-category-monthly', cors(corsOptions), entryController.getEntriesByCategoryMonthly)
-routerEntry.get('/get-entries-by-category-yearly', cors(corsOptions), entryController.getEntriesByCategoryYearly)
 
 export default routerEntry

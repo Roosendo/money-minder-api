@@ -54,26 +54,4 @@ export default class Entry {
 
     return entries.rows
   }
-
-  static async getEntryCashFlow (
-    { email, year }: yearlyEntry
-  ) {
-    const entries = await client.execute({
-      sql: 'SELECT STRFTIME("%m", date) AS month, SUM(amount) AS total_ingresos FROM money_entries WHERE user_email = ? AND STRFTIME("%Y", date) = ? GROUP BY STRFTIME("%m", date)',
-      args: [email, year]
-    })
-
-    return entries.rows
-  }
-
-  static async getEntriesByCategoryYearly (
-    { email, year }: yearlyEntry
-  ) {
-    const entries = await client.execute({
-      sql: 'SELECT category, SUM(amount) AS total FROM money_entries WHERE user_email = ? AND strftime("%Y", date) = ? GROUP BY category',
-      args: [email, year]
-    })
-
-    return entries.rows
-  }
 }

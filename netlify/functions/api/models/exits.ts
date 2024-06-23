@@ -54,26 +54,4 @@ export default class Exit {
 
     return expenses.rows
   }
-
-  static async getExpenseCashFlow (
-    { email, year }: yearlyExpense
-  ) {
-    const expenses = await client.execute({
-      sql: 'SELECT STRFTIME("%m", DATE) AS month, SUM(amount) AS total_egresos FROM money_exits WHERE user_email = ? AND STRFTIME("%Y", DATE) = ? GROUP BY STRFTIME("%m", DATE)',
-      args: [email, year]
-    })
-
-    return expenses.rows
-  }
-
-  static async getExpensesByCategoryYearly (
-    { email, year }: yearlyExpense
-  ) {
-    const expenses = await client.execute({
-      sql: 'SELECT category, SUM(amount) AS total FROM money_exits WHERE user_email = ? AND strftime("%Y", date) = ? GROUP BY category',
-      args: [email, year]
-    })
-
-    return expenses.rows
-  }
 }

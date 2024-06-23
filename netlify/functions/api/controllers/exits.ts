@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express'
 import Exit from '../models/exits.js'
-import type { newExpense, monthlyExpense, yearlyExpense } from '../types'
+import type { newExpense, monthlyExpense } from '../types'
 
 export default class ExitController {
   async newExpense (req: Request, res: Response, next: NextFunction) {
@@ -30,17 +30,6 @@ export default class ExitController {
       const { email, month, year } = req.body as monthlyExpense
       if (!email || !month || !year) return next(new Error('Email, month, and year are required'))
       const expenses = await Exit.getExpensesByCategoryMonthly({ email, month, year })
-      res.json(expenses)
-    } catch (err) {
-      next(err)
-    }
-  }
-
-  async getExpensesByCategoryYearly (req: Request, res: Response, next: NextFunction) {
-    try {
-      const { email, year } = req.body as yearlyExpense
-      if (!email || !year) return next(new Error('Email and year are required'))
-      const expenses = await Exit.getExpensesByCategoryYearly({ email, year })
       res.json(expenses)
     } catch (err) {
       next(err)

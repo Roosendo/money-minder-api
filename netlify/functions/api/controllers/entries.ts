@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express'
 import Entry from '../models/entries.js'
-import type { newIncome, monthlyEntry, yearlyEntry } from '../types'
+import type { newIncome, monthlyEntry } from '../types'
 
 export default class EntryController {
   async newEntry (req: Request, res: Response, next: NextFunction) {
@@ -30,17 +30,6 @@ export default class EntryController {
       const { email, month, year } = req.query as unknown as monthlyEntry
       if (!email || !month || !year) return next(new Error('Email, month, and year are required'))
       const entries = await Entry.getEntriesByCategoryMonthly({ email, month, year })
-      res.json(entries)
-    } catch (err) {
-      next(err)
-    }
-  }
-
-  async getEntriesByCategoryYearly (req: Request, res: Response, next: NextFunction) {
-    try {
-      const { email, year } = req.query as unknown as yearlyEntry
-      if (!email || !year) return next(new Error('Email and year are required'))
-      const entries = await Entry.getEntriesByCategoryYearly({ email, year })
       res.json(entries)
     } catch (err) {
       next(err)
