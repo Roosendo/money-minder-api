@@ -1,12 +1,14 @@
 import type { Request, Response, NextFunction } from 'express'
 import Entry from '../models/entries.js'
+import User from '../models/user.js'
 import type { newIncome, monthlyEntry } from '../types'
 
 export default class EntryController {
   async newEntry (req: Request, res: Response, next: NextFunction) {
     try {
-      const { email, date, amount, category, description } = req.body as newIncome
-      if (!email || !date || !amount || !category) return next(new Error('All fields are required'))
+      const { email, fullName, date, amount, category, description } = req.body as newIncome
+      if (!email || !fullName || !date || !amount || !category) return next(new Error('All fields are required'))
+      await User.createUser({ email, fullName })
       await Entry.newEntry({ email, date, amount, category, description })
       res.json({ message: 'Income added successfully' })
     } catch (err) {

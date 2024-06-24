@@ -1,12 +1,14 @@
 import type { Request, Response, NextFunction } from 'express'
 import Exit from '../models/exits.js'
+import User from '../models/user.js'
 import type { newExpense, monthlyExpense } from '../types'
 
 export default class ExitController {
   async newExpense (req: Request, res: Response, next: NextFunction) {
     try {
-      const { email, date, amount, category, description } = req.body as newExpense
-      if (!email || !date || !amount || !category) return next(new Error('All fields are required'))
+      const { email, fullName, date, amount, category, description } = req.body as newExpense
+      if (!email || !fullName || !date || !amount || !category) return next(new Error('All fields are required'))
+      await User.createUser({ email, fullName })
       await Exit.newExpense({ email, date, amount, category, description })
       res.json({ message: 'Expense added successfully' })
     } catch (err) {

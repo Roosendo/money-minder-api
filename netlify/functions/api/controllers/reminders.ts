@@ -1,12 +1,14 @@
 import type { Request, Response, NextFunction } from 'express'
 import Reminder from '../models/reminders.js'
+import User from '../models/user.js'
 import type { newReminder, singleReminder, updatedReminder } from '../types'
 
 export default class ReminderController {
   async newReminder (req: Request, res: Response, next: NextFunction) {
     try {
-      const { email, title, description, reminderDate } = req.body as newReminder
-      if (!email || !title || !reminderDate) return next(new Error('All fields are required'))
+      const { email, fullName, title, description, reminderDate } = req.body as newReminder
+      if (!email || !fullName || !title || !reminderDate) return next(new Error('All fields are required'))
+      await User.createUser({ email, fullName })
       await Reminder.newReminder({ email, title, description, reminderDate })
       res.json({ message: 'Reminder added successfully' })
     } catch (err) {

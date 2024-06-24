@@ -3,6 +3,7 @@ export interface newExpense {
   category: string
   date: string
   description: string
+  fullName?: string
   email: string
 }
 
@@ -21,6 +22,7 @@ export interface newGoal {
   email: string
   endDate: string
   name: string
+  fullName?: string
   startDate: string
   targetAmount: number
   currentAmount: number
@@ -45,6 +47,7 @@ export interface newIncome {
   category: string
   date: string
   description: string
+  fullName?: string
   email: string
 }
 
@@ -62,6 +65,7 @@ export interface yearlyEntry {
 export interface newReminder {
   description: string
   email: string
+  fullName?: string
   reminderDate: string
   title: string
 }

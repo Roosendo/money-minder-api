@@ -1,12 +1,14 @@
 import type { Request, Response, NextFunction } from 'express'
 import Savings from '../models/savings.js'
+import User from '../models/user.js'
 import type { newGoal, singleGoal, updatedGoal } from '../types'
 
 export default class SavingsController {
   async newSaving (req: Request, res: Response, next: NextFunction) {
     try {
-      const { email, name, targetAmount, currentAmount, startDate, endDate } = req.body as newGoal
-      if (!email || !name || !targetAmount || !currentAmount || !startDate || !endDate) return next(new Error('All fields are required'))
+      const { email, fullName, name, targetAmount, currentAmount, startDate, endDate } = req.body as newGoal
+      if (!email || !name || !fullName || !targetAmount || !currentAmount || !startDate || !endDate) return next(new Error('All fields are required'))
+      await User.createUser({ email, fullName })
       await Savings.newSaving({ email, name, targetAmount, currentAmount, startDate, endDate })
       res.json({ message: 'Saving goal added successfully' })
     } catch (error) {
