@@ -10,7 +10,6 @@ import routerPhrase from './api/routes/phrases.js'
 import routerReminders from './api/routes/reminders.js'
 import routerSavings from './api/routes/savings.js'
 import specialRouter from './api/routes/specials.js'
-import userRouter from './api/routes/user.js' 
 
 const app = express()
 app.use(express.json())
@@ -23,7 +22,6 @@ app.use('/api/phrases', routerPhrase)
 app.use('/api/reminders', routerReminders)
 app.use('/api/savings', routerSavings)
 app.use('/api/specials', specialRouter)
-app.use('/api/user', userRouter)
 
 app.use(errorMiddleware)
 if (process.env.NODE_ENV === 'development') app.listen(7373, () => console.log(`Server running on http://localhost:7373`))
