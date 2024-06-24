@@ -68,4 +68,58 @@ export default class Special {
 
     return categories.rows
   }
+
+  static async getRecentTransactions (
+    { email, year }: { email: string, year: string }
+  ) {
+    const transactions = await client.execute({
+      sql: `SELECT
+            date,
+            category,
+            amount
+          FROM
+            (
+              SELECT
+                date,
+                category,
+                amount
+              FROM
+                money_entries
+              WHERE
+                user_email = ?
+                AND STRFTIME('%Y', date) = ?
+              ORDER BY
+                entry_id DESC
+              LIMIT
+                4
+            ) AS latest_entries
+          UNION ALL
+          SELECT
+            date,
+            category,
+            amount
+          FROM
+            (
+              SELECT
+                category,
+                amount,
+                date
+              FROM
+                money_exits
+              WHERE
+                user_email = ?
+                AND STRFTIME('%Y', date) = ?
+              ORDER BY
+                exit_id DESC
+              LIMIT
+                4
+            ) AS latest_exits
+          ORDER BY
+            date DESC
+          `,
+      args: [email, year, email, year]
+    })
+
+    return transactions.rows
+  }
 }

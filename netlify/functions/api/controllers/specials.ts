@@ -59,4 +59,16 @@ export default class SpecialController {
       next(err)
     }
   }
+
+  async recentTransactions (req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email, year } = req.query as unknown as { email: string, year: string }
+      if (!email || !year) return next(new Error('Email and year are required'))
+      const recentTransactions = await Special.getRecentTransactions({ email, year })
+
+      res.json(recentTransactions)
+    } catch (err) {
+      next(err)
+    }
+  }
 }
