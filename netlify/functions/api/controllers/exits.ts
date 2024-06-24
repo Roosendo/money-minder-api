@@ -18,7 +18,7 @@ export default class ExitController {
 
   async getExpenses (req: Request, res: Response, next: NextFunction) {
     try {
-      const { email }: { email: string } = req.body
+      const { email } = req.query as unknown as { email: string }
       if (!email) return next(new Error('Email is required'))
       const expenses = await Exit.getExpenses({ email })
       res.json(expenses)
@@ -29,7 +29,7 @@ export default class ExitController {
 
   async getExpensesByCategoryMonthly (req: Request, res: Response, next: NextFunction) {
     try {
-      const { email, month, year } = req.body as monthlyExpense
+      const { email, month, year } = req.query as unknown as monthlyExpense
       if (!email || !month || !year) return next(new Error('Email, month, and year are required'))
       const expenses = await Exit.getExpensesByCategoryMonthly({ email, month, year })
       res.json(expenses)
