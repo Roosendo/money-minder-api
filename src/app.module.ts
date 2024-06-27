@@ -9,6 +9,7 @@ import configure from '@/common/configs/config'
 import { PhrasesModule } from './phrases/phrases.module'
 import { RemindersModule } from './reminders/reminders.module'
 import { SavingsModule } from './savings/savings.module'
+import { SpecialsModule } from './specials/specials.module'
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { SavingsModule } from './savings/savings.module'
     PhrasesModule,
     RemindersModule,
     SavingsModule,
+    SpecialsModule,
     DatabaseModule
   ],
   controllers: [AppController],
