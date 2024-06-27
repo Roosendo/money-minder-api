@@ -2,7 +2,7 @@ import { Controller, Get, UseFilters } from '@nestjs/common'
 import { PhrasesService } from './phrases.service'
 import { AllExceptionsFilter } from '@/middlewares/errors'
 
-@Controller('phrases')
+@Controller('api/phrases')
 @UseFilters(AllExceptionsFilter)
 export class PhrasesController {
   constructor (private readonly phrasesService: PhrasesService) { }

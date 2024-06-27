@@ -10,7 +10,7 @@ import { UsersService } from '@/users/users.service'
 import { CreateUserDto } from '@/users/users.dto'
 import { AllExceptionsFilter } from '@/middlewares/errors'
 
-@Controller('reminders')
+@Controller('api/reminders')
 @UseFilters(AllExceptionsFilter)
 export class RemindersController {
   constructor (

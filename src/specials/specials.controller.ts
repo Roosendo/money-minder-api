@@ -11,7 +11,7 @@ import {
 } from './specials.dto'
 import { AllExceptionsFilter } from '@middlewares/errors'
 
-@Controller('specials')
+@Controller('api/specials')
 @UseFilters(AllExceptionsFilter)
 export class SpecialsController {
   constructor (

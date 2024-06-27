@@ -9,7 +9,7 @@ import { UsersService } from '@/users/users.service'
 import { CreateUserDto } from '@/users/users.dto'
 import { AllExceptionsFilter } from '@/middlewares/errors'
 
-@Controller('entries')
+@Controller('api/entries')
 @UseFilters(AllExceptionsFilter)
 export class EntryController {
   constructor (
