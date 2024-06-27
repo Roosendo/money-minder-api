@@ -1,14 +1,6 @@
 import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Matches } from 'class-validator'
 
-export class CreateEntryDto {
-  @IsEmail()
-  @IsNotEmpty()
-    email: string
-
-  @IsNotEmpty()
-  @IsString()
-    date: string
-
+export class CreateExpenseDto {
   @IsNumber()
   @IsNotEmpty()
     amount: number
@@ -18,21 +10,28 @@ export class CreateEntryDto {
     category: string
 
   @IsString()
+  @IsNotEmpty()
+    date: string
+
+  @IsString()
   @IsOptional()
     description?: string
 
   @IsString()
   @IsOptional()
     fullName?: string
+
+  @IsEmail()
+    email: string
 }
 
-export class GetEntriesDto {
+export class GetExitsDto {
   @IsEmail()
   @IsNotEmpty()
     email: string
 }
 
-export class MonthlyEntryDto {
+export class MonthlyExitDto {
   @IsEmail()
   @IsNotEmpty()
     email: string
@@ -52,7 +51,7 @@ export class MonthlyEntryDto {
     year: string
 }
 
-export class YearlyEntryDto {
+export class YearlyExitDto {
   @IsEmail()
   @IsNotEmpty()
     email: string

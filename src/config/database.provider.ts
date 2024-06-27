@@ -6,10 +6,11 @@ export const databaseProviders: Provider[] = [
   {
     provide: 'DATABASE_CLIENT',
     useFactory: (configService: ConfigService) => {
-      return createClient({
+      const client = createClient({
         url: configService.get<string>('TURSO_DATABASE_URL') ?? '',
         authToken: configService.get<string>('TURSO_AUTH_TOKEN') ?? ''
       })
+      return client
     },
     inject: [ConfigService]
   }
