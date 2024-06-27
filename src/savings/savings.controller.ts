@@ -6,15 +6,22 @@ import {
   DeleteSavingDto,
   UpdateSavingDto
 } from './savings.dto'
+import { UsersService } from '@/users/users.service'
+import { CreateUserDto } from '@/users/users.dto'
 import { AllExceptionsFilter } from '@/middlewares/errors'
 
 @Controller('savings')
 @UseFilters(AllExceptionsFilter)
 export class SavingsController {
-  constructor (private readonly savingsService: SavingsService) { }
+  constructor (
+    private readonly savingsService: SavingsService,
+    private readonly usersService: UsersService
+  ) { }
 
   @Post('new-saving')
   async newSaving (@Body() createSavingDto: CreateSavingDto) {
+    const createUserDto: CreateUserDto = { email: createSavingDto.email, fullName: createSavingDto.fullName }
+    await this.usersService.createUser(createUserDto)
     return this.savingsService.newSaving(createSavingDto)
   }
 

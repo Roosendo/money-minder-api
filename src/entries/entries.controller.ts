@@ -5,15 +5,22 @@ import {
   GetEntriesDto,
   MonthlyEntryDto
 } from './entries.dto'
+import { UsersService } from '@/users/users.service'
+import { CreateUserDto } from '@/users/users.dto'
 import { AllExceptionsFilter } from '@/middlewares/errors'
 
 @Controller('entries')
 @UseFilters(AllExceptionsFilter)
 export class EntryController {
-  constructor (private readonly entryService: EntryService) { }
+  constructor (
+    private readonly entryService: EntryService,
+    private readonly usersService: UsersService
+  ) { }
 
   @Post('new-entry')
   async newEntry (@Body() createEntryDto: CreateEntryDto) {
+    const createUserDto: CreateUserDto = { email: createEntryDto.email, fullName: createEntryDto.fullName }
+    await this.usersService.createUser(createUserDto)
     return this.entryService.newEntry(createEntryDto)
   }
 

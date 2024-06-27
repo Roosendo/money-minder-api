@@ -5,15 +5,22 @@ import {
   GetExitsDto,
   MonthlyExitDto
 } from './exits.dto'
+import { UsersService } from '@/users/users.service'
+import { CreateUserDto } from '@/users/users.dto'
 import { AllExceptionsFilter } from '@/middlewares/errors'
 
 @Controller('exits')
 @UseFilters(AllExceptionsFilter)
 export class ExitController {
-  constructor (private readonly exitService: ExitService) { }
+  constructor (
+    private readonly exitService: ExitService,
+    private readonly usersService: UsersService
+  ) { }
 
   @Post('new-exit')
   async newExpense (@Body() createExpenseDto: CreateExpenseDto) {
+    const createUserDto: CreateUserDto = { email: createExpenseDto.email, fullName: createExpenseDto.fullName }
+    await this.usersService.createUser(createUserDto)
     return this.exitService.newExpense(createExpenseDto)
   }
 
