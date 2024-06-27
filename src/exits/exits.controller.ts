@@ -3,8 +3,7 @@ import { ExitService } from './exits.service'
 import {
   CreateExpenseDto,
   GetExitsDto,
-  MonthlyExitDto,
-  YearlyExitDto
+  MonthlyExitDto
 } from './exits.dto'
 import { AllExceptionsFilter } from '@/middlewares/errors'
 

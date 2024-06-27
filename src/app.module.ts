@@ -7,6 +7,7 @@ import { ExitModule } from './exits/exits.module'
 import { DatabaseModule } from './config/database.module'
 import configure from '@/common/configs/config'
 import { PhrasesModule } from './phrases/phrases.module'
+import { RemindersModule } from './reminders/reminders.module'
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { PhrasesModule } from './phrases/phrases.module'
     EntryModule,
     ExitModule,
     PhrasesModule,
+    RemindersModule,
     DatabaseModule
   ],
   controllers: [AppController],
