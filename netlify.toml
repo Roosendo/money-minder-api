@@ -3,10 +3,9 @@
   node_bundler = "esbuild"
 
 [[redirects]]
-  force = true
   from = "/*"
+  to = "/.netlify/functions/main"
   status = 200
-  to = "/.netlify/functions/:splat"
 
 [build]
   command = "npm run build"
