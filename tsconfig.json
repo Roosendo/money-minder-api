@@ -23,8 +23,5 @@
       "@middlewares/*": ["src/middlewares/*"],
       "@config/*": ["src/config/*"],
     }
-  },
-  "exclude": [
-  "**/*.d.ts"
-  ]
+  }
 }
