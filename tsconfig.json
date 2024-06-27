@@ -17,6 +17,7 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": true,
+    "resolveJsonModule": true,
     "paths": {
       "@/*": ["src/*"],
       "@middlewares/*": ["src/middlewares/*"],

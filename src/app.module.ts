@@ -6,6 +6,7 @@ import { EntryModule } from './entries/entries.module'
 import { ExitModule } from './exits/exits.module'
 import { DatabaseModule } from './config/database.module'
 import configure from '@/common/configs/config'
+import { PhrasesModule } from './phrases/phrases.module'
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import configure from '@/common/configs/config'
     }),
     EntryModule,
     ExitModule,
+    PhrasesModule,
     DatabaseModule
   ],
   controllers: [AppController],
