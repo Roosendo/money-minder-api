@@ -1,12 +1,12 @@
 [functions]
-  external_node_modules = ["@nestjs/core", "@nestjs/common", "@nestjs/platform-express", "@libsql/client", "cors", "dotenv"]
+  external_node_modules = ["@nestjs/core", "@nestjs/common", "@nestjs/platform-express", "@libsql/client", "cors", "dotenv", "class-transformer", "reflect-metadata"]
   node_bundler = "esbuild"
 
 [[redirects]]
   force = true
   from = "/*"
   status = 200
-  to = "/.src/:splat"
+  to = "/.netlify/functions/:splat"
 
 [build]
   command = "npm run build"
