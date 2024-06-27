@@ -8,6 +8,7 @@ import { DatabaseModule } from './config/database.module'
 import configure from '@/common/configs/config'
 import { PhrasesModule } from './phrases/phrases.module'
 import { RemindersModule } from './reminders/reminders.module'
+import { SavingsModule } from './savings/savings.module'
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { RemindersModule } from './reminders/reminders.module'
     ExitModule,
     PhrasesModule,
     RemindersModule,
+    SavingsModule,
     DatabaseModule
   ],
   controllers: [AppController],

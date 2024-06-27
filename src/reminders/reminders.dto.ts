@@ -1,4 +1,4 @@
-import { IsDateString, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Matches } from 'class-validator'
+import { IsDateString, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator'
 
 export class CreateReminderDto {
   @IsString()
@@ -26,7 +26,7 @@ export class CreateReminderDto {
 }
 
 export class GetRemindersDto {
-  @IsString()
+  @IsEmail()
   @IsNotEmpty()
     email: string
 }
