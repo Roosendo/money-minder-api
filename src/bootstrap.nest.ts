@@ -16,7 +16,9 @@ export const bootstrap = async (): Promise<NestExpressApplication> => {
   const app = await NestFactory.create<NestExpressApplication>(AppModule)
 
   // Validation
-  app.useGlobalPipes(new ValidationPipe())
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true
+  }))
 
   app.useGlobalFilters(new AllExceptionsFilter())
 

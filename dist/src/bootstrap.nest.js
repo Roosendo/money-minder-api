@@ -11,7 +11,9 @@ const config_1 = require("@nestjs/config");
 const fs = require("fs");
 const bootstrap = async () => {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
-    app.useGlobalPipes(new common_1.ValidationPipe());
+    app.useGlobalPipes(new common_1.ValidationPipe({
+        transform: true
+    }));
     app.useGlobalFilters(new errors_1.AllExceptionsFilter());
     const configService = app.get(config_1.ConfigService);
     const corsConfig = configService.get('cors');
