@@ -42,14 +42,18 @@ export const bootstrap = async (): Promise<NestExpressApplication> => {
     SwaggerModule.setup(swaggerConfig.path || 'api', app, document)
   }
 
-  if (corsConfig.enabled) {
-    app.enableCors({
-      origin: /https:\/\/money-minder-xi\.vercel\.app$/,
-      methods: ['GET', 'POST', 'DELETE', 'PATCH'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
-      credentials: true
-    })
-  }
+  app.enableCors({
+    origin: (origin, callback) => {
+      if (corsConfig.allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'))
+      }
+    },
+    methods: 'GET,POST,PATCH,DELETE',
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+  })
 
   return app
 }
