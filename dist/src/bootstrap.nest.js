@@ -33,7 +33,14 @@ const bootstrap = async () => {
     }
     if (corsConfig.enabled) {
         app.enableCors({
-            origin: corsConfig.allowedOrigins,
+            origin: (origin, callback) => {
+                if (corsConfig.allowedOrigins.includes(origin)) {
+                    callback(null, true);
+                }
+                else {
+                    callback(new Error('Not allowed by CORS'));
+                }
+            },
             methods: ['GET', 'POST', 'DELETE', 'PATCH'],
             allowedHeaders: ['Content-Type', 'Authorization']
         });
