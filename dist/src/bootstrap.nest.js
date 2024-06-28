@@ -34,7 +34,7 @@ const bootstrap = async () => {
     if (corsConfig.enabled) {
         app.enableCors({
             origin: (origin, callback) => {
-                if (corsConfig.allowedOrigins.includes(origin)) {
+                if (!origin || corsConfig.allowedOrigins.includes(origin)) {
                     callback(null, true);
                 }
                 else {
@@ -42,7 +42,8 @@ const bootstrap = async () => {
                 }
             },
             methods: ['GET', 'POST', 'DELETE', 'PATCH'],
-            allowedHeaders: ['Content-Type', 'Authorization']
+            allowedHeaders: ['Content-Type', 'Authorization'],
+            credentials: true
         });
     }
     return app;

@@ -6,7 +6,7 @@ const config = {
     },
     cors: {
         enabled: true,
-        allowedOrigins: ['http://localhost:4321', 'https://money-minder-xi.vercel.app']
+        allowedOrigins: ['http://localhost:4321/', 'https://money-minder-xi.vercel.app/']
     },
     swagger: {
         enabled: true,
