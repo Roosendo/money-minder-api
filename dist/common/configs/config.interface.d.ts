@@ -1,12 +1,10 @@
 export interface NestConfig {
-  port: number
+    port: number;
 }
-
 export interface CorsConfig {
-  enabled: boolean
+    enabled: boolean;
 }
-
 export interface Config {
-  nest: NestConfig
-  cors: CorsConfig
+    nest: NestConfig;
+    cors: CorsConfig;
 }
