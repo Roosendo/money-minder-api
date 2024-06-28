@@ -5,7 +5,8 @@ const config = {
         port: +(process.env.PORT || '7373')
     },
     cors: {
-        enabled: true
+        enabled: true,
+        allowedOrigins: ['http://localhost:4321', 'https://money-minder-xi.vercel.app']
     },
     swagger: {
         enabled: true,
