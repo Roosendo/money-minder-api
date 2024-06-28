@@ -21,7 +21,7 @@ const bootstrap = async () => {
   SwaggerModule.setup('api', app, document)
 
   app.enableCors({
-    origin: '*',
+    origin: 'https://money-minder-xi.vercel.app',
     allowedHeaders: 'Content-Type, Accept, Authorization, X-Requested-With',
     methods: 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
     credentials: true
