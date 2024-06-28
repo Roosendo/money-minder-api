@@ -49,7 +49,7 @@ export const bootstrap = async (): Promise<NestExpressApplication> => {
 
 export const bootstrapServerless = async () => {
   const app = await bootstrap()
-  const globalPrefix = '.netlify/functions/main'
+  const globalPrefix = '.netlify/functions/api'
   app.setGlobalPrefix(globalPrefix)
 
   await app.init()
