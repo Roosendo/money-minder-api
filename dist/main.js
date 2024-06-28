@@ -1,13 +1,26 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const bootstrap_nest_1 = require("./bootstrap.nest");
-const config_1 = require("@nestjs/config");
-const startServer = async () => {
-    const app = await (0, bootstrap_nest_1.bootstrap)();
-    console.log('Starting server...');
-    const configService = app.get(config_1.ConfigService);
-    const nestConfig = configService.get('nest');
-    await app.listen(nestConfig.port);
+const errors_1 = require("./middlewares/errors");
+const core_1 = require("@nestjs/core");
+const common_1 = require("@nestjs/common");
+const app_module_1 = require("./app.module");
+const swagger_1 = require("@nestjs/swagger");
+const bootstrap = async () => {
+    const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    app.useGlobalPipes(new common_1.ValidationPipe());
+    app.useGlobalFilters(new errors_1.AllExceptionsFilter());
+    const config = new swagger_1.DocumentBuilder()
+        .setTitle('Money Minder API')
+        .setDescription('The Money Minder API')
+        .setVersion('1.0')
+        .addTag('money-minder')
+        .build();
+    const document = swagger_1.SwaggerModule.createDocument(app, config);
+    swagger_1.SwaggerModule.setup('api', app, document);
+    app.enableCors({
+        origin: 'https://money-minder-xi.vercel.app'
+    });
+    await app.listen(process.env.PORT || 7373);
 };
-startServer();
+bootstrap();
 //# sourceMappingURL=main.js.map
