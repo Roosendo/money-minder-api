@@ -41,7 +41,9 @@ export const bootstrap = async (): Promise<NestExpressApplication> => {
   }
 
   if (corsConfig.enabled) {
-    app.enableCors()
+    app.enableCors({
+      origin: corsConfig.allowedOrigins
+    })
   }
 
   return app

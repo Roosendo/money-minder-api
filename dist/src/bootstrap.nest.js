@@ -30,7 +30,9 @@ const bootstrap = async () => {
         swagger_1.SwaggerModule.setup(swaggerConfig.path || 'api', app, document);
     }
     if (corsConfig.enabled) {
-        app.enableCors();
+        app.enableCors({
+            origin: corsConfig.allowedOrigins
+        });
     }
     return app;
 };
