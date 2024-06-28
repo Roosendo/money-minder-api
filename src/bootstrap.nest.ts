@@ -44,13 +44,7 @@ export const bootstrap = async (): Promise<NestExpressApplication> => {
 
   if (corsConfig.enabled) {
     app.enableCors({
-      origin: (origin, callback) => {
-        if (!origin || corsConfig.allowedOrigins.includes(origin)) {
-          callback(null, true)
-        } else {
-          callback(new Error('Not allowed by CORS'))
-        }
-      },
+      origin: /https:\/\/money-minder-xi\.vercel\.app$/,
       methods: ['GET', 'POST', 'DELETE', 'PATCH'],
       allowedHeaders: ['Content-Type', 'Authorization'],
       credentials: true
