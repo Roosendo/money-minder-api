@@ -20,7 +20,16 @@ const bootstrap = async () => {
   const document = SwaggerModule.createDocument(app, config)
   SwaggerModule.setup('api', app, document)
 
-  app.enableCors()
+  app.enableCors({
+    origin: [
+      'http://localhost:4321',
+      'https://money-minder-xi.vercel.app',
+      'https://money-minder-xi.vercel.app/*'
+    ],
+    methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+  })
 
   await app.listen(process.env.PORT || 7373)
 }

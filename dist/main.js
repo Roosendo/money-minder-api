@@ -17,7 +17,16 @@ const bootstrap = async () => {
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, config);
     swagger_1.SwaggerModule.setup('api', app, document);
-    app.enableCors();
+    app.enableCors({
+        origin: [
+            'http://localhost:4321',
+            'https://money-minder-xi.vercel.app',
+            'https://money-minder-xi.vercel.app/*'
+        ],
+        methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        credentials: true
+    });
     await app.listen(process.env.PORT || 7373);
 };
 bootstrap();
