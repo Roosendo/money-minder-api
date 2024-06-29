@@ -16,7 +16,13 @@ describe('AppController', () => {
 
   describe('root', () => {
     it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!')
+      expect(appController.getHello()).toBe('Hi there you fantastic person!')
+    })
+  })
+
+  describe('ping', () => {
+    it('should return "pong 🎾"', () => {
+      expect(appController.getPing()).toBe('pong 🎾')
     })
   })
 })
