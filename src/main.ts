@@ -28,6 +28,7 @@ const bootstrap = async () => {
     ],
     methods: ['GET', 'POST', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 204,
     credentials: true
   })
 
