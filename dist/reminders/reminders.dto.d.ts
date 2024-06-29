@@ -10,7 +10,7 @@ export declare class GetRemindersDto {
 }
 export declare class DeleteReminderDto {
     email: string;
-    id: number;
+    id: string;
 }
 export declare class UpdateReminderDto {
     email: string;

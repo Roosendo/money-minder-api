@@ -56,7 +56,7 @@ __decorate([
 ], SavingsController.prototype, "getSavings", null);
 __decorate([
     (0, common_1.Delete)('delete-saving'),
-    __param(0, (0, common_1.Body)()),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [savings_dto_1.DeleteSavingDto]),
     __metadata("design:returntype", Promise)

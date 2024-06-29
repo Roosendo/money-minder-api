@@ -59,9 +59,9 @@ __decorate([
     __metadata("design:type", String)
 ], DeleteReminderDto.prototype, "email", void 0);
 __decorate([
-    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", Number)
+    __metadata("design:type", String)
 ], DeleteReminderDto.prototype, "id", void 0);
 class UpdateReminderDto {
 }

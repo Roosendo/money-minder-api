@@ -32,7 +32,7 @@ export class SavingsController {
   }
 
   @Delete('delete-saving')
-  async deleteSaving (@Body() deleteSavingDto: DeleteSavingDto) {
+  async deleteSaving (@Query() deleteSavingDto: DeleteSavingDto) {
     return this.savingsService.deleteSaving(deleteSavingDto)
   }
 

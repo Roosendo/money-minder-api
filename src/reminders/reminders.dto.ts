@@ -36,9 +36,9 @@ export class DeleteReminderDto {
   @IsNotEmpty()
     email: string
 
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-    id: number
+    id: string
 }
 
 export class UpdateReminderDto {

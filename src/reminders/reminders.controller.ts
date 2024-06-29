@@ -32,7 +32,7 @@ export class RemindersController {
   }
 
   @Delete('delete-reminder')
-  async deleteReminder (@Body() deleteReminderDto: DeleteReminderDto) {
+  async deleteReminder (@Query() deleteReminderDto: DeleteReminderDto) {
     return this.remindersService.deleteReminder(deleteReminderDto)
   }
 

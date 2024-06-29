@@ -12,7 +12,7 @@ export declare class GetSavingsDto {
 }
 export declare class DeleteSavingDto {
     email: string;
-    id: number;
+    id: string;
 }
 export declare class UpdateSavingDto {
     newCurrentAmount: number;

@@ -45,9 +45,9 @@ export class DeleteSavingDto {
   @IsEmail()
     email: string
 
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-    id: number
+    id: string
 }
 
 export class UpdateSavingDto {
