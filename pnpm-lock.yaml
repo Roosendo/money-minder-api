@@ -41,9 +41,6 @@ importers:
       class-validator:
         specifier: 0.14.1
         version: 0.14.1
-      cors:
-        specifier: 2.8.5
-        version: 2.8.5
       dotenv:
         specifier: 16.4.5
         version: 16.4.5
@@ -5777,7 +5774,7 @@ snapshots:
     dependencies:
       eslint: 8.57.0
 
-  eslint-config-standard@12.0.0(eslint-plugin-import@2.29.1(@typescript-eslint/parser@1.13.0(eslint@5.16.0))(eslint@5.16.0))(eslint-plugin-node@9.2.0(eslint@8.57.0))(eslint-plugin-promise@4.3.1)(eslint-plugin-standard@4.1.0(eslint@5.16.0))(eslint@5.16.0):
+  eslint-config-standard@12.0.0(eslint-plugin-import@2.29.1(@typescript-eslint/parser@1.13.0(eslint@5.16.0))(eslint@5.16.0))(eslint-plugin-node@9.2.0(eslint@8.57.0))(eslint-plugin-promise@4.3.1)(eslint-plugin-standard@4.1.0(eslint@8.57.0))(eslint@5.16.0):
     dependencies:
       eslint: 5.16.0
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@6.0.0(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)
@@ -5791,7 +5788,7 @@ snapshots:
       '@typescript-eslint/parser': 1.13.0(eslint@5.16.0)
       ajv: 6.12.6
       eslint: 5.16.0
-      eslint-config-standard: 12.0.0(eslint-plugin-import@2.29.1(@typescript-eslint/parser@1.13.0(eslint@5.16.0))(eslint@5.16.0))(eslint-plugin-node@9.2.0(eslint@8.57.0))(eslint-plugin-promise@4.3.1)(eslint-plugin-standard@4.1.0(eslint@5.16.0))(eslint@5.16.0)
+      eslint-config-standard: 12.0.0(eslint-plugin-import@2.29.1(@typescript-eslint/parser@1.13.0(eslint@5.16.0))(eslint@5.16.0))(eslint-plugin-node@9.2.0(eslint@8.57.0))(eslint-plugin-promise@4.3.1)(eslint-plugin-standard@4.1.0(eslint@8.57.0))(eslint@5.16.0)
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@6.0.0(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)
       eslint-plugin-node: 9.2.0(eslint@5.16.0)
       eslint-plugin-promise: 4.3.1
