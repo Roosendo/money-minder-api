@@ -6,14 +6,8 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: ['@typescript-eslint/eslint-plugin'],
-  extends: ['ts-standard',],
-  overrides: [
-    {
-      files: ['*.ts'],
-      parserOptions: {
-        parser: '@typescript-eslint/parser'
-      }
-    }
+  extends: [
+    'plugin:prettier/recommended'
   ],
   root: true,
   env: {

@@ -9,19 +9,20 @@ import {
   CategoriesDto,
   RecentTransactionsDto
 } from './specials.dto'
-import { AllExceptionsFilter } from '@middlewares/errors'
+import { AllExceptionsFilter } from '@/middlewares/errors'
 
 @Controller('api/specials')
 @UseFilters(AllExceptionsFilter)
 export class SpecialsController {
-  constructor (
+  constructor(
     private readonly specialsService: SpecialsService,
     private readonly entryService: EntryService,
     private readonly exitService: ExitService
-  ) { }
+  ) {}
 
   @Get('financial-summary-yearly')
-  async getFinancialSummaryYearly (@Query() financialSummaryYearlyDto: FinancialSummaryYearlyDto) { // TODO: fix any
+  async getFinancialSummaryYearly(@Query() financialSummaryYearlyDto: FinancialSummaryYearlyDto) {
+    // TODO: fix any
     const entries = await this.entryService.getYearlySummary(financialSummaryYearlyDto)
     const exits = await this.exitService.getYearlySummary(financialSummaryYearlyDto)
 
@@ -32,7 +33,9 @@ export class SpecialsController {
   }
 
   @Get('financial-summary-monthly')
-  async getFinancialSummaryMonthly (@Query() financialSummaryMonthlyDto: FinancialSummaryMonthlyDto) {
+  async getFinancialSummaryMonthly(
+    @Query() financialSummaryMonthlyDto: FinancialSummaryMonthlyDto
+  ) {
     const entries = await this.entryService.getMonthlySummary(financialSummaryMonthlyDto)
     const exits = await this.exitService.getMonthlySummary(financialSummaryMonthlyDto)
 
@@ -43,17 +46,17 @@ export class SpecialsController {
   }
 
   @Get('cash-flow')
-  async getCashFlow (@Query() cashFlowDto: CashFlowDto) {
+  async getCashFlow(@Query() cashFlowDto: CashFlowDto) {
     return this.specialsService.getCashFlow(cashFlowDto)
   }
 
   @Get('yearly-categories')
-  async getCategories (@Query() categoriesDto: CategoriesDto) {
+  async getCategories(@Query() categoriesDto: CategoriesDto) {
     return this.specialsService.getCategories(categoriesDto)
   }
 
   @Get('recent-transactions')
-  async getRecentTransactions (@Query() recentTransactionsDto: RecentTransactionsDto) {
+  async getRecentTransactions(@Query() recentTransactionsDto: RecentTransactionsDto) {
     return this.specialsService.getRecentTransactions(recentTransactionsDto)
   }
 }

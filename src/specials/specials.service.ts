@@ -1,16 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common'
-import {
-  CashFlowDto,
-  CategoriesDto,
-  RecentTransactionsDto
-} from './specials.dto'
+import { CashFlowDto, CategoriesDto, RecentTransactionsDto } from './specials.dto'
 import { Client } from '@libsql/client/.'
 
 @Injectable()
 export class SpecialsService {
-  constructor (@Inject('DATABASE_CLIENT') private readonly client: Client) { }
+  constructor(@Inject('DATABASE_CLIENT') private readonly client: Client) {}
 
-  async getCashFlow ({ email, year }: CashFlowDto) {
+  async getCashFlow({ email, year }: CashFlowDto) {
     const cashFlow = await this.client.execute({
       sql: `SELECT
             month,
@@ -54,7 +50,7 @@ export class SpecialsService {
     return cashFlow.rows
   }
 
-  async getCategories ({ email, year }: CategoriesDto) {
+  async getCategories({ email, year }: CategoriesDto) {
     const categories = await this.client.execute({
       sql: `SELECT category, SUM(amount) AS total
       FROM (
@@ -74,7 +70,7 @@ export class SpecialsService {
     return categories.rows
   }
 
-  async getRecentTransactions ({ email, year }: RecentTransactionsDto) {
+  async getRecentTransactions({ email, year }: RecentTransactionsDto) {
     const transactions = await this.client.execute({
       sql: `SELECT
             date,

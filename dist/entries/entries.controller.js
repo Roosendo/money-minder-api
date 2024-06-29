@@ -24,7 +24,10 @@ let EntryController = class EntryController {
         this.usersService = usersService;
     }
     async newEntry(createEntryDto) {
-        const createUserDto = { email: createEntryDto.email, fullName: createEntryDto.fullName };
+        const createUserDto = {
+            email: createEntryDto.email,
+            fullName: createEntryDto.fullName
+        };
         await this.usersService.createUser(createUserDto);
         return this.entryService.newEntry(createEntryDto);
     }

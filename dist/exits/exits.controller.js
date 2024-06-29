@@ -24,7 +24,10 @@ let ExitController = class ExitController {
         this.usersService = usersService;
     }
     async newExpense(createExpenseDto) {
-        const createUserDto = { email: createExpenseDto.email, fullName: createExpenseDto.fullName };
+        const createUserDto = {
+            email: createExpenseDto.email,
+            fullName: createExpenseDto.fullName
+        };
         await this.usersService.createUser(createUserDto);
         return this.exitService.newExpense(createExpenseDto);
     }

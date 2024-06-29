@@ -9,4 +9,4 @@ import { UsersModule } from '@/users/users.module'
   providers: [RemindersService],
   controllers: [RemindersController]
 })
-export class RemindersModule { }
+export class RemindersModule {}

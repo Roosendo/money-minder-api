@@ -4,9 +4,9 @@ import { Client } from '@libsql/client/.'
 
 @Injectable()
 export class UsersService {
-  constructor (@Inject('DATABASE_CLIENT') private readonly client: Client) { }
+  constructor(@Inject('DATABASE_CLIENT') private readonly client: Client) {}
 
-  async createUser ({ email, fullName }: CreateUserDto) {
+  async createUser({ email, fullName }: CreateUserDto) {
     const user = await this.client.execute({
       sql: 'SELECT email FROM users WHERE email = ?',
       args: [email]

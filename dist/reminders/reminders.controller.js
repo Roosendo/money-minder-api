@@ -24,7 +24,10 @@ let RemindersController = class RemindersController {
         this.usersService = usersService;
     }
     async newReminder(createReminderDto) {
-        const createUserDto = { email: createReminderDto.email, fullName: createReminderDto.fullName };
+        const createUserDto = {
+            email: createReminderDto.email,
+            fullName: createReminderDto.fullName
+        };
         await this.usersService.createUser(createUserDto);
         return this.remindersService.newReminder(createReminderDto);
     }

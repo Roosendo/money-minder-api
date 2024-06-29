@@ -5,10 +5,10 @@ import { AllExceptionsFilter } from '@/middlewares/errors'
 @Controller('api/phrases')
 @UseFilters(AllExceptionsFilter)
 export class PhrasesController {
-  constructor (private readonly phrasesService: PhrasesService) { }
+  constructor(private readonly phrasesService: PhrasesService) {}
 
   @Get('daily-phrase')
-  async getPhrases () {
+  async getPhrases() {
     const today = new Date()
     const phrases = await this.phrasesService.getPhrases()
     const index = today.getDate() % phrases.length

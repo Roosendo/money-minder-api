@@ -24,7 +24,10 @@ let SavingsController = class SavingsController {
         this.usersService = usersService;
     }
     async newSaving(createSavingDto) {
-        const createUserDto = { email: createSavingDto.email, fullName: createSavingDto.fullName };
+        const createUserDto = {
+            email: createSavingDto.email,
+            fullName: createSavingDto.fullName
+        };
         await this.usersService.createUser(createUserDto);
         return this.savingsService.newSaving(createSavingDto);
     }

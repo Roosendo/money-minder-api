@@ -9,4 +9,4 @@ import { UsersModule } from '@/users/users.module'
   controllers: [EntryController],
   providers: [EntryService]
 })
-export class EntryModule { }
+export class EntryModule {}

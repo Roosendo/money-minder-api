@@ -10,4 +10,4 @@ import { DatabaseModule } from '@/config/database.module'
   providers: [SpecialsService, EntryService, ExitService],
   controllers: [SpecialsController]
 })
-export class SpecialsModule { }
+export class SpecialsModule {}

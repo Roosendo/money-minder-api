@@ -3,7 +3,7 @@ import * as phrases from '../phrases.json'
 
 @Injectable()
 export class PhrasesService {
-  async getPhrases () {
+  async getPhrases() {
     return phrases
   }
 }

@@ -13,31 +13,34 @@ import { AllExceptionsFilter } from '@/middlewares/errors'
 @Controller('api/reminders')
 @UseFilters(AllExceptionsFilter)
 export class RemindersController {
-  constructor (
+  constructor(
     private readonly remindersService: RemindersService,
     private readonly usersService: UsersService
-  ) { }
+  ) {}
 
   @Post('new-reminder')
-  async newReminder (@Body() createReminderDto: CreateReminderDto) {
-    const createUserDto: CreateUserDto = { email: createReminderDto.email, fullName: createReminderDto.fullName }
+  async newReminder(@Body() createReminderDto: CreateReminderDto) {
+    const createUserDto: CreateUserDto = {
+      email: createReminderDto.email,
+      fullName: createReminderDto.fullName
+    }
     await this.usersService.createUser(createUserDto)
     return this.remindersService.newReminder(createReminderDto)
   }
 
   @Get('get-reminders')
-  async getReminders (@Query() getRemindersDto: GetRemindersDto) {
+  async getReminders(@Query() getRemindersDto: GetRemindersDto) {
     const reminders = await this.remindersService.getReminders(getRemindersDto)
     return reminders
   }
 
   @Delete('delete-reminder')
-  async deleteReminder (@Query() deleteReminderDto: DeleteReminderDto) {
+  async deleteReminder(@Query() deleteReminderDto: DeleteReminderDto) {
     return this.remindersService.deleteReminder(deleteReminderDto)
   }
 
   @Patch('update-reminder')
-  async updateReminder (@Body() updateReminderDto: UpdateReminderDto) {
+  async updateReminder(@Body() updateReminderDto: UpdateReminderDto) {
     return this.remindersService.updateReminder(updateReminderDto)
   }
 }

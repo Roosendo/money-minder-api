@@ -3,65 +3,73 @@ import { IsDateString, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString } fro
 export class CreateReminderDto {
   @IsString()
   @IsOptional()
-    description?: string
+  description?: string
 
   @IsEmail()
   @IsNotEmpty()
-    email: string
+  email: string
 
   @IsString()
   @IsOptional()
-    fullName?: string
+  fullName?: string
 
   @IsString()
-  @IsDateString({}, {
-    message: 'reminderDate must be a valid ISO 8601 date string (e.g., 2024-06-24 or 2024-06-24T11:25:00).'
-  })
+  @IsDateString(
+    {},
+    {
+      message:
+        'reminderDate must be a valid ISO 8601 date string (e.g., 2024-06-24 or 2024-06-24T11:25:00).'
+    }
+  )
   @IsNotEmpty()
-    reminderDate: string
+  reminderDate: string
 
   @IsString()
   @IsNotEmpty()
-    title: string
+  title: string
 }
 
 export class GetRemindersDto {
   @IsEmail()
   @IsNotEmpty()
-    email: string
+  email: string
 }
 
 export class DeleteReminderDto {
   @IsEmail()
   @IsNotEmpty()
-    email: string
+  email: string
 
   @IsString()
   @IsNotEmpty()
-    id: string
+  id: string
 }
 
 export class UpdateReminderDto {
   @IsEmail()
   @IsNotEmpty()
-    email: string
+  email: string
 
   @IsNumber()
   @IsNotEmpty()
-    id: number
+  id: number
 
   @IsString()
   @IsNotEmpty()
-    newDescription: string
+  newDescription: string
 
   @IsString()
-  @IsDateString({}, {
-    message: 'newReminderDate must be a valid ISO 8601 date string (e.g., 2024-06-24 or 2024-06-24T11:25:00).'
-  })
+  @IsDateString(
+    {},
+    {
+      message:
+        'newReminderDate must be a valid ISO 8601 date string (e.g., 2024-06-24 or 2024-06-24T11:25:00).'
+    }
+  )
   @IsNotEmpty()
-    newDate: string
+  newDate: string
 
   @IsString()
   @IsNotEmpty()
-    newTitle: string
+  newTitle: string
 }

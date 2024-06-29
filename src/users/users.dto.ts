@@ -3,9 +3,9 @@ import { IsString, IsNotEmpty, IsEmail } from 'class-validator'
 export class CreateUserDto {
   @IsNotEmpty()
   @IsEmail()
-    email: string
+  email: string
 
   @IsNotEmpty()
   @IsString()
-    fullName: string
+  fullName: string
 }
