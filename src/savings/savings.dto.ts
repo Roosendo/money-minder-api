@@ -11,7 +11,7 @@ export class CreateSavingDto {
     {},
     {
       message:
-        'newReminderDate must be a valid ISO 8601 date string (e.g., 2024-06-24 or 2024-06-24T11:25:00).'
+        'endDate must be a valid ISO 8601 date string (e.g., 2024-06-24 or 2024-06-24T11:25:00).'
     }
   )
   endDate: string
