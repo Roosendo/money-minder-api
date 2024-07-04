@@ -14,10 +14,13 @@ export class SavingsService {
     startDate,
     endDate
   }: CreateSavingDto) {
-    await this.client.execute({
-      sql: 'INSERT INTO savings_goals (user_email, name, target_amount, current_amount, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?)',
+    const saving = await this.client.execute({
+      sql: 'INSERT INTO savings_goals (user_email, name, target_amount, current_amount, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?) RETURNING id',
       args: [email, name, targetAmount, currentAmount, startDate, endDate]
     })
+
+    const id = saving.rows[0]?.id
+    return { id }
   }
 
   async getSavings({ email }: GetSavingsDto) {

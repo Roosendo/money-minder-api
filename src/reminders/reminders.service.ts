@@ -12,10 +12,13 @@ export class RemindersService {
   constructor(@Inject('DATABASE_CLIENT') private readonly client: Client) {}
 
   async newReminder({ email, title, description, reminderDate }: CreateReminderDto) {
-    await this.client.execute({
-      sql: 'INSERT INTO reminders (user_email, title, description, reminder_date) VALUES (?, ?, ?, ?)',
+    const result = await this.client.execute({
+      sql: 'INSERT INTO reminders (user_email, title, description, reminder_date) VALUES (?, ?, ?, ?) RETURNING id',
       args: [email, title, description, reminderDate]
     })
+
+    const id = result.rows[0]?.id
+    return { id }
   }
 
   async getReminders({ email }: GetRemindersDto) {
