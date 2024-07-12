@@ -5,7 +5,9 @@ export declare class RemindersController {
     private readonly remindersService;
     private readonly usersService;
     constructor(remindersService: RemindersService, usersService: UsersService);
-    newReminder(createReminderDto: CreateReminderDto): Promise<void>;
+    newReminder(createReminderDto: CreateReminderDto): Promise<{
+        id: import("@libsql/client/.").Value;
+    }>;
     getReminders(getRemindersDto: GetRemindersDto): Promise<import("@libsql/client/.").Row[]>;
     deleteReminder(deleteReminderDto: DeleteReminderDto): Promise<void>;
     updateReminder(updateReminderDto: UpdateReminderDto): Promise<void>;

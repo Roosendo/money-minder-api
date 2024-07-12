@@ -5,7 +5,9 @@ export declare class SavingsController {
     private readonly savingsService;
     private readonly usersService;
     constructor(savingsService: SavingsService, usersService: UsersService);
-    newSaving(createSavingDto: CreateSavingDto): Promise<void>;
+    newSaving(createSavingDto: CreateSavingDto): Promise<{
+        id: import("@libsql/client/.").Value;
+    }>;
     getSavings(getSavingsDto: GetSavingsDto): Promise<import("@libsql/client/.").Row[]>;
     deleteSaving(deleteSavingDto: DeleteSavingDto): Promise<void>;
     updateSaving(updateSavingDto: UpdateSavingDto): Promise<void>;
