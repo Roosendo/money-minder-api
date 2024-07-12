@@ -10,6 +10,7 @@ import { PhrasesModule } from './phrases/phrases.module'
 import { RemindersModule } from './reminders/reminders.module'
 import { SavingsModule } from './savings/savings.module'
 import { SpecialsModule } from './specials/specials.module'
+import { AuthModule } from './auth/auth.module'
 
 @Module({
   imports: [
@@ -23,9 +24,10 @@ import { SpecialsModule } from './specials/specials.module'
     RemindersModule,
     SavingsModule,
     SpecialsModule,
-    DatabaseModule
+    DatabaseModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService]
 })
-export class AppModule { }
+export class AppModule {}
