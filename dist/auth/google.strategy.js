@@ -18,18 +18,17 @@ let GoogleStrategy = class GoogleStrategy extends (0, passport_1.PassportStrateg
         super({
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: 'http://localhost:7373/api/google/redirect',
+            callbackURL: 'https://money-minder-api.vercel.app/api/google/redirect',
             scope: ['email', 'profile']
         });
     }
-    async validate(accessToken, _refreshToken, profile, _done) {
+    async validate(_accessToken, _refreshToken, profile, _done) {
         const { name, emails, photos } = profile;
         const user = {
             email: emails[0].value,
             firstName: name.givenName,
             lastName: name.familyName,
-            picture: photos[0].value,
-            accessToken
+            picture: photos[0].value
         };
         return user;
     }

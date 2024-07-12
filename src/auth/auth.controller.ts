@@ -1,7 +1,7 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common'
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { AuthGuard } from '@nestjs/passport'
-import { Request } from 'express'
+import { Request, Response } from 'express'
 
 @Controller('api')
 export class AuthController {
@@ -13,7 +13,9 @@ export class AuthController {
 
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
-  googleAuthRedirect(@Req() req: Request) {
-    return this.authService.googleLogin(req)
+  googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
+    const user = this.authService.googleLogin(req)
+    const frontendURL = `https://money-minder-xi.vercel.app/login?user=${encodeURIComponent(JSON.stringify(user))}`
+    res.redirect(frontendURL)
   }
 }

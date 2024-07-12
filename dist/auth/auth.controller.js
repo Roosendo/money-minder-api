@@ -21,8 +21,10 @@ let AuthController = class AuthController {
         this.authService = authService;
     }
     async googleAuth(_req) { }
-    googleAuthRedirect(req) {
-        return this.authService.googleLogin(req);
+    googleAuthRedirect(req, res) {
+        const user = this.authService.googleLogin(req);
+        const frontendURL = `https://money-minder-xi.vercel.app/login?user=${encodeURIComponent(JSON.stringify(user))}`;
+        res.redirect(frontendURL);
     }
 };
 exports.AuthController = AuthController;
@@ -38,8 +40,9 @@ __decorate([
     (0, common_1.Get)('google/redirect'),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('google')),
     __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "googleAuthRedirect", null);
 exports.AuthController = AuthController = __decorate([

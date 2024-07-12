@@ -2,6 +2,6 @@ import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 declare const GoogleStrategy_base: new (...args: any[]) => InstanceType<typeof Strategy>;
 export declare class GoogleStrategy extends GoogleStrategy_base {
     constructor();
-    validate(accessToken: string, _refreshToken: string, profile: any, _done: VerifyCallback): Promise<any>;
+    validate(_accessToken: string, _refreshToken: string, profile: any, _done: VerifyCallback): Promise<any>;
 }
 export {};

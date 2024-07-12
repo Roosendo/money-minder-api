@@ -9,13 +9,13 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     super({
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: 'http://localhost:7373/api/google/redirect',
+      callbackURL: 'https://money-minder-api.vercel.app/api/google/redirect',
       scope: ['email', 'profile']
     })
   }
 
   async validate(
-    accessToken: string,
+    _accessToken: string,
     _refreshToken: string,
     profile: any,
     _done: VerifyCallback
@@ -25,8 +25,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       email: emails[0].value,
       firstName: name.givenName,
       lastName: name.familyName,
-      picture: photos[0].value,
-      accessToken
+      picture: photos[0].value
     }
     return user
   }
