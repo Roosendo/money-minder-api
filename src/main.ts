@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core'
 import { ValidationPipe } from '@nestjs/common'
 import { AppModule } from './app.module'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
+import * as cookieParser from 'cookie-parser'
 
 const bootstrap = async () => {
   const app = await NestFactory.create(AppModule)
@@ -31,6 +32,8 @@ const bootstrap = async () => {
     optionsSuccessStatus: 204,
     credentials: true
   })
+
+  app.use(cookieParser())
 
   await app.listen(process.env.PORT || 7373)
 }

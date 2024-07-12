@@ -5,6 +5,7 @@ const core_1 = require("@nestjs/core");
 const common_1 = require("@nestjs/common");
 const app_module_1 = require("./app.module");
 const swagger_1 = require("@nestjs/swagger");
+const cookieParser = require("cookie-parser");
 const bootstrap = async () => {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.useGlobalPipes(new common_1.ValidationPipe());
@@ -28,6 +29,7 @@ const bootstrap = async () => {
         optionsSuccessStatus: 204,
         credentials: true
     });
+    app.use(cookieParser());
     await app.listen(process.env.PORT || 7373);
 };
 bootstrap();

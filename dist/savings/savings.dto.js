@@ -23,7 +23,7 @@ __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsDateString)({}, {
-        message: 'newReminderDate must be a valid ISO 8601 date string (e.g., 2024-06-24 or 2024-06-24T11:25:00).'
+        message: 'endDate must be a valid ISO 8601 date string (e.g., 2024-06-24 or 2024-06-24T11:25:00).'
     }),
     __metadata("design:type", String)
 ], CreateSavingDto.prototype, "endDate", void 0);
