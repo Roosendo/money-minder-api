@@ -10,7 +10,7 @@ export class GitHubStrategy extends PassportStrategy(Strategy, 'github') {
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
       callbackURL: 'https://money-minder-api.vercel.app/api/github/redirect',
-      scope: ['email', 'profile']
+      scope: ['user:email']
     })
   }
 

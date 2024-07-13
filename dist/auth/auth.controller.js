@@ -29,6 +29,7 @@ let AuthController = class AuthController {
     async githubAuth(_req) { }
     githubAuthRedirect(req, res) {
         const user = this.authService.githubLogin(req);
+        console.log(user);
         const frontendURL = `https://money-minder-xi.vercel.app/login?user=${encodeURIComponent(JSON.stringify(user))}`;
         res.redirect(frontendURL);
     }
