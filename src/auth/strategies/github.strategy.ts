@@ -20,12 +20,12 @@ export class GitHubStrategy extends PassportStrategy(Strategy, 'github') {
     profile: Profile,
     _done: () => void
   ): Promise<any> {
-    const { name, emails, photos } = profile
+    const { username, emails, photos } = profile
     const user = {
-      email: emails[0].value,
-      firstName: name.givenName,
-      lastName: name.familyName,
-      picture: photos[0].value
+      email: emails?.[0]?.value || '',
+      firstName: profile?.name?.givenName || username || '',
+      lastName: profile?.name?.familyName || '',
+      picture: photos?.[0]?.value || ''
     }
     return user
   }

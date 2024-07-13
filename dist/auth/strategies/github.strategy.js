@@ -23,12 +23,12 @@ let GitHubStrategy = class GitHubStrategy extends (0, passport_1.PassportStrateg
         });
     }
     async validate(_accessToken, _refreshToken, profile, _done) {
-        const { name, emails, photos } = profile;
+        const { username, emails, photos } = profile;
         const user = {
-            email: emails[0].value,
-            firstName: name.givenName,
-            lastName: name.familyName,
-            picture: photos[0].value
+            email: emails?.[0]?.value || '',
+            firstName: profile?.name?.givenName || username || '',
+            lastName: profile?.name?.familyName || '',
+            picture: photos?.[0]?.value || ''
         };
         return user;
     }
