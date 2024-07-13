@@ -14,6 +14,11 @@ let AuthService = class AuthService {
             return 'No user from google';
         return { user: req.user };
     }
+    githubLogin(req) {
+        if (!req.user)
+            return 'No user from github';
+        return { user: req.user };
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([

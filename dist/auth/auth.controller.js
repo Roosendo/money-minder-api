@@ -26,6 +26,12 @@ let AuthController = class AuthController {
         const frontendURL = `https://money-minder-xi.vercel.app/login?user=${encodeURIComponent(JSON.stringify(user))}`;
         res.redirect(frontendURL);
     }
+    async githubAuth(_req) { }
+    githubAuthRedirect(req, res) {
+        const user = this.authService.githubLogin(req);
+        const frontendURL = `https://money-minder-xi.vercel.app/login?user=${encodeURIComponent(JSON.stringify(user))}`;
+        res.redirect(frontendURL);
+    }
 };
 exports.AuthController = AuthController;
 __decorate([
@@ -45,6 +51,23 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "googleAuthRedirect", null);
+__decorate([
+    (0, common_1.Get)('github'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('github')),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "githubAuth", null);
+__decorate([
+    (0, common_1.Get)('github/redirect'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('github')),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "githubAuthRedirect", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('api'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])
