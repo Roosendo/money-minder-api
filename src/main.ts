@@ -23,6 +23,7 @@ const bootstrap = async () => {
   app.enableCors({
     origin: [
       'http://localhost:4321',
+      'http://localhost:4200',
       'https://money-minder-xi.vercel.app',
       'https://money-minder-xi.vercel.app/*'
     ],
