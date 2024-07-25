@@ -26,7 +26,7 @@ let EntryService = class EntryService {
     }
     async getEntries({ email }) {
         const entries = await this.client.execute({
-            sql: 'SELECT amount, description, category, DATE FROM money_entries WHERE user_email = ? ORDER BY entry_id DESC LIMIT 15',
+            sql: 'SELECT amount, description, category, DATE, entry_id FROM money_entries WHERE user_email = ? ORDER BY entry_id DESC LIMIT 15',
             args: [email]
         });
         return entries.rows;

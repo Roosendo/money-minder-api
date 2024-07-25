@@ -26,7 +26,7 @@ let ExitService = class ExitService {
     }
     async getExits({ email }) {
         const expenses = await this.client.execute({
-            sql: 'SELECT amount, description, category, date FROM money_exits WHERE user_email = ? ORDER BY exit_id DESC LIMIT 15',
+            sql: 'SELECT amount, description, category, date, exit_id FROM money_exits WHERE user_email = ? ORDER BY exit_id DESC LIMIT 15',
             args: [email]
         });
         return expenses.rows;
