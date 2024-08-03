@@ -22,7 +22,9 @@ const bootstrap = async () => {
             'http://localhost:4321',
             'http://localhost:4200',
             'https://money-minder-xi.vercel.app',
-            'https://money-minder-xi.vercel.app/*'
+            'https://money-minder-xi.vercel.app/*',
+            'https://rosendo-garcia.vercel.app',
+            'https://rosendo-garcia.vercel.app/*'
         ],
         methods: ['GET', 'POST', 'PATCH', 'DELETE'],
         allowedHeaders: ['Content-Type', 'Authorization'],

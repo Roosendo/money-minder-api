@@ -11,6 +11,7 @@ import { RemindersModule } from './reminders/reminders.module'
 import { SavingsModule } from './savings/savings.module'
 import { SpecialsModule } from './specials/specials.module'
 import { AuthModule } from './auth/auth.module'
+import { EmailModule } from './email/email.module'
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { AuthModule } from './auth/auth.module'
     SavingsModule,
     SpecialsModule,
     DatabaseModule,
-    AuthModule
+    AuthModule,
+    EmailModule
   ],
   controllers: [AppController],
   providers: [AppService]
