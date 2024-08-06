@@ -21,6 +21,7 @@ const savings_module_1 = require("./savings/savings.module");
 const specials_module_1 = require("./specials/specials.module");
 const auth_module_1 = require("./auth/auth.module");
 const email_module_1 = require("./email/email.module");
+const cache_manager_1 = require("@nestjs/cache-manager");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -39,7 +40,12 @@ exports.AppModule = AppModule = __decorate([
             specials_module_1.SpecialsModule,
             database_module_1.DatabaseModule,
             auth_module_1.AuthModule,
-            email_module_1.EmailModule
+            email_module_1.EmailModule,
+            cache_manager_1.CacheModule.register({
+                ttl: 600,
+                max: 100,
+                isGlobal: true
+            })
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService]

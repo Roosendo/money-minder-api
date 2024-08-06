@@ -12,6 +12,7 @@ import { SavingsModule } from './savings/savings.module'
 import { SpecialsModule } from './specials/specials.module'
 import { AuthModule } from './auth/auth.module'
 import { EmailModule } from './email/email.module'
+import { CacheModule } from '@nestjs/cache-manager'
 
 @Module({
   imports: [
@@ -27,7 +28,12 @@ import { EmailModule } from './email/email.module'
     SpecialsModule,
     DatabaseModule,
     AuthModule,
-    EmailModule
+    EmailModule,
+    CacheModule.register({
+      ttl: 600, // seconds
+      max: 100, // maximum number of items in cache
+      isGlobal: true
+    })
   ],
   controllers: [AppController],
   providers: [AppService]
