@@ -1,12 +1,22 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { CashFlowDto, CategoriesDto, RecentTransactionsDto } from './specials.dto'
 import { Client } from '@libsql/client/.'
+import { CACHE_MANAGER, CacheKey, CacheStore, CacheTTL } from '@nestjs/cache-manager'
+import { CashFlowDto, CategoriesDto, RecentTransactionsDto } from './specials.dto'
 
 @Injectable()
 export class SpecialsService {
-  constructor(@Inject('DATABASE_CLIENT') private readonly client: Client) {}
+  constructor(
+    @Inject('DATABASE_CLIENT') private readonly client: Client,
+    @Inject(CACHE_MANAGER) private cacheManager: CacheStore
+  ) {}
 
+  @CacheKey('financialSummaryYearly')
+  @CacheTTL(60 * 1000)
   async getCashFlow({ email, year }: CashFlowDto) {
+    const cacheKey = `financialSummaryYearly_${email}_${year}`
+    const cacheData = await this.cacheManager.get(cacheKey)
+    if (cacheData) return cacheData
+
     const cashFlow = await this.client.execute({
       sql: `SELECT
             month,
@@ -47,10 +57,17 @@ export class SpecialsService {
       args: [year, email, year, email]
     })
 
+    await this.cacheManager.set(cacheKey, cashFlow.rows, { ttl: 60 * 1000 })
     return cashFlow.rows
   }
 
+  @CacheKey('categories')
+  @CacheTTL(60 * 1000)
   async getCategories({ email, year }: CategoriesDto) {
+    const cacheKey = `categories_${email}_${year}`
+    const cacheData = await this.cacheManager.get(cacheKey)
+    if (cacheData) return cacheData
+
     const categories = await this.client.execute({
       sql: `SELECT category, SUM(amount) AS total
       FROM (
@@ -67,10 +84,17 @@ export class SpecialsService {
       args: [email, year, email, year]
     })
 
+    await this.cacheManager.set(cacheKey, categories.rows, { ttl: 60 * 1000 })
     return categories.rows
   }
 
+  @CacheKey('recentTransactions')
+  @CacheTTL(60 * 1000)
   async getRecentTransactions({ email, year }: RecentTransactionsDto) {
+    const cacheKey = `recentTransactions_${email}_${year}`
+    const cacheData = await this.cacheManager.get(cacheKey)
+    if (cacheData) return cacheData
+
     const transactions = await this.client.execute({
       sql: `SELECT
             date,
@@ -119,6 +143,7 @@ export class SpecialsService {
       args: [email, year, email, year]
     })
 
+    await this.cacheManager.set(cacheKey, transactions.rows, { ttl: 60 * 1000 })
     return transactions.rows
   }
 }

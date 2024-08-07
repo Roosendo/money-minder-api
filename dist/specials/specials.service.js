@@ -14,11 +14,18 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpecialsService = void 0;
 const common_1 = require("@nestjs/common");
+const cache_manager_1 = require("@nestjs/cache-manager");
+const specials_dto_1 = require("./specials.dto");
 let SpecialsService = class SpecialsService {
-    constructor(client) {
+    constructor(client, cacheManager) {
         this.client = client;
+        this.cacheManager = cacheManager;
     }
     async getCashFlow({ email, year }) {
+        const cacheKey = `financialSummaryYearly_${email}_${year}`;
+        const cacheData = await this.cacheManager.get(cacheKey);
+        if (cacheData)
+            return cacheData;
         const cashFlow = await this.client.execute({
             sql: `SELECT
             month,
@@ -58,9 +65,14 @@ let SpecialsService = class SpecialsService {
             month`,
             args: [year, email, year, email]
         });
+        await this.cacheManager.set(cacheKey, cashFlow.rows, { ttl: 60 * 1000 });
         return cashFlow.rows;
     }
     async getCategories({ email, year }) {
+        const cacheKey = `categories_${email}_${year}`;
+        const cacheData = await this.cacheManager.get(cacheKey);
+        if (cacheData)
+            return cacheData;
         const categories = await this.client.execute({
             sql: `SELECT category, SUM(amount) AS total
       FROM (
@@ -76,9 +88,14 @@ let SpecialsService = class SpecialsService {
       `,
             args: [email, year, email, year]
         });
+        await this.cacheManager.set(cacheKey, categories.rows, { ttl: 60 * 1000 });
         return categories.rows;
     }
     async getRecentTransactions({ email, year }) {
+        const cacheKey = `recentTransactions_${email}_${year}`;
+        const cacheData = await this.cacheManager.get(cacheKey);
+        if (cacheData)
+            return cacheData;
         const transactions = await this.client.execute({
             sql: `SELECT
             date,
@@ -126,13 +143,36 @@ let SpecialsService = class SpecialsService {
           `,
             args: [email, year, email, year]
         });
+        await this.cacheManager.set(cacheKey, transactions.rows, { ttl: 60 * 1000 });
         return transactions.rows;
     }
 };
 exports.SpecialsService = SpecialsService;
+__decorate([
+    (0, cache_manager_1.CacheKey)('financialSummaryYearly'),
+    (0, cache_manager_1.CacheTTL)(60 * 1000),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [specials_dto_1.CashFlowDto]),
+    __metadata("design:returntype", Promise)
+], SpecialsService.prototype, "getCashFlow", null);
+__decorate([
+    (0, cache_manager_1.CacheKey)('categories'),
+    (0, cache_manager_1.CacheTTL)(60 * 1000),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [specials_dto_1.CategoriesDto]),
+    __metadata("design:returntype", Promise)
+], SpecialsService.prototype, "getCategories", null);
+__decorate([
+    (0, cache_manager_1.CacheKey)('recentTransactions'),
+    (0, cache_manager_1.CacheTTL)(60 * 1000),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [specials_dto_1.RecentTransactionsDto]),
+    __metadata("design:returntype", Promise)
+], SpecialsService.prototype, "getRecentTransactions", null);
 exports.SpecialsService = SpecialsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)('DATABASE_CLIENT')),
-    __metadata("design:paramtypes", [Object])
+    __param(1, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
+    __metadata("design:paramtypes", [Object, Object])
 ], SpecialsService);
 //# sourceMappingURL=specials.service.js.map

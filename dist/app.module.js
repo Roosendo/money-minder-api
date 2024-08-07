@@ -42,7 +42,7 @@ exports.AppModule = AppModule = __decorate([
             auth_module_1.AuthModule,
             email_module_1.EmailModule,
             cache_manager_1.CacheModule.register({
-                ttl: 600,
+                ttl: 60 * 1000,
                 max: 100,
                 isGlobal: true
             })

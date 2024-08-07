@@ -8,7 +8,7 @@ export declare class SavingsController {
     newSaving(createSavingDto: CreateSavingDto): Promise<{
         id: import("@libsql/client/.").Value;
     }>;
-    getSavings(getSavingsDto: GetSavingsDto): Promise<import("@libsql/client/.").Row[]>;
+    getSavings(getSavingsDto: GetSavingsDto): Promise<unknown>;
     deleteSaving(deleteSavingDto: DeleteSavingDto): Promise<void>;
     updateSaving(updateSavingDto: UpdateSavingDto): Promise<void>;
 }

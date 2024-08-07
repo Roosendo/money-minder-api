@@ -15,7 +15,7 @@ export declare class SpecialsController {
         totalEntries: import("@libsql/client/.").Value;
         totalExits: import("@libsql/client/.").Value;
     }>;
-    getCashFlow(cashFlowDto: CashFlowDto): Promise<import("@libsql/client/.").Row[]>;
-    getCategories(categoriesDto: CategoriesDto): Promise<import("@libsql/client/.").Row[]>;
-    getRecentTransactions(recentTransactionsDto: RecentTransactionsDto): Promise<import("@libsql/client/.").Row[]>;
+    getCashFlow(cashFlowDto: CashFlowDto): Promise<unknown>;
+    getCategories(categoriesDto: CategoriesDto): Promise<unknown>;
+    getRecentTransactions(recentTransactionsDto: RecentTransactionsDto): Promise<unknown>;
 }

@@ -6,6 +6,6 @@ export declare class ExitController {
     private readonly usersService;
     constructor(exitService: ExitService, usersService: UsersService);
     newExpense(createExpenseDto: CreateExpenseDto): Promise<void>;
-    getExits(getExitsDto: GetExitsDto): Promise<import("@libsql/client/.").Row[]>;
-    getExpensesByCategoryMonthly(monthlyExitDto: MonthlyExitDto): Promise<import("@libsql/client/.").Row[]>;
+    getExits(getExitsDto: GetExitsDto): Promise<unknown>;
+    getExpensesByCategoryMonthly(monthlyExitDto: MonthlyExitDto): Promise<unknown>;
 }

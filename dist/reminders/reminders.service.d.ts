@@ -1,12 +1,14 @@
-import { CreateReminderDto, GetRemindersDto, DeleteReminderDto, UpdateReminderDto } from './reminders.dto';
 import { Client } from '@libsql/client/.';
+import { CacheStore } from '@nestjs/cache-manager';
+import { CreateReminderDto, GetRemindersDto, DeleteReminderDto, UpdateReminderDto } from './reminders.dto';
 export declare class RemindersService {
     private readonly client;
-    constructor(client: Client);
+    private cacheManager;
+    constructor(client: Client, cacheManager: CacheStore);
     newReminder({ email, title, description, reminderDate }: CreateReminderDto): Promise<{
         id: import("@libsql/client/.").Value;
     }>;
-    getReminders({ email }: GetRemindersDto): Promise<import("@libsql/client/.").Row[]>;
+    getReminders({ email }: GetRemindersDto): Promise<unknown>;
     deleteReminder({ email, id }: DeleteReminderDto): Promise<void>;
     updateReminder({ email, id, newTitle, newDescription, newDate }: UpdateReminderDto): Promise<void>;
 }
