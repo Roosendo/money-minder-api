@@ -30,7 +30,7 @@ import { CacheModule } from '@nestjs/cache-manager'
     AuthModule,
     EmailModule,
     CacheModule.register({
-      ttl: 600, // seconds
+      ttl: 60 * 1000, // seconds
       max: 100, // maximum number of items in cache
       isGlobal: true
     })
