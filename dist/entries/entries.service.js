@@ -86,21 +86,21 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], EntryService.prototype, "getEntries", null);
 __decorate([
-    (0, cache_manager_1.CacheKey)('monthlyEntries'),
+    (0, cache_manager_1.CacheKey)('monthlyEntries_entries'),
     (0, cache_manager_1.CacheTTL)(60 * 1000),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [entries_dto_1.MonthlyEntryDto]),
     __metadata("design:returntype", Promise)
 ], EntryService.prototype, "getEntriesByCategoryMonthly", null);
 __decorate([
-    (0, cache_manager_1.CacheKey)('mothlySummary'),
+    (0, cache_manager_1.CacheKey)('mothlySummary_entries'),
     (0, cache_manager_1.CacheTTL)(60 * 1000),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [entries_dto_1.MonthlyEntryDto]),
     __metadata("design:returntype", Promise)
 ], EntryService.prototype, "getMonthlySummary", null);
 __decorate([
-    (0, cache_manager_1.CacheKey)('yearlySummary'),
+    (0, cache_manager_1.CacheKey)('yearlySummary_entries'),
     (0, cache_manager_1.CacheTTL)(60 * 1000),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [entries_dto_1.YearlyEntryDto]),

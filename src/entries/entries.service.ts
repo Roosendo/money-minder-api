@@ -39,7 +39,7 @@ export class EntryService {
     return entries.rows
   }
 
-  @CacheKey('monthlyEntries')
+  @CacheKey('monthlyEntries_entries')
   @CacheTTL(60 * 1000)
   async getEntriesByCategoryMonthly({ email, month, year }: MonthlyEntryDto) {
     const cacheKey = `monthlyEntries_${email}_${month}_${year}`
@@ -55,7 +55,7 @@ export class EntryService {
     return entries.rows
   }
 
-  @CacheKey('mothlySummary')
+  @CacheKey('mothlySummary_entries')
   @CacheTTL(60 * 1000)
   async getMonthlySummary({ email, month, year }: MonthlyEntryDto) {
     const cacheKey = `monthlySummary_${email}_${month}_${year}`
@@ -71,7 +71,7 @@ export class EntryService {
     return entries.rows
   }
 
-  @CacheKey('yearlySummary')
+  @CacheKey('yearlySummary_entries')
   @CacheTTL(60 * 1000)
   async getYearlySummary({ email, year }: YearlyEntryDto) {
     const cacheKey = `yearlySummary_${email}_${year}`

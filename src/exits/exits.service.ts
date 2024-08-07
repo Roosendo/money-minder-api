@@ -39,7 +39,7 @@ export class ExitService {
     return expenses.rows
   }
 
-  @CacheKey('monthlyExpenses')
+  @CacheKey('monthlyExpenses_exits')
   @CacheTTL(60 * 1000)
   async getExpensesByCategoryMonthly({ email, month, year }: MonthlyExitDto) {
     const cacheKey = `monthlyExpenses_${email}_${month}_${year}`
@@ -55,7 +55,7 @@ export class ExitService {
     return expenses.rows
   }
 
-  @CacheKey('mothlySummary')
+  @CacheKey('mothlySummary_exits')
   @CacheTTL(60 * 1000)
   async getMonthlySummary({ email, month, year }: MonthlyExitDto) {
     const cacheKey = `monthlySummary_${email}_${month}_${year}`
@@ -71,7 +71,7 @@ export class ExitService {
     return expenses.rows
   }
 
-  @CacheKey('yearlySummary')
+  @CacheKey('yearlySummary_exits')
   @CacheTTL(60 * 1000)
   async getYearlySummary({ email, year }: YearlyExitDto) {
     const cacheKey = `yearlySummary_${email}_${year}`

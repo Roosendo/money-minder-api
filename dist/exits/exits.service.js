@@ -86,21 +86,21 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ExitService.prototype, "getExits", null);
 __decorate([
-    (0, cache_manager_1.CacheKey)('monthlyExpenses'),
+    (0, cache_manager_1.CacheKey)('monthlyExpenses_exits'),
     (0, cache_manager_1.CacheTTL)(60 * 1000),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [exits_dto_1.MonthlyExitDto]),
     __metadata("design:returntype", Promise)
 ], ExitService.prototype, "getExpensesByCategoryMonthly", null);
 __decorate([
-    (0, cache_manager_1.CacheKey)('mothlySummary'),
+    (0, cache_manager_1.CacheKey)('mothlySummary_exits'),
     (0, cache_manager_1.CacheTTL)(60 * 1000),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [exits_dto_1.MonthlyExitDto]),
     __metadata("design:returntype", Promise)
 ], ExitService.prototype, "getMonthlySummary", null);
 __decorate([
-    (0, cache_manager_1.CacheKey)('yearlySummary'),
+    (0, cache_manager_1.CacheKey)('yearlySummary_exits'),
     (0, cache_manager_1.CacheTTL)(60 * 1000),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [exits_dto_1.YearlyExitDto]),
