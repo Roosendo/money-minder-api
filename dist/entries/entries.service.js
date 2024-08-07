@@ -41,7 +41,7 @@ let EntryService = class EntryService {
         return entries.rows;
     }
     async getEntriesByCategoryMonthly({ email, month, year }) {
-        const cacheKey = `monthlyEntries_${email}_${month}_${year}`;
+        const cacheKey = `monthlyEntries_entries_${email}_${month}_${year}`;
         const cacheData = await this.cacheManager.get(cacheKey);
         if (cacheData)
             return cacheData;
@@ -53,7 +53,7 @@ let EntryService = class EntryService {
         return entries.rows;
     }
     async getMonthlySummary({ email, month, year }) {
-        const cacheKey = `monthlySummary_${email}_${month}_${year}`;
+        const cacheKey = `monthlySummary_entries_${email}_${month}_${year}`;
         const cacheData = await this.cacheManager.get(cacheKey);
         if (cacheData)
             return cacheData;
@@ -65,7 +65,7 @@ let EntryService = class EntryService {
         return entries.rows;
     }
     async getYearlySummary({ email, year }) {
-        const cacheKey = `yearlySummary_${email}_${year}`;
+        const cacheKey = `yearlySummary_entries_${email}_${year}`;
         const cacheData = await this.cacheManager.get(cacheKey);
         if (cacheData)
             return cacheData;

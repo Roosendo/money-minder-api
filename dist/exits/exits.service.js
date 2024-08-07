@@ -41,7 +41,7 @@ let ExitService = class ExitService {
         return expenses.rows;
     }
     async getExpensesByCategoryMonthly({ email, month, year }) {
-        const cacheKey = `monthlyExpenses_${email}_${month}_${year}`;
+        const cacheKey = `monthlyExpenses_exits_${email}_${month}_${year}`;
         const cacheData = await this.cacheManager.get(cacheKey);
         if (cacheData)
             return cacheData;
@@ -53,7 +53,7 @@ let ExitService = class ExitService {
         return expenses.rows;
     }
     async getMonthlySummary({ email, month, year }) {
-        const cacheKey = `monthlySummary_${email}_${month}_${year}`;
+        const cacheKey = `monthlySummary_exits_${email}_${month}_${year}`;
         const cacheData = await this.cacheManager.get(cacheKey);
         if (cacheData)
             return cacheData;
@@ -65,7 +65,7 @@ let ExitService = class ExitService {
         return expenses.rows;
     }
     async getYearlySummary({ email, year }) {
-        const cacheKey = `yearlySummary_${email}_${year}`;
+        const cacheKey = `yearlySummary_exits_${email}_${year}`;
         const cacheData = await this.cacheManager.get(cacheKey);
         if (cacheData)
             return cacheData;

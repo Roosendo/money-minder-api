@@ -42,7 +42,7 @@ export class EntryService {
   @CacheKey('monthlyEntries_entries')
   @CacheTTL(60 * 1000)
   async getEntriesByCategoryMonthly({ email, month, year }: MonthlyEntryDto) {
-    const cacheKey = `monthlyEntries_${email}_${month}_${year}`
+    const cacheKey = `monthlyEntries_entries_${email}_${month}_${year}`
     const cacheData = await this.cacheManager.get(cacheKey)
     if (cacheData) return cacheData
 
@@ -58,7 +58,7 @@ export class EntryService {
   @CacheKey('mothlySummary_entries')
   @CacheTTL(60 * 1000)
   async getMonthlySummary({ email, month, year }: MonthlyEntryDto) {
-    const cacheKey = `monthlySummary_${email}_${month}_${year}`
+    const cacheKey = `monthlySummary_entries_${email}_${month}_${year}`
     const cacheData = await this.cacheManager.get<FS[]>(cacheKey)
     if (cacheData) return cacheData
 
@@ -74,7 +74,7 @@ export class EntryService {
   @CacheKey('yearlySummary_entries')
   @CacheTTL(60 * 1000)
   async getYearlySummary({ email, year }: YearlyEntryDto) {
-    const cacheKey = `yearlySummary_${email}_${year}`
+    const cacheKey = `yearlySummary_entries_${email}_${year}`
     const cacheData = await this.cacheManager.get<FS[]>(cacheKey)
     if (cacheData) return cacheData
 

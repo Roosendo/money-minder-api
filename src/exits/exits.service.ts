@@ -42,7 +42,7 @@ export class ExitService {
   @CacheKey('monthlyExpenses_exits')
   @CacheTTL(60 * 1000)
   async getExpensesByCategoryMonthly({ email, month, year }: MonthlyExitDto) {
-    const cacheKey = `monthlyExpenses_${email}_${month}_${year}`
+    const cacheKey = `monthlyExpenses_exits_${email}_${month}_${year}`
     const cacheData = await this.cacheManager.get(cacheKey)
     if (cacheData) return cacheData
 
@@ -58,7 +58,7 @@ export class ExitService {
   @CacheKey('mothlySummary_exits')
   @CacheTTL(60 * 1000)
   async getMonthlySummary({ email, month, year }: MonthlyExitDto) {
-    const cacheKey = `monthlySummary_${email}_${month}_${year}`
+    const cacheKey = `monthlySummary_exits_${email}_${month}_${year}`
     const cacheData = await this.cacheManager.get<FS[]>(cacheKey)
     if (cacheData) return cacheData
 
@@ -74,7 +74,7 @@ export class ExitService {
   @CacheKey('yearlySummary_exits')
   @CacheTTL(60 * 1000)
   async getYearlySummary({ email, year }: YearlyExitDto) {
-    const cacheKey = `yearlySummary_${email}_${year}`
+    const cacheKey = `yearlySummary_exits_${email}_${year}`
     const cacheData = await this.cacheManager.get<FS[]>(cacheKey)
     if (cacheData) return cacheData
 
