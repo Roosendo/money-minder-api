@@ -14,10 +14,10 @@ export class ExitService {
     @Inject(CACHE_MANAGER) private cacheManager: CacheStore
   ) {}
 
-  async newExpense({ email, date, amount, category, description }: CreateExpenseDto) {
+  async newExpense({ email, date, amount, category, description, creditCardId, isCreditPayment }: CreateExpenseDto) {
     await this.client.execute({
-      sql: 'INSERT INTO money_exits (user_email, amount, description, category, date) VALUES (?, ?, ?, ?, ?)',
-      args: [email, amount, description, category, date]
+      sql: 'INSERT INTO money_exits (user_email, amount, description, category, date, credit_card_id, is_credit_payment) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      args: [email, amount, description, category, date, creditCardId, isCreditPayment ? 1 : 0]
     })
 
     await this.cacheManager.del(`exits_${email}`)
@@ -31,7 +31,7 @@ export class ExitService {
     if (cacheData) return cacheData
 
     const expenses = await this.client.execute({
-      sql: 'SELECT amount, description, category, date, exit_id FROM money_exits WHERE user_email = ? ORDER BY exit_id DESC LIMIT 15',
+      sql: 'SELECT amount, description, category, date, exit_id, credit_card_id, is_credit_payment FROM money_exits WHERE user_email = ? ORDER BY exit_id DESC LIMIT 15',
       args: [email]
     })
 

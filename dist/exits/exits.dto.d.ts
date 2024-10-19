@@ -5,6 +5,8 @@ export declare class CreateExpenseDto {
     description?: string;
     fullName?: string;
     email: string;
+    creditCardId?: number;
+    isCreditPayment: boolean;
 }
 export declare class GetExitsDto {
     email: string;

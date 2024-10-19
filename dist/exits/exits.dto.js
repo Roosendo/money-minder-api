@@ -43,6 +43,16 @@ __decorate([
     (0, class_validator_1.IsEmail)(),
     __metadata("design:type", String)
 ], CreateExpenseDto.prototype, "email", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], CreateExpenseDto.prototype, "creditCardId", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], CreateExpenseDto.prototype, "isCreditPayment", void 0);
 class GetExitsDto {
 }
 exports.GetExitsDto = GetExitsDto;

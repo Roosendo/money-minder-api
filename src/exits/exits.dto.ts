@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Matches } from 'class-validator'
+import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Matches } from 'class-validator'
 
 export class CreateExpenseDto {
   @IsNumber()
@@ -23,6 +23,14 @@ export class CreateExpenseDto {
 
   @IsEmail()
   email: string
+
+  @IsNumber()
+  @IsOptional()
+  creditCardId?: number
+
+  @IsOptional()
+  @IsBoolean()
+  isCreditPayment: boolean
 }
 
 export class GetExitsDto {
