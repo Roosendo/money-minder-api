@@ -14,6 +14,7 @@ import { AuthModule } from './auth/auth.module'
 import { EmailModule } from './email/email.module'
 import { CacheModule } from '@nestjs/cache-manager'
 import { CreditCardsModule } from './credit-cards/credit-cards.module'
+import { LoansModule } from './loans/loans.module'
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { CreditCardsModule } from './credit-cards/credit-cards.module'
     AuthModule,
     EmailModule,
     CreditCardsModule,
+    LoansModule,
     CacheModule.register({
       ttl: 60 * 1000, // seconds
       max: 100, // maximum number of items in cache

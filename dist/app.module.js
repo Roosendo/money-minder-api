@@ -23,6 +23,7 @@ const auth_module_1 = require("./auth/auth.module");
 const email_module_1 = require("./email/email.module");
 const cache_manager_1 = require("@nestjs/cache-manager");
 const credit_cards_module_1 = require("./credit-cards/credit-cards.module");
+const loans_module_1 = require("./loans/loans.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -43,6 +44,7 @@ exports.AppModule = AppModule = __decorate([
             auth_module_1.AuthModule,
             email_module_1.EmailModule,
             credit_cards_module_1.CreditCardsModule,
+            loans_module_1.LoansModule,
             cache_manager_1.CacheModule.register({
                 ttl: 60 * 1000,
                 max: 100,

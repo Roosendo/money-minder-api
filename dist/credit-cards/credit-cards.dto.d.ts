@@ -16,6 +16,6 @@ export declare class EditCreditCardDto {
     paymentDueDate?: string;
 }
 export declare class DeleteCreditCardDto {
-    creditCardId: string;
+    creditCardId?: string;
     userEmail: string;
 }

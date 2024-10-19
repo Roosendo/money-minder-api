@@ -53,7 +53,7 @@ export class EditCreditCardDto {
 export class DeleteCreditCardDto {
   @IsOptional()
   @IsString()
-  creditCardId: string
+  creditCardId?: string
 
   @IsEmail()
   @IsNotEmpty()
