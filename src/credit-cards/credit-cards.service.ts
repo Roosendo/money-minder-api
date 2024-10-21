@@ -1,7 +1,7 @@
 import { Client } from '@libsql/client'
 import { CACHE_MANAGER, CacheKey, CacheStore, CacheTTL } from '@nestjs/cache-manager'
 import { Inject, Injectable } from '@nestjs/common'
-import { CreateCreditCardDto, EditCreditCardDto, GetCreditCardsDto } from './credit-cards.dto'
+import { CreateCreditCardDto, EditCreditCardDto, GetCreditCardsDto, PurchaseRange } from './credit-cards.dto'
 
 @Injectable()
 export class CreditCardsService {
@@ -51,5 +51,21 @@ export class CreditCardsService {
     })
 
     await this.cacheManager.del(`credit_cards_${userEmail}`)
+  }
+
+  async getDates({ creditCardId }: { creditCardId: number }) {
+    return this.client.execute({
+      sql: 'SELECT cut_off_date, payment_due_date FROM credit_cards WHERE credit_card_id = ?',
+      args: [creditCardId]
+    })
+  }
+
+  async getPurchasesRange({ creditCardId, cutOffDate, paymentDueDate }: PurchaseRange) {
+    const purchases = await this.client.execute({
+      sql: 'SELECT exit_id, amount, description, date FROM money_exits WHERE credit_card_id = ? AND date BETWEEN ? AND ?',
+      args: [creditCardId, cutOffDate, paymentDueDate]
+    })
+
+    return purchases.rows
   }
 }

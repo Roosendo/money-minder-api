@@ -3,7 +3,8 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseFilters } fr
 import { CreditCardsService } from './credit-cards.service'
 import { UsersService } from '@/users/users.service'
 import { CreateUserDto } from '@/users/users.dto'
-import { CreateCreditCardDto, DeleteCreditCardDto, EditCreditCardDto, GetCreditCardsDto } from './credit-cards.dto'
+import { ApiPurchases, CreateCreditCardDto, DeleteCreditCardDto, EditCreditCardDto, GetCreditCardsDto } from './credit-cards.dto'
+import { getPurchaseRange } from './credit-cards.utils'
 
 @Controller('api/credit-cards')
 @UseFilters(AllExceptionsFilter)
@@ -37,5 +38,14 @@ export class CreditCardsController {
   @Delete('/:creditCardId')
   async deleteCreditCard(@Body() deleteCreditCardDto: DeleteCreditCardDto, @Param('creditCardId') creditCardId: string) {
     return this.creditCardsService.deleteCreditCard({ ...deleteCreditCardDto, creditCardId })
+  }
+
+  @Get('/:creditCardId/purchases')
+  async getPurchases(@Param('creditCardId') creditCardId: string) {
+    const dates = this.creditCardsService.getDates({ creditCardId: +creditCardId })
+    if (!(await dates).rows.length) return (await dates).rows
+    const { cut_off_date, payment_due_date } = (await dates).rows[0] as unknown as ApiPurchases
+    const [ cutOffDate, paymentDueDate ] = getPurchaseRange(+cut_off_date, +payment_due_date)
+    return this.creditCardsService.getPurchasesRange({ creditCardId: +creditCardId, cutOffDate, paymentDueDate })
   }
 }

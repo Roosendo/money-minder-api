@@ -1,6 +1,6 @@
 import { Client } from '@libsql/client';
 import { CacheStore } from '@nestjs/cache-manager';
-import { CreateCreditCardDto, EditCreditCardDto, GetCreditCardsDto } from './credit-cards.dto';
+import { CreateCreditCardDto, EditCreditCardDto, GetCreditCardsDto, PurchaseRange } from './credit-cards.dto';
 export declare class CreditCardsService {
     private readonly client;
     private cacheManager;
@@ -9,4 +9,8 @@ export declare class CreditCardsService {
     getCreditCards({ email }: GetCreditCardsDto): Promise<unknown>;
     editCreditCard({ creditCardId, userEmail, name, cutOffDate, paymentDueDate }: EditCreditCardDto): Promise<void>;
     deleteCreditCard({ creditCardId, userEmail }: EditCreditCardDto): Promise<void>;
+    getDates({ creditCardId }: {
+        creditCardId: number;
+    }): Promise<import("@libsql/client/.").ResultSet>;
+    getPurchasesRange({ creditCardId, cutOffDate, paymentDueDate }: PurchaseRange): Promise<import("@libsql/client/.").Row[]>;
 }

@@ -59,3 +59,14 @@ export class DeleteCreditCardDto {
   @IsNotEmpty()
   userEmail: string
 }
+
+export type PurchaseRange = {
+  creditCardId: number
+  cutOffDate: string
+  paymentDueDate: string
+}
+
+export type ApiPurchases = {
+  cut_off_date: string
+  payment_due_date: string
+}

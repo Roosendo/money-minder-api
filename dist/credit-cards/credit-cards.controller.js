@@ -18,6 +18,7 @@ const common_1 = require("@nestjs/common");
 const credit_cards_service_1 = require("./credit-cards.service");
 const users_service_1 = require("../users/users.service");
 const credit_cards_dto_1 = require("./credit-cards.dto");
+const credit_cards_utils_1 = require("./credit-cards.utils");
 let CreditCardsController = class CreditCardsController {
     constructor(creditCardsService, usersService) {
         this.creditCardsService = creditCardsService;
@@ -40,6 +41,14 @@ let CreditCardsController = class CreditCardsController {
     }
     async deleteCreditCard(deleteCreditCardDto, creditCardId) {
         return this.creditCardsService.deleteCreditCard({ ...deleteCreditCardDto, creditCardId });
+    }
+    async getPurchases(creditCardId) {
+        const dates = this.creditCardsService.getDates({ creditCardId: +creditCardId });
+        if (!(await dates).rows.length)
+            return (await dates).rows;
+        const { cut_off_date, payment_due_date } = (await dates).rows[0];
+        const [cutOffDate, paymentDueDate] = (0, credit_cards_utils_1.getPurchaseRange)(+cut_off_date, +payment_due_date);
+        return this.creditCardsService.getPurchasesRange({ creditCardId: +creditCardId, cutOffDate, paymentDueDate });
     }
 };
 exports.CreditCardsController = CreditCardsController;
@@ -73,6 +82,13 @@ __decorate([
     __metadata("design:paramtypes", [credit_cards_dto_1.DeleteCreditCardDto, String]),
     __metadata("design:returntype", Promise)
 ], CreditCardsController.prototype, "deleteCreditCard", null);
+__decorate([
+    (0, common_1.Get)('/:creditCardId/purchases'),
+    __param(0, (0, common_1.Param)('creditCardId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], CreditCardsController.prototype, "getPurchases", null);
 exports.CreditCardsController = CreditCardsController = __decorate([
     (0, common_1.Controller)('api/credit-cards'),
     (0, common_1.UseFilters)(errors_1.AllExceptionsFilter),

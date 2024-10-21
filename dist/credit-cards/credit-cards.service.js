@@ -54,6 +54,19 @@ let CreditCardsService = class CreditCardsService {
         });
         await this.cacheManager.del(`credit_cards_${userEmail}`);
     }
+    async getDates({ creditCardId }) {
+        return this.client.execute({
+            sql: 'SELECT cut_off_date, payment_due_date FROM credit_cards WHERE credit_card_id = ?',
+            args: [creditCardId]
+        });
+    }
+    async getPurchasesRange({ creditCardId, cutOffDate, paymentDueDate }) {
+        const purchases = await this.client.execute({
+            sql: 'SELECT exit_id, amount, description, date FROM money_exits WHERE credit_card_id = ? AND date BETWEEN ? AND ?',
+            args: [creditCardId, cutOffDate, paymentDueDate]
+        });
+        return purchases.rows;
+    }
 };
 exports.CreditCardsService = CreditCardsService;
 __decorate([
