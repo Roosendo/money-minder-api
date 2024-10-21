@@ -44,8 +44,8 @@ export class CreditCardsController {
   async getPurchases(@Param('creditCardId') creditCardId: string) {
     const dates = this.creditCardsService.getDates({ creditCardId: +creditCardId })
     if (!(await dates).rows.length) return (await dates).rows
-    const { cut_off_date, payment_due_date } = (await dates).rows[0] as unknown as ApiPurchases
-    const [ cutOffDate, paymentDueDate ] = getPurchaseRange(+cut_off_date, +payment_due_date)
+    const { cut_off_date } = (await dates).rows[0] as unknown as ApiPurchases
+    const [ cutOffDate, paymentDueDate ] = getPurchaseRange(+cut_off_date)
     return this.creditCardsService.getPurchasesRange({ creditCardId: +creditCardId, cutOffDate, paymentDueDate })
   }
 }

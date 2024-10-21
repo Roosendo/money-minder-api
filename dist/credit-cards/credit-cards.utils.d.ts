@@ -1,1 +1,1 @@
-export declare const getPurchaseRange: (cutOffDate: number, paymentDueDate: number) => string[];
+export declare const getPurchaseRange: (cutOffDate: number) => string[];

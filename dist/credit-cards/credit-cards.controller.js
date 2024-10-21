@@ -46,8 +46,8 @@ let CreditCardsController = class CreditCardsController {
         const dates = this.creditCardsService.getDates({ creditCardId: +creditCardId });
         if (!(await dates).rows.length)
             return (await dates).rows;
-        const { cut_off_date, payment_due_date } = (await dates).rows[0];
-        const [cutOffDate, paymentDueDate] = (0, credit_cards_utils_1.getPurchaseRange)(+cut_off_date, +payment_due_date);
+        const { cut_off_date } = (await dates).rows[0];
+        const [cutOffDate, paymentDueDate] = (0, credit_cards_utils_1.getPurchaseRange)(+cut_off_date);
         return this.creditCardsService.getPurchasesRange({ creditCardId: +creditCardId, cutOffDate, paymentDueDate });
     }
 };
