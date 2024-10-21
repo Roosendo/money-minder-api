@@ -62,8 +62,20 @@ let CreditCardsService = class CreditCardsService {
     }
     async getPurchasesRange({ creditCardId, cutOffDate, paymentDueDate }) {
         const purchases = await this.client.execute({
-            sql: 'SELECT exit_id, amount, description, date FROM money_exits WHERE credit_card_id = ? AND date BETWEEN ? AND ?',
-            args: [creditCardId, cutOffDate, paymentDueDate]
+            sql: `
+        SELECT 
+          exit_id,
+          amount,
+          description,
+          date,
+          (SELECT SUM(amount) FROM money_exits WHERE credit_card_id = ? AND date BETWEEN ? AND ?) AS total_amount
+        FROM 
+          money_exits
+        WHERE 
+          credit_card_id = ?
+        AND date BETWEEN ? AND ?
+      `,
+            args: [creditCardId, cutOffDate, paymentDueDate, creditCardId, cutOffDate, paymentDueDate]
         });
         return purchases.rows;
     }
