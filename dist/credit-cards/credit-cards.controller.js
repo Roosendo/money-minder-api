@@ -18,7 +18,6 @@ const common_1 = require("@nestjs/common");
 const credit_cards_service_1 = require("./credit-cards.service");
 const users_service_1 = require("../users/users.service");
 const credit_cards_dto_1 = require("./credit-cards.dto");
-const credit_cards_utils_1 = require("./credit-cards.utils");
 let CreditCardsController = class CreditCardsController {
     constructor(creditCardsService, usersService) {
         this.creditCardsService = creditCardsService;
@@ -42,9 +41,8 @@ let CreditCardsController = class CreditCardsController {
     async deleteCreditCard(deleteCreditCardDto, creditCardId) {
         return this.creditCardsService.deleteCreditCard({ ...deleteCreditCardDto, creditCardId });
     }
-    async getPurchases(cut_off_date, email) {
-        const [cutOffDate, paymentDueDate] = (0, credit_cards_utils_1.getPurchaseRange)(+cut_off_date);
-        return this.creditCardsService.getPurchasesRange({ email, cutOffDate, paymentDueDate });
+    async getPurchases(email) {
+        return this.creditCardsService.getPurchasesRange({ email });
     }
 };
 exports.CreditCardsController = CreditCardsController;
@@ -79,11 +77,10 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], CreditCardsController.prototype, "deleteCreditCard", null);
 __decorate([
-    (0, common_1.Get)('/:cut_off_date/purchases'),
-    __param(0, (0, common_1.Param)('cut_off_date')),
-    __param(1, (0, common_1.Query)('email')),
+    (0, common_1.Get)('/purchases'),
+    __param(0, (0, common_1.Query)('email')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], CreditCardsController.prototype, "getPurchases", null);
 exports.CreditCardsController = CreditCardsController = __decorate([

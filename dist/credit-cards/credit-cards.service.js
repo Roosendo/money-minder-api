@@ -54,14 +54,41 @@ let CreditCardsService = class CreditCardsService {
         });
         await this.cacheManager.del(`credit_cards_${userEmail}`);
     }
-    async getPurchasesRange({ email, cutOffDate, paymentDueDate }) {
+    async getPurchasesRange({ email }) {
         const purchases = await this.client.execute({
             sql: `
+        WITH CutOffDates AS (
+          SELECT 
+            credit_card_id,
+            user_email,
+            cut_off_date,
+            DATE(
+              CASE 
+                WHEN strftime('%d', 'now') > cut_off_date THEN
+                  strftime('%Y-%m-', 'now') || cut_off_date
+                ELSE
+                  strftime('%Y-%m-', 'now', '-1 month') || cut_off_date
+              END
+            ) AS end_cut_off_date,
+            DATE(
+              CASE 
+                WHEN strftime('%d', 'now') > cut_off_date THEN
+                  strftime('%Y-%m-', 'now', '-1 month') || (cut_off_date + 1)
+                ELSE
+                  strftime('%Y-%m-', 'now', '-2 months') || (cut_off_date + 1)
+              END
+            ) AS start_cut_off_date
+          FROM 
+            credit_cards
+          WHERE 
+            user_email = ?
+        )
         SELECT 
           cc.credit_card_id,
           cc.name,
           cc.cut_off_date,
-          cc.payment_due_date,
+          cod.start_cut_off_date,
+          cod.end_cut_off_date,
           me.exit_id,
           me.amount,
           me.description,
@@ -69,16 +96,18 @@ let CreditCardsService = class CreditCardsService {
           IFNULL(SUM(me.amount) OVER (PARTITION BY cc.credit_card_id), 0) AS total_amount
         FROM 
           credit_cards cc
+        JOIN 
+          CutOffDates cod ON cc.credit_card_id = cod.credit_card_id
         LEFT JOIN 
           money_exits me 
         ON 
           cc.credit_card_id = me.credit_card_id
+        AND 
+          me.date BETWEEN cod.start_cut_off_date AND cod.end_cut_off_date
         WHERE 
           cc.user_email = ?
-        AND 
-          (me.date BETWEEN ? AND ? OR me.date IS NULL);
       `,
-            args: [email, cutOffDate, paymentDueDate]
+            args: [email, email]
         });
         return purchases.rows;
     }

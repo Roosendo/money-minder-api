@@ -9,5 +9,5 @@ export declare class CreditCardsController {
     getCreditCards(getCreditCardsDto: GetCreditCardsDto): Promise<unknown>;
     editCreditCard(editCreditCardDto: EditCreditCardDto, creditCardId: string): Promise<void>;
     deleteCreditCard(deleteCreditCardDto: DeleteCreditCardDto, creditCardId: string): Promise<void>;
-    getPurchases(cut_off_date: string, email: string): Promise<import("@libsql/client/.").Row[]>;
+    getPurchases(email: string): Promise<import("@libsql/client/.").Row[]>;
 }

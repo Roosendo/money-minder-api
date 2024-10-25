@@ -62,8 +62,6 @@ export class DeleteCreditCardDto {
 
 export type PurchaseRange = {
   email: string
-  cutOffDate: string
-  paymentDueDate: string
 }
 
 export type ApiPurchases = {
