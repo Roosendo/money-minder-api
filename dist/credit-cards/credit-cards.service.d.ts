@@ -9,8 +9,5 @@ export declare class CreditCardsService {
     getCreditCards({ email }: GetCreditCardsDto): Promise<unknown>;
     editCreditCard({ creditCardId, userEmail, name, cutOffDate, paymentDueDate }: EditCreditCardDto): Promise<void>;
     deleteCreditCard({ creditCardId, userEmail }: EditCreditCardDto): Promise<void>;
-    getDates({ creditCardId }: {
-        creditCardId: number;
-    }): Promise<import("@libsql/client/.").ResultSet>;
-    getPurchasesRange({ creditCardId, cutOffDate, paymentDueDate }: PurchaseRange): Promise<import("@libsql/client/.").Row[]>;
+    getPurchasesRange({ email, cutOffDate, paymentDueDate }: PurchaseRange): Promise<import("@libsql/client/.").Row[]>;
 }

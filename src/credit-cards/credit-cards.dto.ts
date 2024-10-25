@@ -61,7 +61,7 @@ export class DeleteCreditCardDto {
 }
 
 export type PurchaseRange = {
-  creditCardId: number
+  email: string
   cutOffDate: string
   paymentDueDate: string
 }

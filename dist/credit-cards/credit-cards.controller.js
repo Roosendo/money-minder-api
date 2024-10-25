@@ -42,13 +42,9 @@ let CreditCardsController = class CreditCardsController {
     async deleteCreditCard(deleteCreditCardDto, creditCardId) {
         return this.creditCardsService.deleteCreditCard({ ...deleteCreditCardDto, creditCardId });
     }
-    async getPurchases(creditCardId) {
-        const dates = this.creditCardsService.getDates({ creditCardId: +creditCardId });
-        if (!(await dates).rows.length)
-            return (await dates).rows;
-        const { cut_off_date } = (await dates).rows[0];
+    async getPurchases(cut_off_date, email) {
         const [cutOffDate, paymentDueDate] = (0, credit_cards_utils_1.getPurchaseRange)(+cut_off_date);
-        return this.creditCardsService.getPurchasesRange({ creditCardId: +creditCardId, cutOffDate, paymentDueDate });
+        return this.creditCardsService.getPurchasesRange({ email, cutOffDate, paymentDueDate });
     }
 };
 exports.CreditCardsController = CreditCardsController;
@@ -83,10 +79,11 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], CreditCardsController.prototype, "deleteCreditCard", null);
 __decorate([
-    (0, common_1.Get)('/:creditCardId/purchases'),
-    __param(0, (0, common_1.Param)('creditCardId')),
+    (0, common_1.Get)('/:cut_off_date/purchases'),
+    __param(0, (0, common_1.Param)('cut_off_date')),
+    __param(1, (0, common_1.Query)('email')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], CreditCardsController.prototype, "getPurchases", null);
 exports.CreditCardsController = CreditCardsController = __decorate([

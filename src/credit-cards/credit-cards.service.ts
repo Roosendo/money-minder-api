@@ -5,10 +5,10 @@ import { CreateCreditCardDto, EditCreditCardDto, GetCreditCardsDto, PurchaseRang
 
 @Injectable()
 export class CreditCardsService {
-  constructor (
+  constructor(
     @Inject('DATABASE_CLIENT') private readonly client: Client,
     @Inject(CACHE_MANAGER) private cacheManager: CacheStore
-  ) {}
+  ) { }
 
   async newCreditCard({ email, name, cutOffDate, paymentDueDate }: CreateCreditCardDto) {
     await this.client.execute({
@@ -53,29 +53,31 @@ export class CreditCardsService {
     await this.cacheManager.del(`credit_cards_${userEmail}`)
   }
 
-  async getDates({ creditCardId }: { creditCardId: number }) {
-    return this.client.execute({
-      sql: 'SELECT cut_off_date, payment_due_date FROM credit_cards WHERE credit_card_id = ?',
-      args: [creditCardId]
-    })
-  }
-
-  async getPurchasesRange({ creditCardId, cutOffDate, paymentDueDate }: PurchaseRange) {
+  async getPurchasesRange({ email, cutOffDate, paymentDueDate }: PurchaseRange) {
     const purchases = await this.client.execute({
       sql: `
         SELECT 
-          exit_id,
-          amount,
-          description,
-          date,
-          (SELECT SUM(amount) FROM money_exits WHERE credit_card_id = ? AND date BETWEEN ? AND ?) AS total_amount
+          cc.credit_card_id,
+          cc.name,
+          cc.cut_off_date,
+          cc.payment_due_date,
+          me.exit_id,
+          me.amount,
+          me.description,
+          me.date,
+          IFNULL(SUM(me.amount) OVER (PARTITION BY cc.credit_card_id), 0) AS total_amount
         FROM 
-          money_exits
+          credit_cards cc
+        LEFT JOIN 
+          money_exits me 
+        ON 
+          cc.credit_card_id = me.credit_card_id
         WHERE 
-          credit_card_id = ?
-        AND date BETWEEN ? AND ?
+          cc.user_email = ?
+        AND 
+          (me.date BETWEEN ? AND ? OR me.date IS NULL);
       `,
-      args: [creditCardId, cutOffDate, paymentDueDate, creditCardId, cutOffDate, paymentDueDate]
+      args: [email, cutOffDate, paymentDueDate]
     })
 
     return purchases.rows

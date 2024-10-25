@@ -54,28 +54,31 @@ let CreditCardsService = class CreditCardsService {
         });
         await this.cacheManager.del(`credit_cards_${userEmail}`);
     }
-    async getDates({ creditCardId }) {
-        return this.client.execute({
-            sql: 'SELECT cut_off_date, payment_due_date FROM credit_cards WHERE credit_card_id = ?',
-            args: [creditCardId]
-        });
-    }
-    async getPurchasesRange({ creditCardId, cutOffDate, paymentDueDate }) {
+    async getPurchasesRange({ email, cutOffDate, paymentDueDate }) {
         const purchases = await this.client.execute({
             sql: `
         SELECT 
-          exit_id,
-          amount,
-          description,
-          date,
-          (SELECT SUM(amount) FROM money_exits WHERE credit_card_id = ? AND date BETWEEN ? AND ?) AS total_amount
+          cc.credit_card_id,
+          cc.name,
+          cc.cut_off_date,
+          cc.payment_due_date,
+          me.exit_id,
+          me.amount,
+          me.description,
+          me.date,
+          IFNULL(SUM(me.amount) OVER (PARTITION BY cc.credit_card_id), 0) AS total_amount
         FROM 
-          money_exits
+          credit_cards cc
+        LEFT JOIN 
+          money_exits me 
+        ON 
+          cc.credit_card_id = me.credit_card_id
         WHERE 
-          credit_card_id = ?
-        AND date BETWEEN ? AND ?
+          cc.user_email = ?
+        AND 
+          (me.date BETWEEN ? AND ? OR me.date IS NULL);
       `,
-            args: [creditCardId, cutOffDate, paymentDueDate, creditCardId, cutOffDate, paymentDueDate]
+            args: [email, cutOffDate, paymentDueDate]
         });
         return purchases.rows;
     }
