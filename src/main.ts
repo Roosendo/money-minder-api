@@ -27,7 +27,8 @@ const bootstrap = async () => {
       'https://money-minder-xi.vercel.app',
       'https://money-minder-xi.vercel.app/*',
       'https://rosendo-garcia.vercel.app',
-      'https://rosendo-garcia.vercel.app/*'
+      'https://rosendo-garcia.vercel.app/*',
+      'https://9000-idx-money-minder-1728752434449.cluster-hf4yr35cmnbd4vhbxvfvc6cp5q.cloudworkstations.dev'
     ],
     methods: ['GET', 'POST', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
