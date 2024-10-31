@@ -8,12 +8,12 @@ export declare class SpecialsController {
     private readonly exitService;
     constructor(specialsService: SpecialsService, entryService: EntryService, exitService: ExitService);
     getFinancialSummaryYearly(financialSummaryYearlyDto: FinancialSummaryYearlyDto): Promise<{
-        totalEntries: import("@libsql/client/.").Value;
-        totalExits: import("@libsql/client/.").Value;
+        totalEntries: import("@libsql/core/api").Value;
+        totalExits: import("@libsql/core/api").Value;
     }>;
     getFinancialSummaryMonthly(financialSummaryMonthlyDto: FinancialSummaryMonthlyDto): Promise<{
-        totalEntries: import("@libsql/client/.").Value;
-        totalExits: import("@libsql/client/.").Value;
+        totalEntries: import("@libsql/core/api").Value;
+        totalExits: import("@libsql/core/api").Value;
     }>;
     getCashFlow(cashFlowDto: CashFlowDto): Promise<unknown>;
     getCategories(categoriesDto: CategoriesDto): Promise<unknown>;

@@ -11,7 +11,7 @@ export declare class ExitService {
     newExpense({ email, date, amount, category, description, creditCardId, isCreditPayment }: CreateExpenseDto): Promise<void>;
     getExits({ email }: GetExitsDto): Promise<unknown>;
     getExpensesByCategoryMonthly({ email, month, year }: MonthlyExitDto): Promise<unknown>;
-    getMonthlySummary({ email, month, year }: MonthlyExitDto): Promise<import("@libsql/client/.").Row[] | FS[]>;
-    getYearlySummary({ email, year }: YearlyExitDto): Promise<import("@libsql/client/.").Row[] | FS[]>;
+    getMonthlySummary({ email, month, year }: MonthlyExitDto): Promise<import("@libsql/core/api").Row[] | FS[]>;
+    getYearlySummary({ email, year }: YearlyExitDto): Promise<import("@libsql/core/api").Row[] | FS[]>;
 }
 export {};

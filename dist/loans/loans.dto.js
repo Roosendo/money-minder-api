@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DeleteLoansDto = exports.EditLoansDto = exports.GetLoansDto = exports.CreateLoanDto = void 0;
+exports.EditPaymentDto = exports.AddPaymentDTO = exports.DeleteLoansDto = exports.EditLoansDto = exports.GetLoansDto = exports.CreateLoanDto = void 0;
 const class_validator_1 = require("class-validator");
 class CreateLoanDto {
 }
@@ -38,22 +38,22 @@ __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], CreateLoanDto.prototype, "loanDate", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
 ], CreateLoanDto.prototype, "interestRate", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
-], CreateLoanDto.prototype, "monthlyPayment", void 0);
+    __metadata("design:type", Number)
+], CreateLoanDto.prototype, "loanAmount", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], CreateLoanDto.prototype, "totalPaid", void 0);
+], CreateLoanDto.prototype, "loanStartDate", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateLoanDto.prototype, "loanEndDate", void 0);
 class GetLoansDto {
 }
 exports.GetLoansDto = GetLoansDto;
@@ -118,4 +118,40 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], DeleteLoansDto.prototype, "userEmail", void 0);
+class AddPaymentDTO {
+}
+exports.AddPaymentDTO = AddPaymentDTO;
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", Number)
+], AddPaymentDTO.prototype, "loanId", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], AddPaymentDTO.prototype, "paymentDate", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], AddPaymentDTO.prototype, "paymentAmount", void 0);
+class EditPaymentDto {
+}
+exports.EditPaymentDto = EditPaymentDto;
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", Number)
+], EditPaymentDto.prototype, "paymentId", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], EditPaymentDto.prototype, "paymentDate", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], EditPaymentDto.prototype, "paymentAmount", void 0);
 //# sourceMappingURL=loans.dto.js.map

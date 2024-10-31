@@ -3,7 +3,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseFilters } fr
 import { LoansService } from './loans.service'
 import { UsersService } from '@/users/users.service'
 import { CreateUserDto } from '@/users/users.dto'
-import { CreateLoanDto, DeleteLoansDto, GetLoansDto } from './loans.dto'
+import { APIResponse, AddPaymentDTO, CreateLoanDto, DeleteLoansDto, EditPaymentDto, GetLoansDto } from './loans.dto'
 
 @Controller('api/loans')
 @UseFilters(AllExceptionsFilter)
@@ -26,7 +26,10 @@ export class LoansController {
   @Get('')
   async getLoans(@Query() getLoansDto: GetLoansDto) {
     const loans = await this.loansService.getLoans(getLoansDto)
-    return loans
+    return (loans as unknown as APIResponse[]).map(loan => ({
+      ...loan,
+      last_five_payments: JSON.parse(loan.last_five_payments)
+    }))
   }
 
   @Put('/:loanId')
@@ -37,5 +40,15 @@ export class LoansController {
   @Delete('/:loanId')
   async deleteLoan(@Body() deleteLoanDto: DeleteLoansDto, @Param('loanId') loanId: string) {
     return this.loansService.deleteLoan({ ...deleteLoanDto, loanId })
+  }
+
+  @Post('/payments')
+  async addPayment(@Body() addPaymentDto: AddPaymentDTO) {
+    return this.loansService.addPayment(addPaymentDto)
+  }
+
+  @Put('/payments')
+  async editPayment(@Body() editPaymentDto: EditPaymentDto) {
+    return this.loansService.editPayment(editPaymentDto)
   }
 }

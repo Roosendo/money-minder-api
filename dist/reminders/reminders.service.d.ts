@@ -6,7 +6,7 @@ export declare class RemindersService {
     private cacheManager;
     constructor(client: Client, cacheManager: CacheStore);
     newReminder({ email, title, description, reminderDate }: CreateReminderDto): Promise<{
-        id: import("@libsql/client/.").Value;
+        id: import("@libsql/core/api").Value;
     }>;
     getReminders({ email }: GetRemindersDto): Promise<unknown>;
     deleteReminder({ email, id }: DeleteReminderDto): Promise<void>;

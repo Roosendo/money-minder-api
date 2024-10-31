@@ -11,7 +11,7 @@ export declare class EntryService {
     newEntry({ email, date, amount, category, description }: CreateEntryDto): Promise<void>;
     getEntries({ email }: GetEntriesDto): Promise<unknown>;
     getEntriesByCategoryMonthly({ email, month, year }: MonthlyEntryDto): Promise<unknown>;
-    getMonthlySummary({ email, month, year }: MonthlyEntryDto): Promise<import("@libsql/client/.").Row[] | FS[]>;
-    getYearlySummary({ email, year }: YearlyEntryDto): Promise<import("@libsql/client/.").Row[] | FS[]>;
+    getMonthlySummary({ email, month, year }: MonthlyEntryDto): Promise<import("@libsql/core/api").Row[] | FS[]>;
+    getYearlySummary({ email, year }: YearlyEntryDto): Promise<import("@libsql/core/api").Row[] | FS[]>;
 }
 export {};

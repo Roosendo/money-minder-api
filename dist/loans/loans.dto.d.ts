@@ -3,10 +3,10 @@ export declare class CreateLoanDto {
     userEmail: string;
     loanTitle: string;
     bankName: string;
-    loanDate: string;
     interestRate: string;
-    monthlyPayment: string;
-    totalPaid: string;
+    loanAmount: number;
+    loanStartDate: string;
+    loanEndDate: string;
 }
 export declare class GetLoansDto {
     email: string;
@@ -24,4 +24,24 @@ export declare class EditLoansDto {
 export declare class DeleteLoansDto {
     loanId?: string;
     userEmail: string;
+}
+export declare class AddPaymentDTO {
+    loanId: number;
+    paymentDate: string;
+    paymentAmount: string;
+}
+export declare class EditPaymentDto {
+    paymentId: number;
+    paymentDate: string;
+    paymentAmount: string;
+}
+export interface APIResponse {
+    loan_title: string;
+    bank_name: string;
+    interest_rate: number;
+    loan_amount: number;
+    loan_start_date: string;
+    loan_end_date: string;
+    last_five_payments: string;
+    total_payments: number;
 }

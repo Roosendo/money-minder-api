@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator'
 
 export class CreateLoanDto {
   @IsString()
@@ -19,19 +19,19 @@ export class CreateLoanDto {
 
   @IsString()
   @IsNotEmpty()
-  loanDate: string
-
-  @IsString()
-  @IsNotEmpty()
   interestRate: string
 
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  monthlyPayment: string
+  loanAmount: number
 
   @IsString()
   @IsNotEmpty()
-  totalPaid: string
+  loanStartDate: string
+
+  @IsString()
+  @IsNotEmpty()
+  loanEndDate: string
 }
 
 export class GetLoansDto {
@@ -82,4 +82,43 @@ export class DeleteLoansDto {
   @IsString()
   @IsNotEmpty()
   userEmail: string
+}
+
+export class AddPaymentDTO {
+  @IsNumber()
+  @IsNotEmpty()
+  loanId: number
+
+  @IsString()
+  @IsNotEmpty()
+  paymentDate: string
+
+  @IsString()
+  @IsNotEmpty()
+  paymentAmount: string
+}
+
+export class EditPaymentDto {
+  @IsNumber()
+  @IsNotEmpty()
+  paymentId: number
+
+  @IsString()
+  @IsNotEmpty()
+  paymentDate: string
+
+  @IsString()
+  @IsNotEmpty()
+  paymentAmount: string
+}
+
+export interface APIResponse {
+  loan_title: string
+  bank_name: string
+  interest_rate: number
+  loan_amount: number
+  loan_start_date: string
+  loan_end_date: string
+  last_five_payments: string
+  total_payments: number
 }

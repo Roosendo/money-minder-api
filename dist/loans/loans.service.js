@@ -21,10 +21,10 @@ let LoansService = class LoansService {
         this.client = client;
         this.cacheManager = cacheManager;
     }
-    async newLoan({ userEmail, loanTitle, bankName, loanDate, interestRate, monthlyPayment, totalPaid }) {
+    async newLoan({ userEmail, loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate }) {
         await this.client.execute({
-            sql: 'INSERT INTO loans (user_email, loan_title, bank_name, loan_date, interest_rate, monthly_payment, total_paid) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            args: [userEmail, loanTitle, bankName, loanDate, interestRate, monthlyPayment, totalPaid]
+            sql: 'INSERT INTO loans (user_email, loan_title, bank_name, interest_rate, loan_amount, loan_start_date, loan_end_date) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            args: [userEmail, loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate]
         });
         await this.cacheManager.del(`loans_${userEmail}`);
     }
@@ -34,7 +34,36 @@ let LoansService = class LoansService {
         if (cacheData)
             return cacheData;
         const loans = await this.client.execute({
-            sql: 'SELECT loan_id, loan_title, bank_name, loan_date, interest_rate, monthly_payment, total_paid FROM loans WHERE user_email = ?',
+            sql: `
+        SELECT 
+        l.loan_title,
+        l.bank_name,
+        l.interest_rate,
+        l.loan_amount,
+        l.loan_start_date,
+        l.loan_end_date,
+        (
+          SELECT json_group_array(
+            json_object(
+              'payment_date', p.payment_date,
+              'payment_amount', p.payment_amount
+            )
+          )
+          FROM payments p
+          WHERE p.loan_id = l.id
+          ORDER BY p.payment_date DESC
+          LIMIT 5
+        ) AS last_five_payments,
+        (
+          SELECT IFNULL(SUM(p.payment_amount), 0)
+          FROM payments p
+          WHERE p.loan_id = l.id
+        ) AS total_payments
+      FROM 
+        loans l
+      WHERE 
+        l.user_email = ?
+      `,
             args: [email]
         });
         await this.cacheManager.set(cacheKey, loans.rows, { ttl: 60 * 1000 });
@@ -53,6 +82,18 @@ let LoansService = class LoansService {
             args: [loanId, userEmail]
         });
         await this.cacheManager.del(`loans_${userEmail}`);
+    }
+    async addPayment({ loanId, paymentDate, paymentAmount }) {
+        await this.client.execute({
+            sql: 'INSERT INTO payments (loan_id, payment_date, payment_amount) VALUES (?, ?, ?)',
+            args: [loanId, paymentDate, paymentAmount]
+        });
+    }
+    async editPayment({ paymentId, paymentDate, paymentAmount }) {
+        await this.client.execute({
+            sql: 'UPDATE payments SET payment_date = ?, payment_amount = ? WHERE payment_id = ?',
+            args: [paymentDate, paymentAmount, paymentId]
+        });
     }
 };
 exports.LoansService = LoansService;

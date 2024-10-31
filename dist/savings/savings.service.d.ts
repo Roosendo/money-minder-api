@@ -6,7 +6,7 @@ export declare class SavingsService {
     private cacheManager;
     constructor(client: Client, cacheManager: CacheStore);
     newSaving({ email, name, targetAmount, currentAmount, startDate, endDate }: CreateSavingDto): Promise<{
-        id: import("@libsql/client/.").Value;
+        id: import("@libsql/core/api").Value;
     }>;
     getSavings({ email }: GetSavingsDto): Promise<unknown>;
     deleteSaving({ email, id }: DeleteSavingDto): Promise<void>;
