@@ -107,7 +107,7 @@ export class EditPaymentDto {
   @IsNotEmpty()
   paymentDate: string
 
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
   paymentAmount: string
 }

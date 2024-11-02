@@ -150,7 +150,7 @@ __decorate([
     __metadata("design:type", String)
 ], EditPaymentDto.prototype, "paymentDate", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], EditPaymentDto.prototype, "paymentAmount", void 0);
