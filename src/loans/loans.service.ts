@@ -92,7 +92,7 @@ export class LoansService {
 
   async editPayment({ paymentId, paymentDate, paymentAmount }: EditPaymentDto) {
     await this.client.execute({
-      sql: 'UPDATE payments SET payment_date = ?, payment_amount = ? WHERE payment_id = ?',
+      sql: 'UPDATE payments SET payment_date = ?, payment_amount = ? WHERE id = ?',
       args: [paymentDate, paymentAmount, paymentId]
     })
   }
