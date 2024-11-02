@@ -1,5 +1,5 @@
 import { AllExceptionsFilter } from '@/middlewares/errors'
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseFilters } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseFilters } from '@nestjs/common'
 import { CreditCardsService } from './credit-cards.service'
 import { UsersService } from '@/users/users.service'
 import { CreateUserDto } from '@/users/users.dto'
@@ -29,7 +29,7 @@ export class CreditCardsController {
     return creditCards
   }
 
-  @Put('/:creditCardId')
+  @Patch('/:creditCardId')
   async editCreditCard(@Body() editCreditCardDto: EditCreditCardDto, @Param('creditCardId') creditCardId: string) {
     return this.creditCardsService.editCreditCard({ ...editCreditCardDto, creditCardId })
   }

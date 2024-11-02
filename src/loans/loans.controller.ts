@@ -1,5 +1,5 @@
 import { AllExceptionsFilter } from '@/middlewares/errors'
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseFilters } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseFilters } from '@nestjs/common'
 import { LoansService } from './loans.service'
 import { UsersService } from '@/users/users.service'
 import { CreateUserDto } from '@/users/users.dto'
@@ -32,7 +32,7 @@ export class LoansController {
     }))
   }
 
-  @Put('/:loanId')
+  @Patch('/:loanId')
   async editLoan(@Body() editLoanDto: CreateLoanDto, @Param('loanId') loanId: string) {
     return this.loansService.editLoan({ ...editLoanDto, loanId })
   }
@@ -47,7 +47,7 @@ export class LoansController {
     return this.loansService.addPayment(addPaymentDto)
   }
 
-  @Put('/payments')
+  @Patch('/payments')
   async editPayment(@Body() editPaymentDto: EditPaymentDto) {
     return this.loansService.editPayment(editPaymentDto)
   }

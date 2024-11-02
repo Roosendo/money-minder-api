@@ -61,7 +61,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], CreditCardsController.prototype, "getCreditCards", null);
 __decorate([
-    (0, common_1.Put)('/:creditCardId'),
+    (0, common_1.Patch)('/:creditCardId'),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Param)('creditCardId')),
     __metadata("design:type", Function),
