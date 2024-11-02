@@ -38,6 +38,7 @@ export class LoansService {
         (
           SELECT json_group_array(
             json_object(
+              'id', p.id,
               'payment_date', p.payment_date,
               'payment_amount', p.payment_amount
             )
