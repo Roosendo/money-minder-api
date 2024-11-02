@@ -47,7 +47,7 @@ export class LoansController {
     return this.loansService.addPayment(addPaymentDto)
   }
 
-  @Patch('/payments')
+  @Patch('/payments/edit')
   async editPayment(@Body() editPaymentDto: EditPaymentDto) {
     return this.loansService.editPayment(editPaymentDto)
   }

@@ -90,7 +90,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], LoansController.prototype, "addPayment", null);
 __decorate([
-    (0, common_1.Patch)('/payments'),
+    (0, common_1.Patch)('/payments/edit'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [loans_dto_1.EditPaymentDto]),
