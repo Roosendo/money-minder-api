@@ -86,25 +86,25 @@ __decorate([
     __metadata("design:type", String)
 ], EditLoansDto.prototype, "bankName", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
-], EditLoansDto.prototype, "loanDate", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
 ], EditLoansDto.prototype, "interestRate", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
-], EditLoansDto.prototype, "monthlyPayment", void 0);
+    __metadata("design:type", Number)
+], EditLoansDto.prototype, "loanAmount", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], EditLoansDto.prototype, "totalPaid", void 0);
+], EditLoansDto.prototype, "loanStartDate", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], EditLoansDto.prototype, "loanEndDate", void 0);
 class DeleteLoansDto {
 }
 exports.DeleteLoansDto = DeleteLoansDto;
@@ -132,9 +132,9 @@ __decorate([
     __metadata("design:type", String)
 ], AddPaymentDTO.prototype, "paymentDate", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
 ], AddPaymentDTO.prototype, "paymentAmount", void 0);
 class EditPaymentDto {
 }
@@ -152,7 +152,7 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
 ], EditPaymentDto.prototype, "paymentAmount", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),

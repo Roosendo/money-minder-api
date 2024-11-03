@@ -71,7 +71,7 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Param)('loanId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [loans_dto_1.CreateLoanDto, String]),
+    __metadata("design:paramtypes", [loans_dto_1.EditLoansDto, String]),
     __metadata("design:returntype", Promise)
 ], LoansController.prototype, "editLoan", null);
 __decorate([

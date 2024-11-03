@@ -65,10 +65,10 @@ export class LoansService {
     return loans.rows
   }
 
-  async editLoan({ loanId, userEmail, loanTitle, bankName, loanDate, interestRate, monthlyPayment, totalPaid }: EditLoansDto) {
+  async editLoan({ loanId, userEmail, loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate }: EditLoansDto) {
     await this.client.execute({
-      sql: 'UPDATE loans SET loan_title = ?, bank_name = ?, loan_date = ?, interest_rate = ?, monthly_payment = ?, total_paid = ? WHERE loan_id = ? AND user_email = ?',
-      args: [loanTitle, bankName, loanDate, interestRate, monthlyPayment, totalPaid, loanId, userEmail]
+      sql: 'UPDATE loans SET loan_title = ?, bank_name = ?, interest_rate = ?, loan_amount = ?, loan_start_date = ?, loan_end_date = ? WHERE id = ? AND user_email = ?',
+      args: [loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate, loanId, userEmail]
     })
 
     await this.cacheManager.del(`loans_${userEmail}`)

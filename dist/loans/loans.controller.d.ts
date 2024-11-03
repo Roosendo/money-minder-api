@@ -1,6 +1,6 @@
 import { LoansService } from './loans.service';
 import { UsersService } from '@/users/users.service';
-import { AddPaymentDTO, CreateLoanDto, DeleteLoansDto, EditPaymentDto, GetLoansDto } from './loans.dto';
+import { AddPaymentDTO, CreateLoanDto, DeleteLoansDto, EditLoansDto, EditPaymentDto, GetLoansDto } from './loans.dto';
 export declare class LoansController {
     private readonly loansService;
     private readonly usersService;
@@ -16,7 +16,7 @@ export declare class LoansController {
         loan_end_date: string;
         total_payments: number;
     }[]>;
-    editLoan(editLoanDto: CreateLoanDto, loanId: string): Promise<void>;
+    editLoan(editLoanDto: EditLoansDto, loanId: string): Promise<void>;
     deleteLoan(deleteLoanDto: DeleteLoansDto, loanId: string): Promise<void>;
     addPayment(addPaymentDto: AddPaymentDTO): Promise<void>;
     editPayment(editPaymentDto: EditPaymentDto): Promise<void>;

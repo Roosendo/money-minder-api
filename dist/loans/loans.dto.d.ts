@@ -12,14 +12,14 @@ export declare class GetLoansDto {
     email: string;
 }
 export declare class EditLoansDto {
-    loanId?: string;
+    loanId: string;
     userEmail: string;
-    loanTitle?: string;
-    bankName?: string;
-    loanDate?: string;
-    interestRate?: string;
-    monthlyPayment?: string;
-    totalPaid?: string;
+    loanTitle: string;
+    bankName: string;
+    interestRate: number;
+    loanAmount: number;
+    loanStartDate: string;
+    loanEndDate: string;
 }
 export declare class DeleteLoansDto {
     loanId?: string;
@@ -28,12 +28,12 @@ export declare class DeleteLoansDto {
 export declare class AddPaymentDTO {
     loanId: number;
     paymentDate: string;
-    paymentAmount: string;
+    paymentAmount: number;
 }
 export declare class EditPaymentDto {
     paymentId: number;
     paymentDate: string;
-    paymentAmount: string;
+    paymentAmount: number;
     email: string;
 }
 export interface APIResponse {

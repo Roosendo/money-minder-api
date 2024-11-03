@@ -43,7 +43,7 @@ export class GetLoansDto {
 export class EditLoansDto {
   @IsString()
   @IsNotEmpty()
-  loanId?: string
+  loanId: string
 
   @IsString()
   @IsNotEmpty()
@@ -51,27 +51,27 @@ export class EditLoansDto {
 
   @IsString()
   @IsNotEmpty()
-  loanTitle?: string
+  loanTitle: string
 
   @IsString()
   @IsNotEmpty()
-  bankName?: string
+  bankName: string
+
+  @IsNumber()
+  @IsNotEmpty()
+  interestRate: number
+
+  @IsNumber()
+  @IsNotEmpty()
+  loanAmount: number
 
   @IsString()
   @IsNotEmpty()
-  loanDate?: string
+  loanStartDate: string
 
   @IsString()
   @IsNotEmpty()
-  interestRate?: string
-
-  @IsString()
-  @IsNotEmpty()
-  monthlyPayment?: string
-
-  @IsString()
-  @IsNotEmpty()
-  totalPaid?: string
+  loanEndDate: string
 }
 
 export class DeleteLoansDto {
@@ -93,9 +93,9 @@ export class AddPaymentDTO {
   @IsNotEmpty()
   paymentDate: string
 
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  paymentAmount: string
+  paymentAmount: number
 }
 
 export class EditPaymentDto {
@@ -109,7 +109,7 @@ export class EditPaymentDto {
 
   @IsNumber()
   @IsNotEmpty()
-  paymentAmount: string
+  paymentAmount: number
 
   @IsString()
   @IsNotEmpty()

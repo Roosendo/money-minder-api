@@ -7,7 +7,7 @@ export declare class LoansService {
     constructor(client: Client, cacheManager: CacheStore);
     newLoan({ userEmail, loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate }: CreateLoanDto): Promise<void>;
     getLoans({ email }: GetLoansDto): Promise<unknown>;
-    editLoan({ loanId, userEmail, loanTitle, bankName, loanDate, interestRate, monthlyPayment, totalPaid }: EditLoansDto): Promise<void>;
+    editLoan({ loanId, userEmail, loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate }: EditLoansDto): Promise<void>;
     deleteLoan({ loanId, userEmail }: DeleteLoansDto): Promise<void>;
     addPayment({ loanId, paymentDate, paymentAmount }: AddPaymentDTO): Promise<void>;
     editPayment({ paymentId, paymentDate, paymentAmount, email }: EditPaymentDto): Promise<void>;

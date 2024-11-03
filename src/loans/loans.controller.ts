@@ -3,7 +3,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseFilters } 
 import { LoansService } from './loans.service'
 import { UsersService } from '@/users/users.service'
 import { CreateUserDto } from '@/users/users.dto'
-import { APIResponse, AddPaymentDTO, CreateLoanDto, DeleteLoansDto, EditPaymentDto, GetLoansDto } from './loans.dto'
+import { APIResponse, AddPaymentDTO, CreateLoanDto, DeleteLoansDto, EditLoansDto, EditPaymentDto, GetLoansDto } from './loans.dto'
 
 @Controller('api/loans')
 @UseFilters(AllExceptionsFilter)
@@ -33,7 +33,7 @@ export class LoansController {
   }
 
   @Patch('/:loanId')
-  async editLoan(@Body() editLoanDto: CreateLoanDto, @Param('loanId') loanId: string) {
+  async editLoan(@Body() editLoanDto: EditLoansDto, @Param('loanId') loanId: string) {
     return this.loansService.editLoan({ ...editLoanDto, loanId })
   }
 
