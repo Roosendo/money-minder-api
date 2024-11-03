@@ -90,10 +90,12 @@ export class LoansService {
     })
   }
 
-  async editPayment({ paymentId, paymentDate, paymentAmount }: EditPaymentDto) {
+  async editPayment({ paymentId, paymentDate, paymentAmount, email }: EditPaymentDto) {
     await this.client.execute({
       sql: 'UPDATE payments SET payment_date = ?, payment_amount = ? WHERE id = ?',
       args: [paymentDate, paymentAmount, paymentId]
     })
+
+    await this.cacheManager.del(`loans_${email}`)
   }
 }

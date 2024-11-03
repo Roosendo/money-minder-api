@@ -34,6 +34,7 @@ export declare class EditPaymentDto {
     paymentId: number;
     paymentDate: string;
     paymentAmount: string;
+    email: string;
 }
 export interface APIResponse {
     loan_title: string;

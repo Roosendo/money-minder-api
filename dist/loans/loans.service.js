@@ -90,11 +90,12 @@ let LoansService = class LoansService {
             args: [loanId, paymentDate, paymentAmount]
         });
     }
-    async editPayment({ paymentId, paymentDate, paymentAmount }) {
+    async editPayment({ paymentId, paymentDate, paymentAmount, email }) {
         await this.client.execute({
             sql: 'UPDATE payments SET payment_date = ?, payment_amount = ? WHERE id = ?',
             args: [paymentDate, paymentAmount, paymentId]
         });
+        await this.cacheManager.del(`loans_${email}`);
     }
 };
 exports.LoansService = LoansService;

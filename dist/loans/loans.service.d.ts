@@ -10,5 +10,5 @@ export declare class LoansService {
     editLoan({ loanId, userEmail, loanTitle, bankName, loanDate, interestRate, monthlyPayment, totalPaid }: EditLoansDto): Promise<void>;
     deleteLoan({ loanId, userEmail }: DeleteLoansDto): Promise<void>;
     addPayment({ loanId, paymentDate, paymentAmount }: AddPaymentDTO): Promise<void>;
-    editPayment({ paymentId, paymentDate, paymentAmount }: EditPaymentDto): Promise<void>;
+    editPayment({ paymentId, paymentDate, paymentAmount, email }: EditPaymentDto): Promise<void>;
 }

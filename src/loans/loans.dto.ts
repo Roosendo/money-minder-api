@@ -110,6 +110,10 @@ export class EditPaymentDto {
   @IsNumber()
   @IsNotEmpty()
   paymentAmount: string
+
+  @IsString()
+  @IsNotEmpty()
+  email: string
 }
 
 export interface APIResponse {
