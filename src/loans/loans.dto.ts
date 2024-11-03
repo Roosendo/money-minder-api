@@ -17,9 +17,9 @@ export class CreateLoanDto {
   @IsNotEmpty()
   bankName: string
 
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  interestRate: string
+  interestRate: number
 
   @IsNumber()
   @IsNotEmpty()

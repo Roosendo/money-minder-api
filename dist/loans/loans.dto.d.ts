@@ -3,7 +3,7 @@ export declare class CreateLoanDto {
     userEmail: string;
     loanTitle: string;
     bankName: string;
-    interestRate: string;
+    interestRate: number;
     loanAmount: number;
     loanStartDate: string;
     loanEndDate: string;
