@@ -29,7 +29,7 @@ export class LoansService {
     const loans = await this.client.execute({
       sql: `
         SELECT
-        l.id
+        l.id,
         l.loan_title,
         l.bank_name,
         l.interest_rate,
