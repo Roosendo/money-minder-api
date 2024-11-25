@@ -29,7 +29,7 @@ let ExitService = class ExitService {
                 amount,
                 description,
                 category,
-                date,
+                date: new Date(date),
                 credit_card_id: creditCardId,
                 is_credit_payment: isCreditPayment
             },
