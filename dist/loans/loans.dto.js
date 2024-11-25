@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EditPaymentDto = exports.AddPaymentDTO = exports.DeleteLoansDto = exports.EditLoansDto = exports.GetLoansDto = exports.CreateLoanDto = void 0;
+exports.DeletePaymentDto = exports.EditPaymentDto = exports.AddPaymentDTO = exports.DeleteLoansDto = exports.EditLoansDto = exports.GetLoansDto = exports.CreateLoanDto = void 0;
 const class_validator_1 = require("class-validator");
 class CreateLoanDto {
 }
@@ -159,4 +159,17 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], EditPaymentDto.prototype, "email", void 0);
+class DeletePaymentDto {
+}
+exports.DeletePaymentDto = DeletePaymentDto;
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", Number)
+], DeletePaymentDto.prototype, "paymentId", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], DeletePaymentDto.prototype, "email", void 0);
 //# sourceMappingURL=loans.dto.js.map

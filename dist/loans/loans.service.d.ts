@@ -1,14 +1,17 @@
-import { Client } from '@libsql/client';
 import { CacheStore } from '@nestjs/cache-manager';
-import { AddPaymentDTO, CreateLoanDto, DeleteLoansDto, EditLoansDto, EditPaymentDto, GetLoansDto } from './loans.dto';
+import { AddPaymentDTO, CreateLoanDto, DeleteLoansDto, DeletePaymentDto, EditLoansDto, EditPaymentDto, GetLoansDto } from './loans.dto';
+import { PrismaService } from '@/prisma.service';
 export declare class LoansService {
-    private readonly client;
+    private prisma;
     private cacheManager;
-    constructor(client: Client, cacheManager: CacheStore);
+    constructor(prisma: PrismaService, cacheManager: CacheStore);
     newLoan({ userEmail, loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate }: CreateLoanDto): Promise<void>;
     getLoans({ email }: GetLoansDto): Promise<unknown>;
     editLoan({ loanId, userEmail, loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate }: EditLoansDto): Promise<void>;
     deleteLoan({ loanId, userEmail }: DeleteLoansDto): Promise<void>;
-    addPayment({ loanId, paymentDate, paymentAmount }: AddPaymentDTO): Promise<void>;
+    addPayment({ loanId, paymentDate, paymentAmount }: AddPaymentDTO): Promise<{
+        id: bigint;
+    }>;
     editPayment({ paymentId, paymentDate, paymentAmount, email }: EditPaymentDto): Promise<void>;
+    deletePayment({ paymentId, email }: DeletePaymentDto): Promise<void>;
 }

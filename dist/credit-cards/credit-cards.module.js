@@ -7,19 +7,19 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreditCardsModule = void 0;
-const database_module_1 = require("../config/database.module");
 const users_module_1 = require("../users/users.module");
 const common_1 = require("@nestjs/common");
 const credit_cards_controller_1 = require("./credit-cards.controller");
 const credit_cards_service_1 = require("./credit-cards.service");
+const prisma_service_1 = require("../prisma.service");
 let CreditCardsModule = class CreditCardsModule {
 };
 exports.CreditCardsModule = CreditCardsModule;
 exports.CreditCardsModule = CreditCardsModule = __decorate([
     (0, common_1.Module)({
-        imports: [database_module_1.DatabaseModule, users_module_1.UsersModule],
+        imports: [users_module_1.UsersModule],
         controllers: [credit_cards_controller_1.CreditCardsController],
-        providers: [credit_cards_service_1.CreditCardsService]
+        providers: [credit_cards_service_1.CreditCardsService, prisma_service_1.PrismaService]
     })
 ], CreditCardsModule);
 //# sourceMappingURL=credit-cards.module.js.map

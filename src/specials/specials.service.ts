@@ -1,12 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Client } from '@libsql/client/.'
 import { CACHE_MANAGER, CacheKey, CacheStore, CacheTTL } from '@nestjs/cache-manager'
 import { CashFlowDto, CategoriesDto, RecentTransactionsDto } from './specials.dto'
+import { getCategoryTotalsDetailed, getLatestTransactions, getMonthlyBalance } from './specials.utils'
 
 @Injectable()
 export class SpecialsService {
   constructor(
-    @Inject('DATABASE_CLIENT') private readonly client: Client,
     @Inject(CACHE_MANAGER) private cacheManager: CacheStore
   ) {}
 
@@ -17,48 +16,10 @@ export class SpecialsService {
     const cacheData = await this.cacheManager.get(cacheKey)
     if (cacheData) return cacheData
 
-    const cashFlow = await this.client.execute({
-      sql: `SELECT
-            month,
-            SUM(total_ingresos) AS total_ingresos,
-            SUM(total_egresos) AS total_egresos
-          FROM
-            (
-              SELECT
-                STRFTIME('%m', DATE) AS month,
-                SUM(amount) AS total_ingresos,
-                0 AS total_egresos
-              FROM
-                money_entries
-              WHERE
-                STRFTIME('%Y', DATE) = ?
-              AND
-                user_email = ?
-              GROUP BY
-                STRFTIME('%m', DATE)
-              UNION ALL
-              SELECT
-                STRFTIME('%m', DATE) AS month,
-                0 AS total_ingresos,
-                SUM(amount) AS total_egresos
-              FROM
-                money_exits
-              WHERE
-                STRFTIME('%Y', DATE) = ?
-              AND
-                user_email = ?
-              GROUP BY
-                STRFTIME('%m', DATE)
-            )
-          GROUP BY
-            month
-          ORDER BY
-            month`,
-      args: [year, email, year, email]
-    })
+    const result = await getMonthlyBalance(year, email)
 
-    await this.cacheManager.set(cacheKey, cashFlow.rows, { ttl: 60 * 1000 })
-    return cashFlow.rows
+    await this.cacheManager.set(cacheKey, result, { ttl: 60 * 1000 })
+    return result
   }
 
   @CacheKey('categories')
@@ -68,24 +29,10 @@ export class SpecialsService {
     const cacheData = await this.cacheManager.get(cacheKey)
     if (cacheData) return cacheData
 
-    const categories = await this.client.execute({
-      sql: `SELECT category, SUM(amount) AS total
-      FROM (
-          SELECT category, amount, date
-          FROM money_entries
-          WHERE user_email = ? AND strftime("%Y", date) = ?
-          UNION ALL
-          SELECT category, amount AS amount, date
-          FROM money_exits
-          WHERE user_email = ? AND strftime("%Y", date) = ?
-      ) AS combined
-      GROUP BY category
-      `,
-      args: [email, year, email, year]
-    })
+    const categories = await getCategoryTotalsDetailed(year, email)
 
-    await this.cacheManager.set(cacheKey, categories.rows, { ttl: 60 * 1000 })
-    return categories.rows
+    await this.cacheManager.set(cacheKey, categories, { ttl: 60 * 1000 })
+    return categories
   }
 
   @CacheKey('recentTransactions')
@@ -95,55 +42,9 @@ export class SpecialsService {
     const cacheData = await this.cacheManager.get(cacheKey)
     if (cacheData) return cacheData
 
-    const transactions = await this.client.execute({
-      sql: `SELECT
-            date,
-            category,
-            amount
-          FROM
-            (
-              SELECT
-                date,
-                category,
-                amount
-              FROM
-                money_entries
-              WHERE
-                user_email = ?
-                AND STRFTIME('%Y', date) = ?
-              ORDER BY
-                entry_id DESC
-              LIMIT
-                4
-            ) AS latest_entries
-          UNION ALL
-          SELECT
-            date,
-            category,
-            amount
-          FROM
-            (
-              SELECT
-                category,
-                amount,
-                date
-              FROM
-                money_exits
-              WHERE
-                user_email = ?
-                AND STRFTIME('%Y', date) = ?
-              ORDER BY
-                exit_id DESC
-              LIMIT
-                4
-            ) AS latest_exits
-          ORDER BY
-            date DESC
-          `,
-      args: [email, year, email, year]
-    })
+    const transactions = await getLatestTransactions(year, email)
 
-    await this.cacheManager.set(cacheKey, transactions.rows, { ttl: 60 * 1000 })
-    return transactions.rows
+    await this.cacheManager.set(cacheKey, transactions, { ttl: 60 * 1000 })
+    return transactions
   }
 }

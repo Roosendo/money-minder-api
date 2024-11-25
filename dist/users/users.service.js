@@ -8,25 +8,24 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
+const prisma_service_1 = require("../prisma.service");
 let UsersService = class UsersService {
-    constructor(client) {
-        this.client = client;
+    constructor(prisma) {
+        this.prisma = prisma;
     }
     async createUser({ email, fullName }) {
-        const user = await this.client.execute({
-            sql: 'SELECT email FROM users WHERE email = ?',
-            args: [email]
+        const user = await this.prisma.users.findUnique({
+            where: { email }
         });
-        if (user.rows.length === 0) {
-            await this.client.execute({
-                sql: 'INSERT INTO users (email, full_name) VALUES (?, ?)',
-                args: [email, fullName]
+        if (!user) {
+            await this.prisma.users.create({
+                data: {
+                    email,
+                    full_name: fullName
+                }
             });
         }
     }
@@ -34,7 +33,6 @@ let UsersService = class UsersService {
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, common_1.Inject)('DATABASE_CLIENT')),
-    __metadata("design:paramtypes", [Object])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], UsersService);
 //# sourceMappingURL=users.service.js.map

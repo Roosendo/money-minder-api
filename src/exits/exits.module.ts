@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common'
 import { ExitController } from './exits.controller'
 import { ExitService } from './exits.service'
-import { DatabaseModule } from '@/config/database.module'
 import { UsersModule } from '@/users/users.module'
+import { PrismaService } from '@/prisma.service'
 
 @Module({
-  imports: [DatabaseModule, UsersModule],
+  imports: [UsersModule],
   controllers: [ExitController],
-  providers: [ExitService]
+  providers: [ExitService, PrismaService]
 })
 export class ExitModule {}

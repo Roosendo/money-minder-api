@@ -1,12 +1,12 @@
-import { Client } from '@libsql/client/.';
 import { CacheStore } from '@nestjs/cache-manager';
 import { CreateSavingDto, GetSavingsDto, DeleteSavingDto, UpdateSavingDto } from './savings.dto';
+import { PrismaService } from '@/prisma.service';
 export declare class SavingsService {
-    private readonly client;
+    private prisma;
     private cacheManager;
-    constructor(client: Client, cacheManager: CacheStore);
+    constructor(prisma: PrismaService, cacheManager: CacheStore);
     newSaving({ email, name, targetAmount, currentAmount, startDate, endDate }: CreateSavingDto): Promise<{
-        id: import("@libsql/core/api").Value;
+        id: number;
     }>;
     getSavings({ email }: GetSavingsDto): Promise<unknown>;
     deleteSaving({ email, id }: DeleteSavingDto): Promise<void>;

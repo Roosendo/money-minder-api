@@ -50,6 +50,9 @@ let LoansController = class LoansController {
     async editPayment(editPaymentDto) {
         return this.loansService.editPayment(editPaymentDto);
     }
+    async deletePayment(paymentId, email) {
+        return this.loansService.deletePayment({ paymentId: +paymentId, email });
+    }
 };
 exports.LoansController = LoansController;
 __decorate([
@@ -96,6 +99,14 @@ __decorate([
     __metadata("design:paramtypes", [loans_dto_1.EditPaymentDto]),
     __metadata("design:returntype", Promise)
 ], LoansController.prototype, "editPayment", null);
+__decorate([
+    (0, common_1.Delete)('/payments/:paymentId'),
+    __param(0, (0, common_1.Param)()),
+    __param(1, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], LoansController.prototype, "deletePayment", null);
 exports.LoansController = LoansController = __decorate([
     (0, common_1.Controller)('api/loans'),
     (0, common_1.UseFilters)(errors_1.AllExceptionsFilter),

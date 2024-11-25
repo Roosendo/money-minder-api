@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("XATA_DATABASE_URL")
+}
+
+model credit_cards {
+  credit_card_id   BigInt        @id @default(autoincrement())
+  user_email       String
+  name             String
+  cut_off_date     Int
+  payment_due_date Int
+  users            users         @relation(fields: [user_email], references: [email], onDelete: NoAction, onUpdate: NoAction)
+  money_exits      money_exits[]
+}
+
+model loans {
+  id              BigInt     @id @default(autoincrement())
+  user_email      String
+  loan_title      String
+  bank_name       String
+  interest_rate   Float
+  loan_amount     Float
+  loan_start_date DateTime   @db.Date
+  loan_end_date   DateTime?  @db.Date
+  users           users      @relation(fields: [user_email], references: [email], onDelete: NoAction, onUpdate: NoAction)
+  payments        payments[]
+}
+
+model money_entries {
+  entry_id    BigInt    @id @default(autoincrement())
+  user_email  String?
+  amount      Float?
+  description String?
+  category    String?
+  date        DateTime? @db.Date
+  users       users?    @relation(fields: [user_email], references: [email], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model money_exits {
+  exit_id           BigInt        @id @default(autoincrement())
+  user_email        String
+  amount            Decimal       @db.Decimal(10, 2)
+  description       String?
+  category          String
+  date              DateTime      @db.Date
+  credit_card_id    BigInt?
+  is_credit_payment Boolean?      @default(false)
+  credit_cards      credit_cards? @relation(fields: [credit_card_id], references: [credit_card_id], onDelete: NoAction, onUpdate: NoAction)
+  users             users         @relation(fields: [user_email], references: [email], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model payments {
+  id             BigInt   @id @default(autoincrement())
+  loan_id        BigInt
+  payment_date   DateTime @db.Date
+  payment_amount Float
+  loans          loans    @relation(fields: [loan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model reminders {
+  id            BigInt   @id @default(autoincrement())
+  user_email    String
+  title         String
+  description   String?
+  reminder_date DateTime @db.Date
+  users         users    @relation(fields: [user_email], references: [email], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model savings_goals {
+  id             BigInt    @id @default(autoincrement())
+  user_email     String
+  name           String
+  target_amount  Float
+  current_amount Float?    @default(0)
+  start_date     DateTime? @db.Date
+  end_date       DateTime? @db.Date
+  users          users     @relation(fields: [user_email], references: [email], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model users {
+  email         String          @id
+  full_name     String?
+  credit_cards  credit_cards[]
+  loans         loans[]
+  money_entries money_entries[]
+  money_exits   money_exits[]
+  reminders     reminders[]
+  savings_goals savings_goals[]
+}

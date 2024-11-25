@@ -10,16 +10,16 @@ exports.EntryModule = void 0;
 const common_1 = require("@nestjs/common");
 const entries_controller_1 = require("./entries.controller");
 const entries_service_1 = require("./entries.service");
-const database_module_1 = require("../config/database.module");
 const users_module_1 = require("../users/users.module");
+const prisma_service_1 = require("../prisma.service");
 let EntryModule = class EntryModule {
 };
 exports.EntryModule = EntryModule;
 exports.EntryModule = EntryModule = __decorate([
     (0, common_1.Module)({
-        imports: [database_module_1.DatabaseModule, users_module_1.UsersModule],
+        imports: [users_module_1.UsersModule],
         controllers: [entries_controller_1.EntryController],
-        providers: [entries_service_1.EntryService]
+        providers: [entries_service_1.EntryService, prisma_service_1.PrismaService]
     })
 ], EntryModule);
 //# sourceMappingURL=entries.module.js.map

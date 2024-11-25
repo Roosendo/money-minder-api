@@ -6,7 +6,7 @@ export declare class SavingsController {
     private readonly usersService;
     constructor(savingsService: SavingsService, usersService: UsersService);
     newSaving(createSavingDto: CreateSavingDto): Promise<{
-        id: import("@libsql/core/api").Value;
+        id: number;
     }>;
     getSavings(getSavingsDto: GetSavingsDto): Promise<unknown>;
     deleteSaving(deleteSavingDto: DeleteSavingDto): Promise<void>;

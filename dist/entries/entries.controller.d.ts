@@ -5,7 +5,9 @@ export declare class EntryController {
     private readonly entryService;
     private readonly usersService;
     constructor(entryService: EntryService, usersService: UsersService);
-    newEntry(createEntryDto: CreateEntryDto): Promise<void>;
+    newEntry(createEntryDto: CreateEntryDto): Promise<{
+        entry_id: bigint;
+    }>;
     getEntries(getEntriesDto: GetEntriesDto): Promise<unknown>;
     getEntriesByCategoryMonthly(monthlyEntryDto: MonthlyEntryDto): Promise<unknown>;
 }

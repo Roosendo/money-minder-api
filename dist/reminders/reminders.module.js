@@ -10,15 +10,15 @@ exports.RemindersModule = void 0;
 const common_1 = require("@nestjs/common");
 const reminders_service_1 = require("./reminders.service");
 const reminders_controller_1 = require("./reminders.controller");
-const database_module_1 = require("../config/database.module");
 const users_module_1 = require("../users/users.module");
+const prisma_service_1 = require("../prisma.service");
 let RemindersModule = class RemindersModule {
 };
 exports.RemindersModule = RemindersModule;
 exports.RemindersModule = RemindersModule = __decorate([
     (0, common_1.Module)({
-        imports: [database_module_1.DatabaseModule, users_module_1.UsersModule],
-        providers: [reminders_service_1.RemindersService],
+        imports: [users_module_1.UsersModule],
+        providers: [reminders_service_1.RemindersService, prisma_service_1.PrismaService],
         controllers: [reminders_controller_1.RemindersController]
     })
 ], RemindersModule);

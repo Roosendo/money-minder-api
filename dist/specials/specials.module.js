@@ -12,14 +12,13 @@ const specials_service_1 = require("./specials.service");
 const entries_service_1 = require("../entries/entries.service");
 const exits_service_1 = require("../exits/exits.service");
 const specials_controller_1 = require("./specials.controller");
-const database_module_1 = require("../config/database.module");
+const prisma_service_1 = require("../prisma.service");
 let SpecialsModule = class SpecialsModule {
 };
 exports.SpecialsModule = SpecialsModule;
 exports.SpecialsModule = SpecialsModule = __decorate([
     (0, common_1.Module)({
-        imports: [database_module_1.DatabaseModule],
-        providers: [specials_service_1.SpecialsService, entries_service_1.EntryService, exits_service_1.ExitService],
+        providers: [specials_service_1.SpecialsService, entries_service_1.EntryService, exits_service_1.ExitService, prisma_service_1.PrismaService],
         controllers: [specials_controller_1.SpecialsController]
     })
 ], SpecialsModule);

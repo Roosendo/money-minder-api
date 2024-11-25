@@ -16,42 +16,46 @@ exports.RemindersService = void 0;
 const common_1 = require("@nestjs/common");
 const cache_manager_1 = require("@nestjs/cache-manager");
 const reminders_dto_1 = require("./reminders.dto");
+const prisma_service_1 = require("../prisma.service");
 let RemindersService = class RemindersService {
-    constructor(client, cacheManager) {
-        this.client = client;
+    constructor(prisma, cacheManager) {
+        this.prisma = prisma;
         this.cacheManager = cacheManager;
     }
     async newReminder({ email, title, description, reminderDate }) {
-        const result = await this.client.execute({
-            sql: 'INSERT INTO reminders (user_email, title, description, reminder_date) VALUES (?, ?, ?, ?) RETURNING id',
-            args: [email, title, description, reminderDate]
+        const result = await this.prisma.reminders.create({
+            data: {
+                user_email: email,
+                title,
+                description,
+                reminder_date: reminderDate
+            },
+            select: { id: true }
         });
         await this.cacheManager.del(`reminders_${email}`);
-        const id = result.rows[0]?.id;
-        return { id };
+        return { id: result.id };
     }
     async getReminders({ email }) {
         const cacheKey = `reminders_${email}`;
         const cacheData = await this.cacheManager.get(cacheKey);
         if (cacheData)
             return cacheData;
-        const reminders = await this.client.execute({
-            sql: 'SELECT id, title, description, reminder_date FROM reminders WHERE user_email = ?',
-            args: [email]
+        const reminders = await this.prisma.reminders.findMany({
+            where: { user_email: email },
+            select: { id: true, title: true, description: true, reminder_date: true }
         });
-        return reminders.rows;
+        return reminders;
     }
     async deleteReminder({ email, id }) {
-        await this.client.execute({
-            sql: 'DELETE FROM reminders WHERE user_email = ? AND id = ?',
-            args: [email, id]
+        await this.prisma.reminders.delete({
+            where: { user_email: email, id: +id }
         });
         await this.cacheManager.del(`reminders_${email}`);
     }
     async updateReminder({ email, id, newTitle, newDescription, newDate }) {
-        await this.client.execute({
-            sql: 'UPDATE reminders SET title = ?, description = ?, reminder_date = ? WHERE user_email = ? AND id = ?',
-            args: [newTitle, newDescription, newDate, email, id]
+        await this.prisma.reminders.update({
+            where: { user_email: email, id: +id },
+            data: { title: newTitle, description: newDescription, reminder_date: newDate }
         });
         await this.cacheManager.del(`reminders_${email}`);
     }
@@ -66,8 +70,7 @@ __decorate([
 ], RemindersService.prototype, "getReminders", null);
 exports.RemindersService = RemindersService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, common_1.Inject)('DATABASE_CLIENT')),
     __param(1, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
-    __metadata("design:paramtypes", [Object, Object])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService, Object])
 ], RemindersService);
 //# sourceMappingURL=reminders.service.js.map

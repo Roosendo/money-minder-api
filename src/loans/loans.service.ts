@@ -1,19 +1,28 @@
-import { Client } from '@libsql/client'
 import { CACHE_MANAGER, CacheKey, CacheStore, CacheTTL } from '@nestjs/cache-manager'
 import { Inject, Injectable } from '@nestjs/common'
-import { AddPaymentDTO, CreateLoanDto, DeleteLoansDto, EditLoansDto, EditPaymentDto, GetLoansDto } from './loans.dto'
+import { AddPaymentDTO, CreateLoanDto, DeleteLoansDto, DeletePaymentDto, EditLoansDto, EditPaymentDto, GetLoansDto } from './loans.dto'
+import { PrismaService } from '@/prisma.service'
+import { getLoanDetails } from './loans.utils'
 
 @Injectable()
 export class LoansService {
   constructor (
-    @Inject('DATABASE_CLIENT') private readonly client: Client,
+    private prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: CacheStore
   ) {}
 
   async newLoan({ userEmail, loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate }: CreateLoanDto) {
-    await this.client.execute({
-      sql: 'INSERT INTO loans (user_email, loan_title, bank_name, interest_rate, loan_amount, loan_start_date, loan_end_date) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      args: [userEmail, loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate]
+    await this.prisma.loans.create({
+      data: {
+        user_email: userEmail,
+        loan_title: loanTitle,
+        bank_name: bankName,
+        interest_rate: interestRate,
+        loan_amount: loanAmount,
+        loan_start_date: new Date(loanStartDate),
+        loan_end_date: new Date(loanEndDate)
+      },
+      select: { id: true }
     })
 
     await this.cacheManager.del(`loans_${userEmail}`)
@@ -26,75 +35,62 @@ export class LoansService {
     const cacheData = await this.cacheManager.get(cacheKey)
     if (cacheData) return cacheData
 
-    const loans = await this.client.execute({
-      sql: `
-        SELECT
-        l.id,
-        l.loan_title,
-        l.bank_name,
-        l.interest_rate,
-        l.loan_amount,
-        l.loan_start_date,
-        l.loan_end_date,
-        (
-          SELECT json_group_array(
-            json_object(
-              'id', p.id,
-              'payment_date', p.payment_date,
-              'payment_amount', p.payment_amount
-            )
-          )
-          FROM payments p
-          WHERE p.loan_id = l.id
-          ORDER BY p.payment_date DESC
-          LIMIT 5
-        ) AS last_five_payments,
-        (
-          SELECT IFNULL(SUM(p.payment_amount), 0)
-          FROM payments p
-          WHERE p.loan_id = l.id
-        ) AS total_payments
-      FROM 
-        loans l
-      WHERE 
-        l.user_email = ?
-      `,
-      args: [email]
-    })
+    const loans = await getLoanDetails(email)
 
-    await this.cacheManager.set(cacheKey, loans.rows, { ttl: 60 * 1000 })
-    return loans.rows
+    await this.cacheManager.set(cacheKey, loans, { ttl: 60 * 1000 })
+    return loans
   }
 
   async editLoan({ loanId, userEmail, loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate }: EditLoansDto) {
-    await this.client.execute({
-      sql: 'UPDATE loans SET loan_title = ?, bank_name = ?, interest_rate = ?, loan_amount = ?, loan_start_date = ?, loan_end_date = ? WHERE id = ? AND user_email = ?',
-      args: [loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate, loanId, userEmail]
+    await this.prisma.loans.update({
+      where: { id: +loanId, user_email: userEmail },
+      data: {
+        loan_title: loanTitle,
+        bank_name: bankName,
+        interest_rate: interestRate,
+        loan_amount: loanAmount,
+        loan_start_date: new Date(loanStartDate),
+        loan_end_date: new Date(loanEndDate)
+      }
     })
 
     await this.cacheManager.del(`loans_${userEmail}`)
   }
 
   async deleteLoan({ loanId, userEmail }: DeleteLoansDto) {
-    await this.client.execute({
-      sql: 'DELETE FROM loans WHERE loan_id = ? AND user_email = ?',
-      args: [loanId, userEmail]
+    await this.prisma.loans.delete({
+      where: { id: +loanId, user_email: userEmail }
     })
 
     await this.cacheManager.del(`loans_${userEmail}`)
   }
 
   async addPayment({ loanId, paymentDate, paymentAmount }: AddPaymentDTO) {
-    await this.client.execute({
-      sql: 'INSERT INTO payments (loan_id, payment_date, payment_amount) VALUES (?, ?, ?)',
-      args: [loanId, paymentDate, paymentAmount]
+    return await this.prisma.payments.create({
+      data: {
+        loan_id: loanId,
+        payment_date: new Date(paymentDate),
+        payment_amount: paymentAmount
+      },
+      select: { id: true }
     })
   }
 
   async editPayment({ paymentId, paymentDate, paymentAmount, email }: EditPaymentDto) {
-    await this.client.execute({
-      sql: 'UPDATE payments SET payment_date = ?, payment_amount = ? WHERE id = ?',
-      args: [paymentDate, paymentAmount, paymentId]
+    await this.prisma.payments.update({
+      where: { id: +paymentId },
+      data: {
+        payment_date: new Date(paymentDate),
+        payment_amount: paymentAmount
+      }
+    })
+
+    await this.cacheManager.del(`loans_${email}`)
+  }
+
+  async deletePayment({ paymentId, email }: DeletePaymentDto) {
+    await this.prisma.payments.delete({
+      where: { id: +paymentId }
     })
 
     await this.cacheManager.del(`loans_${email}`)

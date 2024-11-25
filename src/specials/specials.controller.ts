@@ -22,12 +22,11 @@ export class SpecialsController {
 
   @Get('financial-summary-yearly')
   async getFinancialSummaryYearly(@Query() financialSummaryYearlyDto: FinancialSummaryYearlyDto) {
-    // TODO: fix any
     const entries = await this.entryService.getYearlySummary(financialSummaryYearlyDto)
     const exits = await this.exitService.getYearlySummary(financialSummaryYearlyDto)
 
-    const totalEntries = entries[0]?.totalEntries || 0
-    const totalExits = exits[0]?.totalExits || 0
+    const totalEntries = entries._sum || 0
+    const totalExits = exits._sum || 0
 
     return { totalEntries, totalExits }
   }
@@ -39,8 +38,8 @@ export class SpecialsController {
     const entries = await this.entryService.getMonthlySummary(financialSummaryMonthlyDto)
     const exits = await this.exitService.getMonthlySummary(financialSummaryMonthlyDto)
 
-    const totalEntries = entries[0]?.totalEntries || 0
-    const totalExits = exits[0]?.totalExits || 0
+    const totalEntries = entries._sum || 0
+    const totalExits = exits._sum || 0
 
     return { totalEntries, totalExits }
   }

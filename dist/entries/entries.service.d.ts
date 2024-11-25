@@ -1,17 +1,41 @@
-import { Client } from '@libsql/client/.';
 import { CacheStore } from '@nestjs/cache-manager';
 import { CreateEntryDto, GetEntriesDto, MonthlyEntryDto, YearlyEntryDto } from './entries.dto';
+import { PrismaService } from '@/prisma.service';
 interface FS {
-    totalEntries: number | null;
+    _sum: number;
 }
 export declare class EntryService {
-    private readonly client;
+    private prisma;
     private cacheManager;
-    constructor(client: Client, cacheManager: CacheStore);
-    newEntry({ email, date, amount, category, description }: CreateEntryDto): Promise<void>;
+    constructor(prisma: PrismaService, cacheManager: CacheStore);
+    newEntry({ email, date, amount, category, description }: CreateEntryDto): Promise<{
+        entry_id: bigint;
+    }>;
     getEntries({ email }: GetEntriesDto): Promise<unknown>;
     getEntriesByCategoryMonthly({ email, month, year }: MonthlyEntryDto): Promise<unknown>;
-    getMonthlySummary({ email, month, year }: MonthlyEntryDto): Promise<import("@libsql/core/api").Row[] | FS[]>;
-    getYearlySummary({ email, year }: YearlyEntryDto): Promise<import("@libsql/core/api").Row[] | FS[]>;
+    getMonthlySummary({ email, month, year }: MonthlyEntryDto): Promise<FS | import("@prisma/client").Prisma.GetMoney_entriesAggregateType<{
+        where: {
+            user_email: string;
+            date: {
+                gte: Date;
+                lt: Date;
+            };
+        };
+        _sum: {
+            amount: true;
+        };
+    }>>;
+    getYearlySummary({ email, year }: YearlyEntryDto): Promise<FS | import("@prisma/client").Prisma.GetMoney_entriesAggregateType<{
+        where: {
+            user_email: string;
+            date: {
+                gte: Date;
+                lt: Date;
+            };
+        };
+        _sum: {
+            amount: true;
+        };
+    }>>;
 }
 export {};

@@ -2,17 +2,19 @@ import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
+import configure from '@/common/configs/config'
+import { SavingsModule } from './savings/savings.module'
+import { CacheModule } from '@nestjs/cache-manager'
+import { PrismaService } from './prisma.service'
+import { APP_INTERCEPTOR } from '@nestjs/core'
+import { BigIntInterceptor } from './big-int-interceptor'
 import { EntryModule } from './entries/entries.module'
 import { ExitModule } from './exits/exits.module'
-import { DatabaseModule } from './config/database.module'
-import configure from '@/common/configs/config'
 import { PhrasesModule } from './phrases/phrases.module'
 import { RemindersModule } from './reminders/reminders.module'
-import { SavingsModule } from './savings/savings.module'
-import { SpecialsModule } from './specials/specials.module'
 import { AuthModule } from './auth/auth.module'
 import { EmailModule } from './email/email.module'
-import { CacheModule } from '@nestjs/cache-manager'
+import { SpecialsModule } from './specials/specials.module'
 import { CreditCardsModule } from './credit-cards/credit-cards.module'
 import { LoansModule } from './loans/loans.module'
 
@@ -28,7 +30,6 @@ import { LoansModule } from './loans/loans.module'
     RemindersModule,
     SavingsModule,
     SpecialsModule,
-    DatabaseModule,
     AuthModule,
     EmailModule,
     CreditCardsModule,
@@ -40,6 +41,10 @@ import { LoansModule } from './loans/loans.module'
     })
   ],
   controllers: [AppController],
-  providers: [AppService]
+  providers: [AppService, PrismaService, {
+    provide: APP_INTERCEPTOR,
+    useClass: BigIntInterceptor
+  }],
+  exports: [PrismaService]
 })
 export class AppModule {}

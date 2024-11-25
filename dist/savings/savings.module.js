@@ -10,15 +10,15 @@ exports.SavingsModule = void 0;
 const common_1 = require("@nestjs/common");
 const savings_service_1 = require("./savings.service");
 const savings_controller_1 = require("./savings.controller");
-const database_module_1 = require("../config/database.module");
 const users_module_1 = require("../users/users.module");
+const prisma_service_1 = require("../prisma.service");
 let SavingsModule = class SavingsModule {
 };
 exports.SavingsModule = SavingsModule;
 exports.SavingsModule = SavingsModule = __decorate([
     (0, common_1.Module)({
-        imports: [database_module_1.DatabaseModule, users_module_1.UsersModule],
-        providers: [savings_service_1.SavingsService],
+        imports: [users_module_1.UsersModule],
+        providers: [savings_service_1.SavingsService, prisma_service_1.PrismaService],
         controllers: [savings_controller_1.SavingsController]
     })
 ], SavingsModule);

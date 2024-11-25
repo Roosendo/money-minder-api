@@ -1,7 +1,7 @@
 import { CreateUserDto } from './users.dto';
-import { Client } from '@libsql/client/.';
+import { PrismaService } from '@/prisma.service';
 export declare class UsersService {
-    private readonly client;
-    constructor(client: Client);
+    private prisma;
+    constructor(prisma: PrismaService);
     createUser({ email, fullName }: CreateUserDto): Promise<void>;
 }

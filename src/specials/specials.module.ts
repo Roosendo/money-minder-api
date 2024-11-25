@@ -3,11 +3,10 @@ import { SpecialsService } from './specials.service'
 import { EntryService } from '@/entries/entries.service'
 import { ExitService } from '@/exits/exits.service'
 import { SpecialsController } from './specials.controller'
-import { DatabaseModule } from '@/config/database.module'
+import { PrismaService } from '@/prisma.service'
 
 @Module({
-  imports: [DatabaseModule],
-  providers: [SpecialsService, EntryService, ExitService],
+  providers: [SpecialsService, EntryService, ExitService, PrismaService],
   controllers: [SpecialsController]
 })
 export class SpecialsModule {}

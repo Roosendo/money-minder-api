@@ -36,6 +36,10 @@ export declare class EditPaymentDto {
     paymentAmount: number;
     email: string;
 }
+export declare class DeletePaymentDto {
+    paymentId: number;
+    email: string;
+}
 export interface APIResponse {
     loan_title: string;
     bank_name: string;

@@ -18,6 +18,9 @@ export declare class LoansController {
     }[]>;
     editLoan(editLoanDto: EditLoansDto, loanId: string): Promise<void>;
     deleteLoan(deleteLoanDto: DeleteLoansDto, loanId: string): Promise<void>;
-    addPayment(addPaymentDto: AddPaymentDTO): Promise<void>;
+    addPayment(addPaymentDto: AddPaymentDTO): Promise<{
+        id: bigint;
+    }>;
     editPayment(editPaymentDto: EditPaymentDto): Promise<void>;
+    deletePayment(paymentId: string, email: string): Promise<void>;
 }

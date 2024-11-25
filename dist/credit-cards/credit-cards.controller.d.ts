@@ -9,5 +9,18 @@ export declare class CreditCardsController {
     getCreditCards(getCreditCardsDto: GetCreditCardsDto): Promise<unknown>;
     editCreditCard(editCreditCardDto: EditCreditCardDto, creditCardId: string): Promise<void>;
     deleteCreditCard(deleteCreditCardDto: DeleteCreditCardDto, creditCardId: string): Promise<void>;
-    getPurchases(email: string): Promise<import("@libsql/core/api").Row[]>;
+    getPurchases(email: string): Promise<{
+        exits: {
+            date: Date;
+            amount: import("@prisma/client/runtime/library").Decimal;
+            description: string;
+            exit_id: bigint;
+        }[];
+        total_amount: number;
+        start_cut_off_date: Date;
+        end_cut_off_date: Date;
+        name: string;
+        credit_card_id: bigint;
+        cut_off_date: number;
+    }[]>;
 }

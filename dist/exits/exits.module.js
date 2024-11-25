@@ -10,16 +10,16 @@ exports.ExitModule = void 0;
 const common_1 = require("@nestjs/common");
 const exits_controller_1 = require("./exits.controller");
 const exits_service_1 = require("./exits.service");
-const database_module_1 = require("../config/database.module");
 const users_module_1 = require("../users/users.module");
+const prisma_service_1 = require("../prisma.service");
 let ExitModule = class ExitModule {
 };
 exports.ExitModule = ExitModule;
 exports.ExitModule = ExitModule = __decorate([
     (0, common_1.Module)({
-        imports: [database_module_1.DatabaseModule, users_module_1.UsersModule],
+        imports: [users_module_1.UsersModule],
         controllers: [exits_controller_1.ExitController],
-        providers: [exits_service_1.ExitService]
+        providers: [exits_service_1.ExitService, prisma_service_1.PrismaService]
     })
 ], ExitModule);
 //# sourceMappingURL=exits.module.js.map

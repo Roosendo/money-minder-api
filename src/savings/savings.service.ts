@@ -1,12 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Client } from '@libsql/client/.'
 import { CACHE_MANAGER, CacheKey, CacheStore, CacheTTL } from '@nestjs/cache-manager'
 import { CreateSavingDto, GetSavingsDto, DeleteSavingDto, UpdateSavingDto } from './savings.dto'
+import { PrismaService } from '@/prisma.service'
 
 @Injectable()
 export class SavingsService {
   constructor(
-    @Inject('DATABASE_CLIENT') private readonly client: Client,
+    private prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: CacheStore
   ) {}
 
@@ -18,14 +18,21 @@ export class SavingsService {
     startDate,
     endDate
   }: CreateSavingDto) {
-    const saving = await this.client.execute({
-      sql: 'INSERT INTO savings_goals (user_email, name, target_amount, current_amount, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?) RETURNING id',
-      args: [email, name, targetAmount, currentAmount, startDate, endDate]
+    const saving = await this.prisma.savings_goals.create({
+      data: {
+        user_email: email,
+        name,
+        target_amount: targetAmount,
+        current_amount: currentAmount,
+        start_date: new Date(startDate),
+        end_date: new Date(endDate)
+      },
+      select: { id: true }
     })
+    const interceptedId = Number(saving.id)
 
     await this.cacheManager.del(`savings_${email}`)
-    const id = saving.rows[0]?.id
-    return { id }
+    return { id: interceptedId }
   }
 
   @CacheKey('savings')
@@ -35,19 +42,27 @@ export class SavingsService {
     const cacheData = await this.cacheManager.get(cacheKey)
     if (cacheData) return cacheData
 
-    const savings = await this.client.execute({
-      sql: 'SELECT id, name, target_amount, current_amount, end_date FROM savings_goals WHERE user_email = ?',
-      args: [email]
+    const savings = await this.prisma.savings_goals.findMany({
+      where: { user_email: email },
+      select: {
+        id: true,
+        name: true,
+        target_amount: true,
+        current_amount: true,
+        end_date: true
+      }
     })
 
-    await this.cacheManager.set(cacheKey, savings.rows, { ttl: 60 * 1000 })
-    return savings.rows
+    await this.cacheManager.set(cacheKey, savings, { ttl: 60 * 1000 })
+    return savings
   }
 
   async deleteSaving({ email, id }: DeleteSavingDto) {
-    await this.client.execute({
-      sql: 'DELETE FROM savings_goals WHERE user_email = ? AND id = ?',
-      args: [email, id]
+    await this.prisma.savings_goals.delete({
+      where: {
+        user_email: email,
+        id: +id
+      }
     })
 
     await this.cacheManager.del(`savings_${email}`)
@@ -61,9 +76,17 @@ export class SavingsService {
     newCurrentAmount,
     newEndDate
   }: UpdateSavingDto) {
-    await this.client.execute({
-      sql: 'UPDATE savings_goals SET name = ?, target_amount = ?, current_amount = ?, end_date = ? WHERE user_email = ? AND id = ?',
-      args: [newSavingName, newTarget, newCurrentAmount, newEndDate, email, id]
+    await this.prisma.savings_goals.updateMany({
+      where: {
+        user_email: email,
+        id: +id
+      },
+      data: {
+        name: newSavingName,
+        target_amount: newTarget,
+        current_amount: newCurrentAmount,
+        end_date: new Date(newEndDate)
+      }
     })
 
     await this.cacheManager.del(`savings_${email}`)

@@ -116,6 +116,16 @@ export class EditPaymentDto {
   email: string
 }
 
+export class DeletePaymentDto {
+  @IsNumber()
+  @IsNotEmpty()
+  paymentId: number
+
+  @IsString()
+  @IsNotEmpty()
+  email: string
+}
+
 export interface APIResponse {
   loan_title: string
   bank_name: string

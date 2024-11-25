@@ -51,4 +51,9 @@ export class LoansController {
   async editPayment(@Body() editPaymentDto: EditPaymentDto) {
     return this.loansService.editPayment(editPaymentDto)
   }
+
+  @Delete('/payments/:paymentId')
+  async deletePayment(@Param() paymentId: string, @Query() email: string) {
+    return this.loansService.deletePayment({ paymentId: +paymentId, email })
+  }
 }

@@ -1,12 +1,12 @@
-import { Client } from '@libsql/client/.';
 import { CacheStore } from '@nestjs/cache-manager';
 import { CreateReminderDto, GetRemindersDto, DeleteReminderDto, UpdateReminderDto } from './reminders.dto';
+import { PrismaService } from '@/prisma.service';
 export declare class RemindersService {
-    private readonly client;
+    private prisma;
     private cacheManager;
-    constructor(client: Client, cacheManager: CacheStore);
+    constructor(prisma: PrismaService, cacheManager: CacheStore);
     newReminder({ email, title, description, reminderDate }: CreateReminderDto): Promise<{
-        id: import("@libsql/core/api").Value;
+        id: bigint;
     }>;
     getReminders({ email }: GetRemindersDto): Promise<unknown>;
     deleteReminder({ email, id }: DeleteReminderDto): Promise<void>;

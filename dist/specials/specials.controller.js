@@ -28,15 +28,15 @@ let SpecialsController = class SpecialsController {
     async getFinancialSummaryYearly(financialSummaryYearlyDto) {
         const entries = await this.entryService.getYearlySummary(financialSummaryYearlyDto);
         const exits = await this.exitService.getYearlySummary(financialSummaryYearlyDto);
-        const totalEntries = entries[0]?.totalEntries || 0;
-        const totalExits = exits[0]?.totalExits || 0;
+        const totalEntries = entries._sum || 0;
+        const totalExits = exits._sum || 0;
         return { totalEntries, totalExits };
     }
     async getFinancialSummaryMonthly(financialSummaryMonthlyDto) {
         const entries = await this.entryService.getMonthlySummary(financialSummaryMonthlyDto);
         const exits = await this.exitService.getMonthlySummary(financialSummaryMonthlyDto);
-        const totalEntries = entries[0]?.totalEntries || 0;
-        const totalExits = exits[0]?.totalExits || 0;
+        const totalEntries = entries._sum || 0;
+        const totalExits = exits._sum || 0;
         return { totalEntries, totalExits };
     }
     async getCashFlow(cashFlowDto) {

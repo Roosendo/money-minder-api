@@ -16,65 +16,106 @@ exports.EntryService = void 0;
 const common_1 = require("@nestjs/common");
 const cache_manager_1 = require("@nestjs/cache-manager");
 const entries_dto_1 = require("./entries.dto");
+const prisma_service_1 = require("../prisma.service");
 let EntryService = class EntryService {
-    constructor(client, cacheManager) {
-        this.client = client;
+    constructor(prisma, cacheManager) {
+        this.prisma = prisma;
         this.cacheManager = cacheManager;
     }
     async newEntry({ email, date, amount, category, description }) {
-        await this.client.execute({
-            sql: 'INSERT INTO money_entries (user_email, DATE, amount, category, description) VALUES (?, ?, ?, ?, ?)',
-            args: [email, date, amount, category, description]
+        const id = await this.prisma.money_entries.create({
+            data: {
+                user_email: email,
+                date: new Date(date),
+                amount,
+                category,
+                description
+            },
+            select: { entry_id: true }
         });
         await this.cacheManager.del(`entries_${email}`);
+        return id;
     }
     async getEntries({ email }) {
         const cacheKey = `entries_${email}`;
         const cacheData = await this.cacheManager.get(cacheKey);
         if (cacheData)
             return cacheData;
-        const entries = await this.client.execute({
-            sql: 'SELECT amount, description, category, DATE, entry_id FROM money_entries WHERE user_email = ? ORDER BY entry_id DESC LIMIT 15',
-            args: [email]
+        const entries = await this.prisma.money_entries.findMany({
+            where: { user_email: email },
+            orderBy: { entry_id: 'desc' },
+            take: 15,
+            select: {
+                amount: true,
+                description: true,
+                category: true,
+                date: true,
+                entry_id: true
+            }
         });
-        await this.cacheManager.set(cacheKey, entries.rows, { ttl: 60 * 1000 });
-        return entries.rows;
+        await this.cacheManager.set(cacheKey, entries, { ttl: 60 * 1000 });
+        return entries;
     }
     async getEntriesByCategoryMonthly({ email, month, year }) {
         const cacheKey = `monthlyEntries_entries_${email}_${month}_${year}`;
         const cacheData = await this.cacheManager.get(cacheKey);
         if (cacheData)
             return cacheData;
-        const entries = await this.client.execute({
-            sql: 'SELECT category, SUM(amount) AS total FROM money_entries WHERE user_email = ? AND strftime("%m", date) = ? AND strftime("%Y", date) = ? GROUP BY category',
-            args: [email, month, year]
+        const entries = await this.prisma.money_entries.groupBy({
+            by: ['category'],
+            where: {
+                user_email: email,
+                date: {
+                    gte: new Date(`${year}-${month}-01`),
+                    lt: new Date(`${year}-${month}-32`)
+                }
+            },
+            _sum: {
+                amount: true,
+            }
         });
-        await this.cacheManager.set(cacheKey, entries.rows, { ttl: 60 * 1000 });
-        return entries.rows;
+        await this.cacheManager.set(cacheKey, entries, { ttl: 60 * 1000 });
+        return entries;
     }
     async getMonthlySummary({ email, month, year }) {
         const cacheKey = `monthlySummary_entries_${email}_${month}_${year}`;
         const cacheData = await this.cacheManager.get(cacheKey);
         if (cacheData)
             return cacheData;
-        const entries = await this.client.execute({
-            sql: 'SELECT SUM(amount) AS totalEntries FROM money_entries WHERE user_email = ? AND strftime("%m", date) = ? AND strftime("%Y", date) = ?',
-            args: [email, month, year]
+        const entries = await this.prisma.money_entries.aggregate({
+            where: {
+                user_email: email,
+                date: {
+                    gte: new Date(`${year}-${month}-01`),
+                    lt: new Date(`${year}-${month}-32`)
+                }
+            },
+            _sum: {
+                amount: true
+            }
         });
-        await this.cacheManager.set(cacheKey, entries.rows, { ttl: 60 * 1000 });
-        return entries.rows;
+        await this.cacheManager.set(cacheKey, entries, { ttl: 60 * 1000 });
+        return entries;
     }
     async getYearlySummary({ email, year }) {
         const cacheKey = `yearlySummary_entries_${email}_${year}`;
         const cacheData = await this.cacheManager.get(cacheKey);
         if (cacheData)
             return cacheData;
-        const entries = await this.client.execute({
-            sql: 'SELECT SUM(amount) AS totalEntries FROM money_entries WHERE user_email = ? AND strftime("%Y", date) = ?',
-            args: [email, year]
+        const entries = await this.prisma.money_entries.aggregate({
+            where: {
+                user_email: email,
+                date: {
+                    gte: new Date(`${year}-01-01`),
+                    lt: new Date(`${year}-12-32`)
+                }
+            },
+            _sum: {
+                amount: true
+            }
         });
-        await this.cacheManager.set(cacheKey, entries.rows, { ttl: 60 * 1000 });
-        return entries.rows;
+        await this.cacheManager.set(cacheKey, entries, { ttl: 60 * 1000 });
+        return entries;
     }
 };
 exports.EntryService = EntryService;
@@ -108,8 +149,7 @@ __decorate([
 ], EntryService.prototype, "getYearlySummary", null);
 exports.EntryService = EntryService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, common_1.Inject)('DATABASE_CLIENT')),
     __param(1, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
-    __metadata("design:paramtypes", [Object, Object])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService, Object])
 ], EntryService);
 //# sourceMappingURL=entries.service.js.map

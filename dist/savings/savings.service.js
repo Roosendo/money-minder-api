@@ -16,43 +16,67 @@ exports.SavingsService = void 0;
 const common_1 = require("@nestjs/common");
 const cache_manager_1 = require("@nestjs/cache-manager");
 const savings_dto_1 = require("./savings.dto");
+const prisma_service_1 = require("../prisma.service");
 let SavingsService = class SavingsService {
-    constructor(client, cacheManager) {
-        this.client = client;
+    constructor(prisma, cacheManager) {
+        this.prisma = prisma;
         this.cacheManager = cacheManager;
     }
     async newSaving({ email, name, targetAmount, currentAmount, startDate, endDate }) {
-        const saving = await this.client.execute({
-            sql: 'INSERT INTO savings_goals (user_email, name, target_amount, current_amount, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?) RETURNING id',
-            args: [email, name, targetAmount, currentAmount, startDate, endDate]
+        const saving = await this.prisma.savings_goals.create({
+            data: {
+                user_email: email,
+                name,
+                target_amount: targetAmount,
+                current_amount: currentAmount,
+                start_date: new Date(startDate),
+                end_date: new Date(endDate)
+            },
+            select: { id: true }
         });
+        const interceptedId = Number(saving.id);
         await this.cacheManager.del(`savings_${email}`);
-        const id = saving.rows[0]?.id;
-        return { id };
+        return { id: interceptedId };
     }
     async getSavings({ email }) {
         const cacheKey = `savings_${email}`;
         const cacheData = await this.cacheManager.get(cacheKey);
         if (cacheData)
             return cacheData;
-        const savings = await this.client.execute({
-            sql: 'SELECT id, name, target_amount, current_amount, end_date FROM savings_goals WHERE user_email = ?',
-            args: [email]
+        const savings = await this.prisma.savings_goals.findMany({
+            where: { user_email: email },
+            select: {
+                id: true,
+                name: true,
+                target_amount: true,
+                current_amount: true,
+                end_date: true
+            }
         });
-        await this.cacheManager.set(cacheKey, savings.rows, { ttl: 60 * 1000 });
-        return savings.rows;
+        await this.cacheManager.set(cacheKey, savings, { ttl: 60 * 1000 });
+        return savings;
     }
     async deleteSaving({ email, id }) {
-        await this.client.execute({
-            sql: 'DELETE FROM savings_goals WHERE user_email = ? AND id = ?',
-            args: [email, id]
+        await this.prisma.savings_goals.delete({
+            where: {
+                user_email: email,
+                id: +id
+            }
         });
         await this.cacheManager.del(`savings_${email}`);
     }
     async updateSaving({ email, id, newSavingName, newTarget, newCurrentAmount, newEndDate }) {
-        await this.client.execute({
-            sql: 'UPDATE savings_goals SET name = ?, target_amount = ?, current_amount = ?, end_date = ? WHERE user_email = ? AND id = ?',
-            args: [newSavingName, newTarget, newCurrentAmount, newEndDate, email, id]
+        await this.prisma.savings_goals.updateMany({
+            where: {
+                user_email: email,
+                id: +id
+            },
+            data: {
+                name: newSavingName,
+                target_amount: newTarget,
+                current_amount: newCurrentAmount,
+                end_date: new Date(newEndDate)
+            }
         });
         await this.cacheManager.del(`savings_${email}`);
     }
@@ -67,8 +91,7 @@ __decorate([
 ], SavingsService.prototype, "getSavings", null);
 exports.SavingsService = SavingsService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, common_1.Inject)('DATABASE_CLIENT')),
     __param(1, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
-    __metadata("design:paramtypes", [Object, Object])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService, Object])
 ], SavingsService);
 //# sourceMappingURL=savings.service.js.map

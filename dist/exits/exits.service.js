@@ -16,65 +16,95 @@ exports.ExitService = void 0;
 const common_1 = require("@nestjs/common");
 const cache_manager_1 = require("@nestjs/cache-manager");
 const exits_dto_1 = require("./exits.dto");
+const prisma_service_1 = require("../prisma.service");
 let ExitService = class ExitService {
-    constructor(client, cacheManager) {
-        this.client = client;
+    constructor(prisma, cacheManager) {
+        this.prisma = prisma;
         this.cacheManager = cacheManager;
     }
     async newExpense({ email, date, amount, category, description, creditCardId, isCreditPayment }) {
-        await this.client.execute({
-            sql: 'INSERT INTO money_exits (user_email, amount, description, category, date, credit_card_id, is_credit_payment) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            args: [email, amount, description, category, date, creditCardId, isCreditPayment ? 1 : 0]
+        const id = await this.prisma.money_exits.create({
+            data: {
+                user_email: email,
+                amount,
+                description,
+                category,
+                date,
+                credit_card_id: creditCardId,
+                is_credit_payment: isCreditPayment
+            },
+            select: { exit_id: true }
         });
         await this.cacheManager.del(`exits_${email}`);
+        return id;
     }
     async getExits({ email }) {
         const cacheKey = `exits_${email}`;
         const cacheData = await this.cacheManager.get(cacheKey);
         if (cacheData)
             return cacheData;
-        const expenses = await this.client.execute({
-            sql: 'SELECT amount, description, category, date, exit_id, credit_card_id, is_credit_payment FROM money_exits WHERE user_email = ? ORDER BY exit_id DESC LIMIT 15',
-            args: [email]
+        const expenses = await this.prisma.money_exits.findMany({
+            where: { user_email: email },
+            orderBy: { exit_id: 'desc' },
+            take: 15,
+            select: {
+                amount: true,
+                description: true,
+                category: true,
+                date: true,
+                exit_id: true,
+                credit_card_id: true,
+                is_credit_payment: true
+            }
         });
-        await this.cacheManager.set(cacheKey, expenses.rows, { ttl: 60 * 1000 });
-        return expenses.rows;
+        await this.cacheManager.set(cacheKey, expenses, { ttl: 60 * 1000 });
+        return expenses;
     }
     async getExpensesByCategoryMonthly({ email, month, year }) {
         const cacheKey = `monthlyExpenses_exits_${email}_${month}_${year}`;
         const cacheData = await this.cacheManager.get(cacheKey);
         if (cacheData)
             return cacheData;
-        const expenses = await this.client.execute({
-            sql: 'SELECT category, SUM(amount) AS total FROM money_exits WHERE user_email = ? AND strftime("%m", date) = ? AND strftime("%Y", date) = ? GROUP BY category',
-            args: [email, month, year]
+        const expenses = await this.prisma.money_exits.groupBy({
+            by: ['category'],
+            where: {
+                user_email: email,
+                date: { gte: new Date(`${year}-${month}-01`), lt: new Date(`${year}-${month}-32`) }
+            },
+            _sum: { amount: true }
         });
-        await this.cacheManager.set(cacheKey, expenses.rows, { ttl: 60 * 1000 });
-        return expenses.rows;
+        await this.cacheManager.set(cacheKey, expenses, { ttl: 60 * 1000 });
+        return expenses;
     }
     async getMonthlySummary({ email, month, year }) {
         const cacheKey = `monthlySummary_exits_${email}_${month}_${year}`;
         const cacheData = await this.cacheManager.get(cacheKey);
         if (cacheData)
             return cacheData;
-        const expenses = await this.client.execute({
-            sql: 'SELECT SUM(amount) AS totalExits FROM money_exits WHERE user_email = ? AND strftime("%m", date) = ? AND strftime("%Y", date) = ?',
-            args: [email, month, year]
+        const expenses = await this.prisma.money_exits.aggregate({
+            where: {
+                user_email: email,
+                date: { gte: new Date(`${year}-${month}-01`), lt: new Date(`${year}-${month}-32`) }
+            },
+            _sum: { amount: true }
         });
-        await this.cacheManager.set(cacheKey, expenses.rows, { ttl: 60 * 1000 });
-        return expenses.rows;
+        await this.cacheManager.set(cacheKey, expenses, { ttl: 60 * 1000 });
+        return expenses;
     }
     async getYearlySummary({ email, year }) {
         const cacheKey = `yearlySummary_exits_${email}_${year}`;
         const cacheData = await this.cacheManager.get(cacheKey);
         if (cacheData)
             return cacheData;
-        const expenses = await this.client.execute({
-            sql: 'SELECT SUM(amount) AS totalExits FROM money_exits WHERE user_email = ? AND strftime("%Y", date) = ?',
-            args: [email, year]
+        const expenses = await this.prisma.money_exits.aggregate({
+            where: {
+                user_email: email,
+                date: { gte: new Date(`${year}-01-01`), lt: new Date(`${year}-12-32`) }
+            },
+            _sum: { amount: true }
         });
-        await this.cacheManager.set(cacheKey, expenses.rows, { ttl: 60 * 1000 });
-        return expenses.rows;
+        await this.cacheManager.set(cacheKey, expenses, { ttl: 60 * 1000 });
+        return expenses;
     }
 };
 exports.ExitService = ExitService;
@@ -108,8 +138,7 @@ __decorate([
 ], ExitService.prototype, "getYearlySummary", null);
 exports.ExitService = ExitService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, common_1.Inject)('DATABASE_CLIENT')),
     __param(1, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
-    __metadata("design:paramtypes", [Object, Object])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService, Object])
 ], ExitService);
 //# sourceMappingURL=exits.service.js.map
