@@ -29,7 +29,8 @@ let CreditCardsService = class CreditCardsService {
                 name,
                 cut_off_date: +cutOffDate,
                 payment_due_date: +paymentDueDate
-            }
+            },
+            select: { credit_card_id: true }
         });
         await this.cacheManager.del(`credit_cards_${email}`);
     }
