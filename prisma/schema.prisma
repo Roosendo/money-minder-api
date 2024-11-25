@@ -43,7 +43,7 @@ model money_entries {
 model money_exits {
   exit_id           BigInt        @id @default(autoincrement())
   user_email        String
-  amount            Decimal       @db.Decimal(10, 2)
+  amount            Float
   description       String?
   category          String
   date              DateTime      @db.Date

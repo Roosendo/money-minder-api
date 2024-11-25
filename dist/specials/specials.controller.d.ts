@@ -12,7 +12,7 @@ export declare class SpecialsController {
             amount: number;
         };
         totalExits: number | {
-            amount: import("@prisma/client/runtime/library").Decimal;
+            amount: number;
         };
     }>;
     getFinancialSummaryMonthly(financialSummaryMonthlyDto: FinancialSummaryMonthlyDto): Promise<{
@@ -20,7 +20,7 @@ export declare class SpecialsController {
             amount: number;
         };
         totalExits: number | {
-            amount: import("@prisma/client/runtime/library").Decimal;
+            amount: number;
         };
     }>;
     getCashFlow(cashFlowDto: CashFlowDto): Promise<unknown>;
