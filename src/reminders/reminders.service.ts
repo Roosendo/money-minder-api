@@ -56,7 +56,7 @@ export class RemindersService {
   async updateReminder({ email, id, newTitle, newDescription, newDate }: UpdateReminderDto) {
     await this.prisma.reminders.update({
       where: { user_email: email, id: +id },
-      data: { title: newTitle, description: newDescription, reminder_date: newDate }
+      data: { title: newTitle, description: newDescription, reminder_date: new Date(newDate) }
     })
 
     await this.cacheManager.del(`reminders_${email}`)
