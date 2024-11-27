@@ -5,7 +5,9 @@ export declare class LoansController {
     private readonly loansService;
     private readonly usersService;
     constructor(loansService: LoansService, usersService: UsersService);
-    newLoan(createLoanDto: CreateLoanDto): Promise<void>;
+    newLoan(createLoanDto: CreateLoanDto): Promise<{
+        id: bigint;
+    }>;
     getLoans(getLoansDto: GetLoansDto): Promise<{
         last_five_payments: any;
         loan_title: string;

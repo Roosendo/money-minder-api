@@ -24,7 +24,7 @@ let LoansService = class LoansService {
         this.cacheManager = cacheManager;
     }
     async newLoan({ userEmail, loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate }) {
-        await this.prisma.loans.create({
+        const newLoanId = await this.prisma.loans.create({
             data: {
                 user_email: userEmail,
                 loan_title: loanTitle,
@@ -37,6 +37,7 @@ let LoansService = class LoansService {
             select: { id: true }
         });
         await this.cacheManager.del(`loans_${userEmail}`);
+        return { id: newLoanId.id };
     }
     async getLoans({ email }) {
         const cacheKey = `loans_${email}`;

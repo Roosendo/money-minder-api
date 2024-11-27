@@ -12,7 +12,7 @@ export class LoansService {
   ) {}
 
   async newLoan({ userEmail, loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate }: CreateLoanDto) {
-    await this.prisma.loans.create({
+    const newLoanId = await this.prisma.loans.create({
       data: {
         user_email: userEmail,
         loan_title: loanTitle,
@@ -26,6 +26,7 @@ export class LoansService {
     })
 
     await this.cacheManager.del(`loans_${userEmail}`)
+    return { id: newLoanId.id }
   }
 
   @CacheKey('loans')

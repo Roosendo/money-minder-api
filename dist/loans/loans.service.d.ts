@@ -5,7 +5,9 @@ export declare class LoansService {
     private prisma;
     private cacheManager;
     constructor(prisma: PrismaService, cacheManager: CacheStore);
-    newLoan({ userEmail, loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate }: CreateLoanDto): Promise<void>;
+    newLoan({ userEmail, loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate }: CreateLoanDto): Promise<{
+        id: bigint;
+    }>;
     getLoans({ email }: GetLoansDto): Promise<unknown>;
     editLoan({ loanId, userEmail, loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate }: EditLoansDto): Promise<void>;
     deleteLoan({ loanId, userEmail }: DeleteLoansDto): Promise<void>;
