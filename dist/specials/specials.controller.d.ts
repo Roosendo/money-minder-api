@@ -8,19 +8,15 @@ export declare class SpecialsController {
     private readonly exitService;
     constructor(specialsService: SpecialsService, entryService: EntryService, exitService: ExitService);
     getFinancialSummaryYearly(financialSummaryYearlyDto: FinancialSummaryYearlyDto): Promise<{
-        totalEntries: number | {
-            amount: number;
-        };
-        totalExits: number | {
-            amount: import("@prisma/client/runtime/library").Decimal;
-        };
+        totalEntries: number;
+        totalExits: number;
     }>;
     getFinancialSummaryMonthly(financialSummaryMonthlyDto: FinancialSummaryMonthlyDto): Promise<{
         totalEntries: number | {
             amount: number;
         };
         totalExits: number | {
-            amount: import("@prisma/client/runtime/library").Decimal;
+            amount: number;
         };
     }>;
     getCashFlow(cashFlowDto: CashFlowDto): Promise<unknown>;

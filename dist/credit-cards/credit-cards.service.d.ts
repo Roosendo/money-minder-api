@@ -12,7 +12,7 @@ export declare class CreditCardsService {
     getPurchasesRange({ email }: PurchaseRange): Promise<{
         exits: {
             date: Date;
-            amount: import("@prisma/client/runtime/library").Decimal;
+            amount: number;
             description: string;
             exit_id: bigint;
         }[];

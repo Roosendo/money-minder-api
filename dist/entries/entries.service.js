@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const cache_manager_1 = require("@nestjs/cache-manager");
 const entries_dto_1 = require("./entries.dto");
 const prisma_service_1 = require("../prisma.service");
+const common_2 = require("../common");
 let EntryService = class EntryService {
     constructor(prisma, cacheManager) {
         this.prisma = prisma;
@@ -62,12 +63,12 @@ let EntryService = class EntryService {
         if (cacheData)
             return cacheData;
         const entries = await this.prisma.money_entries.groupBy({
-            by: ['category'],
+            by: 'category',
             where: {
                 user_email: email,
                 date: {
-                    gte: new Date(`${year}-${month}-01`),
-                    lt: new Date(`${year}-${month}-32`)
+                    lte: (0, common_2.getLastDayOfMonth)(+year, +month),
+                    gte: new Date(`${year}-${month}-01`)
                 }
             },
             _sum: {
@@ -86,8 +87,8 @@ let EntryService = class EntryService {
             where: {
                 user_email: email,
                 date: {
+                    lte: (0, common_2.getLastDayOfMonth)(+year, +month),
                     gte: new Date(`${year}-${month}-01`),
-                    lt: new Date(`${year}-${month}-32`)
                 }
             },
             _sum: {
@@ -106,8 +107,8 @@ let EntryService = class EntryService {
             where: {
                 user_email: email,
                 date: {
-                    gte: new Date(`${year}-01-01`),
-                    lt: new Date(`${year}-12-32`)
+                    lte: new Date(`${year}-12-31`),
+                    gte: new Date(`${year}-01-01`)
                 }
             },
             _sum: {

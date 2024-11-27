@@ -2,7 +2,9 @@ import { CacheStore } from '@nestjs/cache-manager';
 import { CreateEntryDto, GetEntriesDto, MonthlyEntryDto, YearlyEntryDto } from './entries.dto';
 import { PrismaService } from '@/prisma.service';
 interface FS {
-    _sum: number;
+    _sum: {
+        amount: number;
+    };
 }
 export declare class EntryService {
     private prisma;
@@ -13,29 +15,7 @@ export declare class EntryService {
     }>;
     getEntries({ email }: GetEntriesDto): Promise<unknown>;
     getEntriesByCategoryMonthly({ email, month, year }: MonthlyEntryDto): Promise<unknown>;
-    getMonthlySummary({ email, month, year }: MonthlyEntryDto): Promise<FS | import("@prisma/client").Prisma.GetMoney_entriesAggregateType<{
-        where: {
-            user_email: string;
-            date: {
-                gte: Date;
-                lt: Date;
-            };
-        };
-        _sum: {
-            amount: true;
-        };
-    }>>;
-    getYearlySummary({ email, year }: YearlyEntryDto): Promise<FS | import("@prisma/client").Prisma.GetMoney_entriesAggregateType<{
-        where: {
-            user_email: string;
-            date: {
-                gte: Date;
-                lt: Date;
-            };
-        };
-        _sum: {
-            amount: true;
-        };
-    }>>;
+    getMonthlySummary({ email, month, year }: MonthlyEntryDto): Promise<FS>;
+    getYearlySummary({ email, year }: YearlyEntryDto): Promise<FS>;
 }
 export {};

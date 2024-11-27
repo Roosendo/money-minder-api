@@ -2,7 +2,9 @@ import { CacheStore } from '@nestjs/cache-manager';
 import { CreateExpenseDto, GetExitsDto, MonthlyExitDto, YearlyExitDto } from './exits.dto';
 import { PrismaService } from '@/prisma.service';
 interface FS {
-    _sum: number;
+    _sum: {
+        amount: number;
+    };
 }
 export declare class ExitService {
     private prisma;
@@ -13,29 +15,7 @@ export declare class ExitService {
     }>;
     getExits({ email }: GetExitsDto): Promise<unknown>;
     getExpensesByCategoryMonthly({ email, month, year }: MonthlyExitDto): Promise<unknown>;
-    getMonthlySummary({ email, month, year }: MonthlyExitDto): Promise<FS | import("@prisma/client").Prisma.GetMoney_exitsAggregateType<{
-        where: {
-            user_email: string;
-            date: {
-                gte: Date;
-                lt: Date;
-            };
-        };
-        _sum: {
-            amount: true;
-        };
-    }>>;
-    getYearlySummary({ email, year }: YearlyExitDto): Promise<FS | import("@prisma/client").Prisma.GetMoney_exitsAggregateType<{
-        where: {
-            user_email: string;
-            date: {
-                gte: Date;
-                lt: Date;
-            };
-        };
-        _sum: {
-            amount: true;
-        };
-    }>>;
+    getMonthlySummary({ email, month, year }: MonthlyExitDto): Promise<FS>;
+    getYearlySummary({ email, year }: YearlyExitDto): Promise<FS>;
 }
 export {};

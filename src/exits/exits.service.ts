@@ -2,9 +2,12 @@ import { Inject, Injectable } from '@nestjs/common'
 import { CACHE_MANAGER, CacheKey, CacheStore, CacheTTL } from '@nestjs/cache-manager'
 import { CreateExpenseDto, GetExitsDto, MonthlyExitDto, YearlyExitDto } from './exits.dto'
 import { PrismaService } from '@/prisma.service'
+import { getLastDayOfMonth } from '../common'
 
 interface FS {
-  _sum: number
+  _sum: {
+    amount: number
+  }
 }
 
 @Injectable()
@@ -66,10 +69,13 @@ export class ExitService {
     if (cacheData) return cacheData
 
     const expenses = await this.prisma.money_exits.groupBy({
-      by: ['category'],
+      by: 'category',
       where: {
         user_email: email,
-        date: { gte: new Date(`${year}-${month}-01`), lt: new Date(`${year}-${month}-32`) }
+        date: {
+          lte: getLastDayOfMonth(+year, +month),
+          gte: new Date(`${year}-${month}-01`)
+        }
       },
       _sum: { amount: true }
     })
@@ -88,7 +94,10 @@ export class ExitService {
     const expenses = await this.prisma.money_exits.aggregate({
       where: {
         user_email: email,
-        date: { gte: new Date(`${year}-${month}-01`), lt: new Date(`${year}-${month}-32`) }
+        date: {
+          lte: getLastDayOfMonth(+year, +month),
+          gte: new Date(`${year}-${month}-01`)
+        }
       },
       _sum: { amount: true }
     })
@@ -107,7 +116,7 @@ export class ExitService {
     const expenses = await this.prisma.money_exits.aggregate({
       where: {
         user_email: email,
-        date: { gte: new Date(`${year}-01-01`), lt: new Date(`${year}-12-32`) }
+        date: { lte: new Date(`${year}-12-31`), gte: new Date(`${year}-01-01`) }
       },
       _sum: { amount: true }
     })

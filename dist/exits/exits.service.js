@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const cache_manager_1 = require("@nestjs/cache-manager");
 const exits_dto_1 = require("./exits.dto");
 const prisma_service_1 = require("../prisma.service");
+const common_2 = require("../common");
 let ExitService = class ExitService {
     constructor(prisma, cacheManager) {
         this.prisma = prisma;
@@ -66,10 +67,13 @@ let ExitService = class ExitService {
         if (cacheData)
             return cacheData;
         const expenses = await this.prisma.money_exits.groupBy({
-            by: ['category'],
+            by: 'category',
             where: {
                 user_email: email,
-                date: { gte: new Date(`${year}-${month}-01`), lt: new Date(`${year}-${month}-32`) }
+                date: {
+                    lte: (0, common_2.getLastDayOfMonth)(+year, +month),
+                    gte: new Date(`${year}-${month}-01`)
+                }
             },
             _sum: { amount: true }
         });
@@ -84,7 +88,10 @@ let ExitService = class ExitService {
         const expenses = await this.prisma.money_exits.aggregate({
             where: {
                 user_email: email,
-                date: { gte: new Date(`${year}-${month}-01`), lt: new Date(`${year}-${month}-32`) }
+                date: {
+                    lte: (0, common_2.getLastDayOfMonth)(+year, +month),
+                    gte: new Date(`${year}-${month}-01`)
+                }
             },
             _sum: { amount: true }
         });
@@ -99,7 +106,7 @@ let ExitService = class ExitService {
         const expenses = await this.prisma.money_exits.aggregate({
             where: {
                 user_email: email,
-                date: { gte: new Date(`${year}-01-01`), lt: new Date(`${year}-12-32`) }
+                date: { lte: new Date(`${year}-12-31`), gte: new Date(`${year}-01-01`) }
             },
             _sum: { amount: true }
         });
