@@ -21,7 +21,7 @@ export class RemindersService {
         user_email: email,
         title,
         description,
-        reminder_date: reminderDate
+        reminder_date: new Date(reminderDate)
       },
       select: { id: true }
     })
