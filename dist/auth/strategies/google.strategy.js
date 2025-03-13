@@ -18,7 +18,7 @@ let GoogleStrategy = class GoogleStrategy extends (0, passport_1.PassportStrateg
         super({
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: 'https://money-minder-api.up.railway.app/api/google/redirect',
+            callbackURL: 'https://money-minder-api.vercel.app/api/google/redirect',
             scope: ['email', 'profile']
         });
     }

@@ -18,7 +18,7 @@ let GitHubStrategy = class GitHubStrategy extends (0, passport_1.PassportStrateg
         super({
             clientID: process.env.GITHUB_CLIENT_ID,
             clientSecret: process.env.GITHUB_CLIENT_SECRET,
-            callbackURL: 'https://money-minder-api.up.railway.app/api/github/redirect',
+            callbackURL: 'https://money-minder-api.vercel.app/api/github/redirect',
             scope: ['user:email']
         });
     }
