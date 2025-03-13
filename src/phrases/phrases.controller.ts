@@ -1,5 +1,6 @@
 import { Controller, Get, Inject, UseFilters } from '@nestjs/common'
-import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager'
+
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager'
 import { PhrasesService } from './phrases.service'
 import { AllExceptionsFilter } from '@/middlewares/errors'
 
@@ -8,7 +9,7 @@ import { AllExceptionsFilter } from '@/middlewares/errors'
 export class PhrasesController {
   constructor(
     private readonly phrasesService: PhrasesService,
-    @Inject(CACHE_MANAGER) private cacheManager: CacheStore
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
 
   @Get('daily-phrase')
@@ -22,7 +23,7 @@ export class PhrasesController {
     const index = today.getDate() % phrases.length
     const dailyPhrase = phrases[index]
 
-    await this.cacheManager.set(cacheKey, dailyPhrase, { ttl: 24 * 60 * 60 * 1000 })
+    await this.cacheManager.set(cacheKey, dailyPhrase, 24 * 60 * 60 * 1000)
     return dailyPhrase
   }
 }

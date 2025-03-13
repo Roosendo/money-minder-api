@@ -1,4 +1,5 @@
-import { CACHE_MANAGER, CacheKey, CacheStore, CacheTTL } from '@nestjs/cache-manager'
+
+import { CACHE_MANAGER, CacheKey, CacheTTL, Cache } from '@nestjs/cache-manager'
 import { Inject, Injectable } from '@nestjs/common'
 import { AddPaymentDTO, CreateLoanDto, DeleteLoansDto, DeletePaymentDto, EditLoansDto, EditPaymentDto, GetLoansDto } from './loans.dto'
 import { PrismaService } from '@/prisma.service'
@@ -8,7 +9,7 @@ import { getLoanDetails } from './loans.utils'
 export class LoansService {
   constructor (
     private prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: CacheStore
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
 
   async newLoan({ userEmail, loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate }: CreateLoanDto) {
@@ -38,7 +39,7 @@ export class LoansService {
 
     const loans = await getLoanDetails(email)
 
-    await this.cacheManager.set(cacheKey, loans, { ttl: 60 * 1000 })
+    await this.cacheManager.set(cacheKey, loans, 60 * 1000)
     return loans
   }
 

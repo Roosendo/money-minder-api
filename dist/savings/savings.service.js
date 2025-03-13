@@ -53,7 +53,7 @@ let SavingsService = class SavingsService {
                 end_date: true
             }
         });
-        await this.cacheManager.set(cacheKey, savings, { ttl: 60 * 1000 });
+        await this.cacheManager.set(cacheKey, savings, 60 * 1000);
         return savings;
     }
     async deleteSaving({ email, id }) {
@@ -92,6 +92,7 @@ __decorate([
 exports.SavingsService = SavingsService = __decorate([
     (0, common_1.Injectable)(),
     __param(1, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService, Object])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        cache_manager_1.Cache])
 ], SavingsService);
 //# sourceMappingURL=savings.service.js.map

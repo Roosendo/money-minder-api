@@ -1,4 +1,4 @@
-import { CacheStore } from '@nestjs/cache-manager';
+import { Cache } from '@nestjs/cache-manager';
 import { CreateEntryDto, GetEntriesDto, MonthlyEntryDto, YearlyEntryDto } from './entries.dto';
 import { PrismaService } from '@/prisma.service';
 interface FS {
@@ -9,7 +9,7 @@ interface FS {
 export declare class EntryService {
     private prisma;
     private cacheManager;
-    constructor(prisma: PrismaService, cacheManager: CacheStore);
+    constructor(prisma: PrismaService, cacheManager: Cache);
     newEntry({ email, date, amount, category, description }: CreateEntryDto): Promise<{
         entry_id: bigint;
     }>;

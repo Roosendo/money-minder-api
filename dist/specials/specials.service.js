@@ -27,7 +27,7 @@ let SpecialsService = class SpecialsService {
         if (cacheData)
             return cacheData;
         const result = await (0, specials_utils_1.getMonthlyBalance)(year, email);
-        await this.cacheManager.set(cacheKey, result, { ttl: 60 * 1000 });
+        await this.cacheManager.set(cacheKey, result, 60 * 1000);
         return result;
     }
     async getCategories({ email, year }) {
@@ -36,7 +36,7 @@ let SpecialsService = class SpecialsService {
         if (cacheData)
             return cacheData;
         const categories = await (0, specials_utils_1.getCategoryTotalsDetailed)(year, email);
-        await this.cacheManager.set(cacheKey, categories, { ttl: 60 * 1000 });
+        await this.cacheManager.set(cacheKey, categories, 60 * 1000);
         return categories;
     }
     async getRecentTransactions({ email, year }) {
@@ -45,7 +45,7 @@ let SpecialsService = class SpecialsService {
         if (cacheData)
             return cacheData;
         const transactions = await (0, specials_utils_1.getLatestTransactions)(year, email);
-        await this.cacheManager.set(cacheKey, transactions, { ttl: 60 * 1000 });
+        await this.cacheManager.set(cacheKey, transactions, 60 * 1000);
         return transactions;
     }
 };
@@ -74,6 +74,6 @@ __decorate([
 exports.SpecialsService = SpecialsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
-    __metadata("design:paramtypes", [Object])
+    __metadata("design:paramtypes", [cache_manager_1.Cache])
 ], SpecialsService);
 //# sourceMappingURL=specials.service.js.map

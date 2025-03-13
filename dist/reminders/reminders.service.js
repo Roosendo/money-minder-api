@@ -71,6 +71,7 @@ __decorate([
 exports.RemindersService = RemindersService = __decorate([
     (0, common_1.Injectable)(),
     __param(1, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService, Object])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        cache_manager_1.Cache])
 ], RemindersService);
 //# sourceMappingURL=reminders.service.js.map

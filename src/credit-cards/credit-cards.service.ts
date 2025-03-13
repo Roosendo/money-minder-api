@@ -1,4 +1,4 @@
-import { CACHE_MANAGER, CacheKey, CacheStore, CacheTTL } from '@nestjs/cache-manager'
+import { CACHE_MANAGER, CacheKey, CacheTTL, Cache } from '@nestjs/cache-manager'
 import { Inject, Injectable } from '@nestjs/common'
 import { CreateCreditCardDto, EditCreditCardDto, GetCreditCardsDto, PurchaseRange } from './credit-cards.dto'
 import { PrismaService } from '@/prisma.service'
@@ -7,7 +7,7 @@ import { PrismaService } from '@/prisma.service'
 export class CreditCardsService {
   constructor(
     private prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: CacheStore
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) { }
 
   async newCreditCard({ email, name, cutOffDate, paymentDueDate }: CreateCreditCardDto) {
@@ -36,7 +36,7 @@ export class CreditCardsService {
       select: { credit_card_id: true, name: true, cut_off_date: true, payment_due_date: true }
     })
 
-    await this.cacheManager.set(cacheKey, creditCards, { ttl: 60 * 1000 })
+    await this.cacheManager.set(cacheKey, creditCards, 60 * 1000)
     return creditCards
   }
 

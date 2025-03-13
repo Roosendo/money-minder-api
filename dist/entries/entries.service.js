@@ -54,7 +54,7 @@ let EntryService = class EntryService {
                 entry_id: true
             }
         });
-        await this.cacheManager.set(cacheKey, entries, { ttl: 60 * 1000 });
+        await this.cacheManager.set(cacheKey, entries, 60 * 1000);
         return entries;
     }
     async getEntriesByCategoryMonthly({ email, month, year }) {
@@ -75,7 +75,7 @@ let EntryService = class EntryService {
                 amount: true,
             }
         });
-        await this.cacheManager.set(cacheKey, entries, { ttl: 60 * 1000 });
+        await this.cacheManager.set(cacheKey, entries, 60 * 1000);
         return entries;
     }
     async getMonthlySummary({ email, month, year }) {
@@ -95,7 +95,7 @@ let EntryService = class EntryService {
                 amount: true
             }
         });
-        await this.cacheManager.set(cacheKey, entries, { ttl: 60 * 1000 });
+        await this.cacheManager.set(cacheKey, entries, 60 * 1000);
         return entries;
     }
     async getYearlySummary({ email, year }) {
@@ -115,7 +115,7 @@ let EntryService = class EntryService {
                 amount: true
             }
         });
-        await this.cacheManager.set(cacheKey, entries, { ttl: 60 * 1000 });
+        await this.cacheManager.set(cacheKey, entries, 60 * 1000);
         return entries;
     }
 };
@@ -151,6 +151,7 @@ __decorate([
 exports.EntryService = EntryService = __decorate([
     (0, common_1.Injectable)(),
     __param(1, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService, Object])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        cache_manager_1.Cache])
 ], EntryService);
 //# sourceMappingURL=entries.service.js.map

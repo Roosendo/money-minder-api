@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { CACHE_MANAGER, CacheKey, CacheStore, CacheTTL } from '@nestjs/cache-manager'
+
+import { CACHE_MANAGER, CacheKey, Cache, CacheTTL } from '@nestjs/cache-manager'
 import {
   CreateReminderDto,
   GetRemindersDto,
@@ -12,7 +13,7 @@ import { PrismaService } from '@/prisma.service'
 export class RemindersService {
   constructor(
     private prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: CacheStore
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
 
   async newReminder({ email, title, description, reminderDate }: CreateReminderDto) {

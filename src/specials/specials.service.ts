@@ -1,12 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { CACHE_MANAGER, CacheKey, CacheStore, CacheTTL } from '@nestjs/cache-manager'
+
+import { CACHE_MANAGER, CacheKey, CacheTTL, Cache } from '@nestjs/cache-manager'
 import { CashFlowDto, CategoriesDto, RecentTransactionsDto } from './specials.dto'
 import { getCategoryTotalsDetailed, getLatestTransactions, getMonthlyBalance } from './specials.utils'
 
 @Injectable()
 export class SpecialsService {
   constructor(
-    @Inject(CACHE_MANAGER) private cacheManager: CacheStore
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
 
   @CacheKey('financialSummaryYearly')
@@ -18,7 +19,7 @@ export class SpecialsService {
 
     const result = await getMonthlyBalance(year, email)
 
-    await this.cacheManager.set(cacheKey, result, { ttl: 60 * 1000 })
+    await this.cacheManager.set(cacheKey, result, 60 * 1000)
     return result
   }
 
@@ -31,7 +32,7 @@ export class SpecialsService {
 
     const categories = await getCategoryTotalsDetailed(year, email)
 
-    await this.cacheManager.set(cacheKey, categories, { ttl: 60 * 1000 })
+    await this.cacheManager.set(cacheKey, categories, 60 * 1000)
     return categories
   }
 
@@ -44,7 +45,7 @@ export class SpecialsService {
 
     const transactions = await getLatestTransactions(year, email)
 
-    await this.cacheManager.set(cacheKey, transactions, { ttl: 60 * 1000 })
+    await this.cacheManager.set(cacheKey, transactions, 60 * 1000)
     return transactions
   }
 }

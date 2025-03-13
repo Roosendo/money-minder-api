@@ -43,7 +43,7 @@ let CreditCardsService = class CreditCardsService {
             where: { user_email: email },
             select: { credit_card_id: true, name: true, cut_off_date: true, payment_due_date: true }
         });
-        await this.cacheManager.set(cacheKey, creditCards, { ttl: 60 * 1000 });
+        await this.cacheManager.set(cacheKey, creditCards, 60 * 1000);
         return creditCards;
     }
     async editCreditCard({ creditCardId, userEmail, name, cutOffDate, paymentDueDate }) {
@@ -127,6 +127,7 @@ __decorate([
 exports.CreditCardsService = CreditCardsService = __decorate([
     (0, common_1.Injectable)(),
     __param(1, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService, Object])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        cache_manager_1.Cache])
 ], CreditCardsService);
 //# sourceMappingURL=credit-cards.service.js.map

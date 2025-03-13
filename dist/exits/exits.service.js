@@ -58,7 +58,7 @@ let ExitService = class ExitService {
                 is_credit_payment: true
             }
         });
-        await this.cacheManager.set(cacheKey, expenses, { ttl: 60 * 1000 });
+        await this.cacheManager.set(cacheKey, expenses, 60 * 1000);
         return expenses;
     }
     async getExpensesByCategoryMonthly({ email, month, year }) {
@@ -77,7 +77,7 @@ let ExitService = class ExitService {
             },
             _sum: { amount: true }
         });
-        await this.cacheManager.set(cacheKey, expenses, { ttl: 60 * 1000 });
+        await this.cacheManager.set(cacheKey, expenses, 60 * 1000);
         return expenses;
     }
     async getMonthlySummary({ email, month, year }) {
@@ -95,7 +95,7 @@ let ExitService = class ExitService {
             },
             _sum: { amount: true }
         });
-        await this.cacheManager.set(cacheKey, expenses, { ttl: 60 * 1000 });
+        await this.cacheManager.set(cacheKey, expenses, 60 * 1000);
         return expenses;
     }
     async getYearlySummary({ email, year }) {
@@ -110,7 +110,7 @@ let ExitService = class ExitService {
             },
             _sum: { amount: true }
         });
-        await this.cacheManager.set(cacheKey, expenses, { ttl: 60 * 1000 });
+        await this.cacheManager.set(cacheKey, expenses, 60 * 1000);
         return expenses;
     }
 };
@@ -146,6 +146,7 @@ __decorate([
 exports.ExitService = ExitService = __decorate([
     (0, common_1.Injectable)(),
     __param(1, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService, Object])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        cache_manager_1.Cache])
 ], ExitService);
 //# sourceMappingURL=exits.service.js.map

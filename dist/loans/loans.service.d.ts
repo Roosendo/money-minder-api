@@ -1,10 +1,10 @@
-import { CacheStore } from '@nestjs/cache-manager';
+import { Cache } from '@nestjs/cache-manager';
 import { AddPaymentDTO, CreateLoanDto, DeleteLoansDto, DeletePaymentDto, EditLoansDto, EditPaymentDto, GetLoansDto } from './loans.dto';
 import { PrismaService } from '@/prisma.service';
 export declare class LoansService {
     private prisma;
     private cacheManager;
-    constructor(prisma: PrismaService, cacheManager: CacheStore);
+    constructor(prisma: PrismaService, cacheManager: Cache);
     newLoan({ userEmail, loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate }: CreateLoanDto): Promise<{
         id: bigint;
     }>;

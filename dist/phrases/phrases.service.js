@@ -25,7 +25,7 @@ let PhrasesService = class PhrasesService {
         const cachedPhrases = await this.cacheManager.get(cacheKey);
         if (cachedPhrases)
             return cachedPhrases;
-        await this.cacheManager.set(cacheKey, phrases, { ttl: 24 * 60 * 60 * 1000 });
+        await this.cacheManager.set(cacheKey, phrases, 24 * 60 * 60 * 1000);
         return phrases;
     }
 };
@@ -33,6 +33,6 @@ exports.PhrasesService = PhrasesService;
 exports.PhrasesService = PhrasesService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
-    __metadata("design:paramtypes", [Object])
+    __metadata("design:paramtypes", [cache_manager_1.Cache])
 ], PhrasesService);
 //# sourceMappingURL=phrases.service.js.map

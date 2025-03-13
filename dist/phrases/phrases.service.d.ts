@@ -1,7 +1,7 @@
-import { CacheStore } from '@nestjs/cache-manager';
+import { Cache } from '@nestjs/cache-manager';
 export declare class PhrasesService {
     private cacheManager;
-    constructor(cacheManager: CacheStore);
+    constructor(cacheManager: Cache);
     getPhrases(): Promise<{
         phrase: string;
         movie: string;

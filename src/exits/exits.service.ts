@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { CACHE_MANAGER, CacheKey, CacheStore, CacheTTL } from '@nestjs/cache-manager'
+
+import { CACHE_MANAGER, CacheKey, CacheTTL, Cache } from '@nestjs/cache-manager'
 import { CreateExpenseDto, GetExitsDto, MonthlyExitDto, YearlyExitDto } from './exits.dto'
 import { PrismaService } from '@/prisma.service'
 import { getLastDayOfMonth } from '../common'
@@ -14,7 +15,7 @@ interface FS {
 export class ExitService {
   constructor(
     private prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: CacheStore
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
 
   async newExpense({ email, date, amount, category, description, creditCardId, isCreditPayment }: CreateExpenseDto) {
@@ -57,7 +58,7 @@ export class ExitService {
       }
     })
 
-    await this.cacheManager.set(cacheKey, expenses, { ttl: 60 * 1000 })
+    await this.cacheManager.set(cacheKey, expenses, 60 * 1000)
     return expenses
   }
 
@@ -80,7 +81,7 @@ export class ExitService {
       _sum: { amount: true }
     })
 
-    await this.cacheManager.set(cacheKey, expenses, { ttl: 60 * 1000 })
+    await this.cacheManager.set(cacheKey, expenses, 60 * 1000)
     return expenses
   }
 
@@ -102,7 +103,7 @@ export class ExitService {
       _sum: { amount: true }
     })
 
-    await this.cacheManager.set(cacheKey, expenses, { ttl: 60 * 1000 })
+    await this.cacheManager.set(cacheKey, expenses, 60 * 1000)
     return expenses
   }
 
@@ -121,7 +122,7 @@ export class ExitService {
       _sum: { amount: true }
     })
 
-    await this.cacheManager.set(cacheKey, expenses, { ttl: 60 * 1000 })
+    await this.cacheManager.set(cacheKey, expenses, 60 * 1000)
     return expenses
   }
 }

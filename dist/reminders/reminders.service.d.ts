@@ -1,10 +1,10 @@
-import { CacheStore } from '@nestjs/cache-manager';
+import { Cache } from '@nestjs/cache-manager';
 import { CreateReminderDto, GetRemindersDto, DeleteReminderDto, UpdateReminderDto } from './reminders.dto';
 import { PrismaService } from '@/prisma.service';
 export declare class RemindersService {
     private prisma;
     private cacheManager;
-    constructor(prisma: PrismaService, cacheManager: CacheStore);
+    constructor(prisma: PrismaService, cacheManager: Cache);
     newReminder({ email, title, description, reminderDate }: CreateReminderDto): Promise<{
         id: bigint;
     }>;

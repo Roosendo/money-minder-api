@@ -45,7 +45,7 @@ let LoansService = class LoansService {
         if (cacheData)
             return cacheData;
         const loans = await (0, loans_utils_1.getLoanDetails)(email);
-        await this.cacheManager.set(cacheKey, loans, { ttl: 60 * 1000 });
+        await this.cacheManager.set(cacheKey, loans, 60 * 1000);
         return loans;
     }
     async editLoan({ loanId, userEmail, loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate }) {
@@ -106,6 +106,7 @@ __decorate([
 exports.LoansService = LoansService = __decorate([
     (0, common_1.Injectable)(),
     __param(1, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService, Object])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        cache_manager_1.Cache])
 ], LoansService);
 //# sourceMappingURL=loans.service.js.map

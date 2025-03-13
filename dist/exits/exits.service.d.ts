@@ -1,4 +1,4 @@
-import { CacheStore } from '@nestjs/cache-manager';
+import { Cache } from '@nestjs/cache-manager';
 import { CreateExpenseDto, GetExitsDto, MonthlyExitDto, YearlyExitDto } from './exits.dto';
 import { PrismaService } from '@/prisma.service';
 interface FS {
@@ -9,7 +9,7 @@ interface FS {
 export declare class ExitService {
     private prisma;
     private cacheManager;
-    constructor(prisma: PrismaService, cacheManager: CacheStore);
+    constructor(prisma: PrismaService, cacheManager: Cache);
     newExpense({ email, date, amount, category, description, creditCardId, isCreditPayment }: CreateExpenseDto): Promise<{
         exit_id: bigint;
     }>;

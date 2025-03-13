@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { CACHE_MANAGER, CacheKey, CacheStore, CacheTTL } from '@nestjs/cache-manager'
+
+import { CACHE_MANAGER, CacheKey, CacheTTL, Cache } from '@nestjs/cache-manager'
 import { CreateEntryDto, GetEntriesDto, MonthlyEntryDto, YearlyEntryDto } from './entries.dto'
 import { PrismaService } from '@/prisma.service'
 import { getLastDayOfMonth } from '@/common'
@@ -14,7 +15,7 @@ interface FS {
 export class EntryService {
   constructor(
     private prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: CacheStore
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
 
   async newEntry({ email, date, amount, category, description }: CreateEntryDto) {
@@ -53,7 +54,7 @@ export class EntryService {
       }
     })
 
-    await this.cacheManager.set(cacheKey, entries, { ttl: 60 * 1000 })
+    await this.cacheManager.set(cacheKey, entries, 60 * 1000)
     return entries
   }
 
@@ -78,7 +79,7 @@ export class EntryService {
       }
     })
 
-    await this.cacheManager.set(cacheKey, entries, { ttl: 60 * 1000 })
+    await this.cacheManager.set(cacheKey, entries, 60 * 1000)
     return entries
   }
 
@@ -102,7 +103,7 @@ export class EntryService {
       }
     })
 
-    await this.cacheManager.set(cacheKey, entries, { ttl: 60 * 1000 })
+    await this.cacheManager.set(cacheKey, entries, 60 * 1000)
     return entries
   }
 
@@ -126,7 +127,7 @@ export class EntryService {
       }
     })
 
-    await this.cacheManager.set(cacheKey, entries, { ttl: 60 * 1000 })
+    await this.cacheManager.set(cacheKey, entries, 60 * 1000)
     return entries
   }
 }

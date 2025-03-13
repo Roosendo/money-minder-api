@@ -1,10 +1,10 @@
-import { CacheStore } from '@nestjs/cache-manager';
+import { Cache } from '@nestjs/cache-manager';
 import { CreateSavingDto, GetSavingsDto, DeleteSavingDto, UpdateSavingDto } from './savings.dto';
 import { PrismaService } from '@/prisma.service';
 export declare class SavingsService {
     private prisma;
     private cacheManager;
-    constructor(prisma: PrismaService, cacheManager: CacheStore);
+    constructor(prisma: PrismaService, cacheManager: Cache);
     newSaving({ email, name, targetAmount, currentAmount, startDate, endDate }: CreateSavingDto): Promise<{
         id: number;
     }>;

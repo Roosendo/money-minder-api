@@ -31,7 +31,7 @@ let PhrasesController = class PhrasesController {
         const phrases = await this.phrasesService.getPhrases();
         const index = today.getDate() % phrases.length;
         const dailyPhrase = phrases[index];
-        await this.cacheManager.set(cacheKey, dailyPhrase, { ttl: 24 * 60 * 60 * 1000 });
+        await this.cacheManager.set(cacheKey, dailyPhrase, 24 * 60 * 60 * 1000);
         return dailyPhrase;
     }
 };
@@ -46,6 +46,7 @@ exports.PhrasesController = PhrasesController = __decorate([
     (0, common_1.Controller)('api/phrases'),
     (0, common_1.UseFilters)(errors_1.AllExceptionsFilter),
     __param(1, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
-    __metadata("design:paramtypes", [phrases_service_1.PhrasesService, Object])
+    __metadata("design:paramtypes", [phrases_service_1.PhrasesService,
+        cache_manager_1.Cache])
 ], PhrasesController);
 //# sourceMappingURL=phrases.controller.js.map
