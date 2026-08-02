@@ -1,9 +1,9 @@
-import { Controller, Post, Get, Body, Query, UseFilters } from '@nestjs/common'
-import { ExitService } from './exits.service'
-import { CreateExpenseDto, GetExitsDto, MonthlyExitDto } from './exits.dto'
-import { UsersService } from '@/users/users.service'
-import { CreateUserDto } from '@/users/users.dto'
+import { Body, Controller, Get, Post, Query, UseFilters } from '@nestjs/common'
 import { AllExceptionsFilter } from '@/middlewares/errors'
+import { CreateUserDto } from '@/users/users.dto'
+import { UsersService } from '@/users/users.service'
+import { CreateExpenseDto, GetExitsDto, MonthlyExitDto } from './exits.dto'
+import { ExitService } from './exits.service'
 
 @Controller('api/exits')
 @UseFilters(AllExceptionsFilter)
@@ -11,7 +11,7 @@ export class ExitController {
   constructor(
     private readonly exitService: ExitService,
     private readonly usersService: UsersService
-  ) {}
+  ) { }
 
   @Post('new-exit')
   async newExpense(@Body() createExpenseDto: CreateExpenseDto) {

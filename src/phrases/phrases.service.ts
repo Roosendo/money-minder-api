@@ -1,12 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common'
-
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager'
+import { Inject, Injectable } from '@nestjs/common'
 import * as phrases from '../phrases.json'
 import { Quote } from './phrases.dto'
 
 @Injectable()
 export class PhrasesService {
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) { }
   async getPhrases() {
     const cacheKey = 'all_phrases'
     const cachedPhrases = await this.cacheManager.get<Quote[] | null>(cacheKey)

@@ -1,9 +1,9 @@
-import { Controller, Post, Get, Body, Query, UseFilters } from '@nestjs/common'
-import { EntryService } from './entries.service'
-import { CreateEntryDto, GetEntriesDto, MonthlyEntryDto } from './entries.dto'
-import { UsersService } from '@/users/users.service'
-import { CreateUserDto } from '@/users/users.dto'
+import { Body, Controller, Get, Post, Query, UseFilters } from '@nestjs/common'
 import { AllExceptionsFilter } from '@/middlewares/errors'
+import { CreateUserDto } from '@/users/users.dto'
+import { UsersService } from '@/users/users.service'
+import { CreateEntryDto, GetEntriesDto, MonthlyEntryDto } from './entries.dto'
+import { EntryService } from './entries.service'
 
 @Controller('api/entries')
 @UseFilters(AllExceptionsFilter)
@@ -11,7 +11,7 @@ export class EntryController {
   constructor(
     private readonly entryService: EntryService,
     private readonly usersService: UsersService
-  ) {}
+  ) { }
 
   @Post('new-entry')
   async newEntry(@Body() createEntryDto: CreateEntryDto) {

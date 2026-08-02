@@ -1,9 +1,9 @@
-import { Controller, Post, Get, Delete, Body, Query, UseFilters, Patch } from '@nestjs/common'
-import { SavingsService } from './savings.service'
-import { CreateSavingDto, GetSavingsDto, DeleteSavingDto, UpdateSavingDto } from './savings.dto'
-import { UsersService } from '@/users/users.service'
-import { CreateUserDto } from '@/users/users.dto'
+import { Body, Controller, Delete, Get, Patch, Post, Query, UseFilters } from '@nestjs/common'
 import { AllExceptionsFilter } from '@/middlewares/errors'
+import { CreateUserDto } from '@/users/users.dto'
+import { UsersService } from '@/users/users.service'
+import { CreateSavingDto, DeleteSavingDto, GetSavingsDto, UpdateSavingDto } from './savings.dto'
+import { SavingsService } from './savings.service'
 
 @Controller('api/savings')
 @UseFilters(AllExceptionsFilter)
@@ -11,7 +11,7 @@ export class SavingsController {
   constructor(
     private readonly savingsService: SavingsService,
     private readonly usersService: UsersService
-  ) {}
+  ) { }
 
   @Post('new-saving')
   async newSaving(@Body() createSavingDto: CreateSavingDto) {

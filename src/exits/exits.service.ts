@@ -1,9 +1,8 @@
+import { CACHE_MANAGER, Cache, CacheKey, CacheTTL } from '@nestjs/cache-manager'
 import { Inject, Injectable } from '@nestjs/common'
-
-import { CACHE_MANAGER, CacheKey, CacheTTL, Cache } from '@nestjs/cache-manager'
-import { CreateExpenseDto, GetExitsDto, MonthlyExitDto, YearlyExitDto } from './exits.dto'
 import { PrismaService } from '@/prisma.service'
 import { getLastDayOfMonth } from '../common'
+import { CreateExpenseDto, GetExitsDto, MonthlyExitDto, YearlyExitDto } from './exits.dto'
 
 interface FS {
   _sum: {
@@ -16,7 +15,7 @@ export class ExitService {
   constructor(
     private prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache
-  ) {}
+  ) { }
 
   async newExpense({ email, date, amount, category, description, creditCardId, isCreditPayment }: CreateExpenseDto) {
     const id = await this.prisma.money_exits.create({

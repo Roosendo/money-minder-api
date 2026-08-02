@@ -1,9 +1,9 @@
-import { AllExceptionsFilter } from '@/middlewares/errors'
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseFilters } from '@nestjs/common'
-import { LoansService } from './loans.service'
-import { UsersService } from '@/users/users.service'
+import { AllExceptionsFilter } from '@/middlewares/errors'
 import { CreateUserDto } from '@/users/users.dto'
-import { APIResponse, AddPaymentDTO, CreateLoanDto, DeleteLoansDto, EditLoansDto, EditPaymentDto, GetLoansDto } from './loans.dto'
+import { UsersService } from '@/users/users.service'
+import { AddPaymentDTO, APIResponse, CreateLoanDto, DeleteLoansDto, EditLoansDto, EditPaymentDto, GetLoansDto } from './loans.dto'
+import { LoansService } from './loans.service'
 
 @Controller('api/loans')
 @UseFilters(AllExceptionsFilter)
@@ -11,7 +11,7 @@ export class LoansController {
   constructor(
     private readonly loansService: LoansService,
     private readonly usersService: UsersService
-  ) {}
+  ) { }
 
   @Post('')
   async newLoan(@Body() createLoanDto: CreateLoanDto) {

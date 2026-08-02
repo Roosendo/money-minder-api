@@ -9,7 +9,6 @@
     "target": "ES2021",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,
@@ -21,9 +20,9 @@
     "noUnusedParameters": true,
     "resolveJsonModule": true,
     "paths": {
-      "@/*": ["src/*"],
-      "@middlewares/*": ["src/middlewares/*"],
-      "@config/*": ["src/config/*"],
+      "@/*": ["./src/*"],
+      "@middlewares/*": ["./src/middlewares/*"],
+      "@config/*": ["./src/config/*"],
     }
   }
 }

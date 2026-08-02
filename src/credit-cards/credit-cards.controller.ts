@@ -1,9 +1,9 @@
-import { AllExceptionsFilter } from '@/middlewares/errors'
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseFilters } from '@nestjs/common'
-import { CreditCardsService } from './credit-cards.service'
-import { UsersService } from '@/users/users.service'
+import { AllExceptionsFilter } from '@/middlewares/errors'
 import { CreateUserDto } from '@/users/users.dto'
+import { UsersService } from '@/users/users.service'
 import { CreateCreditCardDto, DeleteCreditCardDto, EditCreditCardDto, GetCreditCardsDto } from './credit-cards.dto'
+import { CreditCardsService } from './credit-cards.service'
 
 @Controller('api/credit-cards')
 @UseFilters(AllExceptionsFilter)
@@ -11,7 +11,7 @@ export class CreditCardsController {
   constructor(
     private readonly creditCardsService: CreditCardsService,
     private readonly usersService: UsersService
-  ) {}
+  ) { }
 
   @Post('')
   async newCreditCard(@Body() createCreditCardDto: CreateCreditCardDto) {

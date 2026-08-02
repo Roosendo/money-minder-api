@@ -10,7 +10,7 @@ export const getMonthlyBalance = async (year: string, userEmail: string) => {
       user_email: userEmail,
       date: {
         gte: new Date(`${year}-01-01`),
-        lt: new Date(`${parseInt(year) + 1}-01-01`),
+        lt: new Date(`${parseInt(year, 10) + 1}-01-01`),
       }
     },
     _sum: {
@@ -25,7 +25,7 @@ export const getMonthlyBalance = async (year: string, userEmail: string) => {
       user_email: userEmail,
       date: {
         gte: new Date(`${year}-01-01`),
-        lt: new Date(`${parseInt(year) + 1}-01-01`),
+        lt: new Date(`${parseInt(year, 10) + 1}-01-01`),
       }
     },
     _sum: {
@@ -81,7 +81,7 @@ export const getCategoryTotalsDetailed = async (year: string, userEmail: string)
       user_email: userEmail,
       date: {
         gte: new Date(`${year}-01-01`),
-        lt: new Date(`${parseInt(year) + 1}-01-01`),
+        lt: new Date(`${parseInt(year, 10) + 1}-01-01`),
       }
     },
     _sum: {
@@ -95,7 +95,7 @@ export const getCategoryTotalsDetailed = async (year: string, userEmail: string)
       user_email: userEmail,
       date: {
         gte: new Date(`${year}-01-01`),
-        lt: new Date(`${parseInt(year) + 1}-01-01`),
+        lt: new Date(`${parseInt(year, 10) + 1}-01-01`),
       }
     },
     _sum: {
@@ -151,7 +151,7 @@ export const getLatestTransactions = async (year: string, userEmail: string) => 
       user_email: userEmail,
       date: {
         gte: new Date(`${year}-01-01`),
-        lt: new Date(`${parseInt(year) + 1}-01-01`),
+        lt: new Date(`${parseInt(year, 10) + 1}-01-01`),
       }
     },
     select: {
@@ -171,7 +171,7 @@ export const getLatestTransactions = async (year: string, userEmail: string) => 
       user_email: userEmail,
       date: {
         gte: new Date(`${year}-01-01`),
-        lt: new Date(`${parseInt(year) + 1}-01-01`),
+        lt: new Date(`${parseInt(year, 10) + 1}-01-01`),
       }
     },
     select: {

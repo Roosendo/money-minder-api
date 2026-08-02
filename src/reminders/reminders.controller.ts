@@ -1,14 +1,14 @@
-import { Controller, Post, Get, Delete, Body, Query, UseFilters, Patch } from '@nestjs/common'
-import { RemindersService } from './reminders.service'
+import { Body, Controller, Delete, Get, Patch, Post, Query, UseFilters } from '@nestjs/common'
+import { AllExceptionsFilter } from '@/middlewares/errors'
+import { CreateUserDto } from '@/users/users.dto'
+import { UsersService } from '@/users/users.service'
 import {
   CreateReminderDto,
-  GetRemindersDto,
   DeleteReminderDto,
+  GetRemindersDto,
   UpdateReminderDto
 } from './reminders.dto'
-import { UsersService } from '@/users/users.service'
-import { CreateUserDto } from '@/users/users.dto'
-import { AllExceptionsFilter } from '@/middlewares/errors'
+import { RemindersService } from './reminders.service'
 
 @Controller('api/reminders')
 @UseFilters(AllExceptionsFilter)
@@ -16,7 +16,7 @@ export class RemindersController {
   constructor(
     private readonly remindersService: RemindersService,
     private readonly usersService: UsersService
-  ) {}
+  ) { }
 
   @Post('new-reminder')
   async newReminder(@Body() createReminderDto: CreateReminderDto) {

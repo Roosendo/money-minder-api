@@ -1,6 +1,5 @@
+import { CACHE_MANAGER, Cache, CacheKey, CacheTTL } from '@nestjs/cache-manager'
 import { Inject, Injectable } from '@nestjs/common'
-
-import { CACHE_MANAGER, CacheKey, CacheTTL, Cache } from '@nestjs/cache-manager'
 import { CashFlowDto, CategoriesDto, RecentTransactionsDto } from './specials.dto'
 import { getCategoryTotalsDetailed, getLatestTransactions, getMonthlyBalance } from './specials.utils'
 
@@ -8,7 +7,7 @@ import { getCategoryTotalsDetailed, getLatestTransactions, getMonthlyBalance } f
 export class SpecialsService {
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache
-  ) {}
+  ) { }
 
   @CacheKey('financialSummaryYearly')
   @CacheTTL(60 * 1000)

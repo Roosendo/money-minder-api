@@ -1,15 +1,15 @@
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common'
-import { AuthService } from './auth.service'
 import { AuthGuard } from '@nestjs/passport'
-import { Request, Response } from 'express'
+import type { Request, Response } from 'express'
+import { AuthService } from './auth.service'
 
 @Controller('api')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Get('google')
   @UseGuards(AuthGuard('google'))
-  async googleAuth(@Req() _req: Request) {}
+  async googleAuth(@Req() _req: Request) { }
 
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
@@ -21,7 +21,7 @@ export class AuthController {
 
   @Get('github')
   @UseGuards(AuthGuard('github'))
-  async githubAuth(@Req() _req: Request) {}
+  async githubAuth(@Req() _req: Request) { }
 
   @Get('github/redirect')
   @UseGuards(AuthGuard('github'))

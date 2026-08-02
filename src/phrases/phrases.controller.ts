@@ -1,8 +1,7 @@
-import { Controller, Get, Inject, UseFilters } from '@nestjs/common'
-
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager'
-import { PhrasesService } from './phrases.service'
+import { Controller, Get, Inject, UseFilters } from '@nestjs/common'
 import { AllExceptionsFilter } from '@/middlewares/errors'
+import { PhrasesService } from './phrases.service'
 
 @Controller('api/phrases')
 @UseFilters(AllExceptionsFilter)
@@ -10,7 +9,7 @@ export class PhrasesController {
   constructor(
     private readonly phrasesService: PhrasesService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache
-  ) {}
+  ) { }
 
   @Get('daily-phrase')
   async getPhrases() {

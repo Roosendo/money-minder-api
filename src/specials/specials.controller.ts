@@ -1,15 +1,15 @@
 import { Controller, Get, Query, UseFilters } from '@nestjs/common'
-import { SpecialsService } from './specials.service'
 import { EntryService } from '@/entries/entries.service'
 import { ExitService } from '@/exits/exits.service'
+import { AllExceptionsFilter } from '@/middlewares/errors'
 import {
-  FinancialSummaryMonthlyDto,
-  FinancialSummaryYearlyDto,
   CashFlowDto,
   CategoriesDto,
+  FinancialSummaryMonthlyDto,
+  FinancialSummaryYearlyDto,
   RecentTransactionsDto
 } from './specials.dto'
-import { AllExceptionsFilter } from '@/middlewares/errors'
+import { SpecialsService } from './specials.service'
 
 @Controller('api/specials')
 @UseFilters(AllExceptionsFilter)
@@ -18,7 +18,7 @@ export class SpecialsController {
     private readonly specialsService: SpecialsService,
     private readonly entryService: EntryService,
     private readonly exitService: ExitService
-  ) {}
+  ) { }
 
   @Get('financial-summary-yearly')
   async getFinancialSummaryYearly(@Query() financialSummaryYearlyDto: FinancialSummaryYearlyDto) {

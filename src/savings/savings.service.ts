@@ -1,15 +1,14 @@
+import { CACHE_MANAGER, Cache, CacheKey, CacheTTL } from '@nestjs/cache-manager'
 import { Inject, Injectable } from '@nestjs/common'
-
-import { CACHE_MANAGER, CacheKey, CacheTTL, Cache } from '@nestjs/cache-manager'
-import { CreateSavingDto, GetSavingsDto, DeleteSavingDto, UpdateSavingDto } from './savings.dto'
 import { PrismaService } from '@/prisma.service'
+import { CreateSavingDto, DeleteSavingDto, GetSavingsDto, UpdateSavingDto } from './savings.dto'
 
 @Injectable()
 export class SavingsService {
   constructor(
     private prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache
-  ) {}
+  ) { }
 
   async newSaving({
     email,
