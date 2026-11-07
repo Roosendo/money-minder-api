@@ -1,8 +1,10 @@
 allowBuilds:
-  '@nestjs/core': true
-  '@prisma/client': set this to true or false
-  '@prisma/engines': true
-  '@scarf/scarf': true
+  "@nestjs/core": true
+  "@prisma/client": set this to true or false
+  "@prisma/engines": true
+  "@scarf/scarf": true
+  better-sqlite3: true
   esbuild: true
+  lefthook: true
   prisma: true
   unrs-resolver: true
