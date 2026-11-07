@@ -1,33 +1,25 @@
-import { Controller, Get, Req, Res, UseGuards } from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
+import { All, Controller, Get, Req, Res } from "@nestjs/common";
+import { toNodeHandler } from "better-auth/node";
 import type { Request, Response } from "express";
+import { CurrentUser } from "@/common/decorators/current-user.decorator";
+import { Public } from "@/common/decorators/public.decorator";
+import type { users } from "@prisma/client";
+import { getBetterAuthInstance } from "./auth";
 import { AuthService } from "./auth.service";
 
-@Controller("api")
+@Controller("auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get("google")
-  @UseGuards(AuthGuard("google"))
-  async googleAuth(@Req() _req: Request) {}
-
-  @Get("google/redirect")
-  @UseGuards(AuthGuard("google"))
-  googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
-    const user = this.authService.googleLogin(req);
-    const frontendURL = `https://money-minder-xi.vercel.app/login?user=${encodeURIComponent(JSON.stringify(user))}`;
-    res.redirect(frontendURL);
+  @Public()
+  @All("*")
+  async handleBetterAuth(@Req() req: Request, @Res() res: Response) {
+    const auth = getBetterAuthInstance();
+    return toNodeHandler(auth)(req, res);
   }
 
-  @Get("github")
-  @UseGuards(AuthGuard("github"))
-  async githubAuth(@Req() _req: Request) {}
-
-  @Get("github/redirect")
-  @UseGuards(AuthGuard("github"))
-  githubAuthRedirect(@Req() req: Request, @Res() res: Response) {
-    const user = this.authService.githubLogin(req);
-    const frontendURL = `https://money-minder-xi.vercel.app/login?user=${encodeURIComponent(JSON.stringify(user))}`;
-    res.redirect(frontendURL);
+  @Get("me")
+  async getMe(@CurrentUser() user: users) {
+    return this.authService.getProfile(user.id);
   }
 }

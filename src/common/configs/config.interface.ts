@@ -3,10 +3,23 @@ export interface NestConfig {
 }
 
 export interface CorsConfig {
-  enabled: boolean;
+  origins: string[];
+}
+
+export interface BetterAuthConfig {
+  url?: string;
+  secret?: string;
+}
+
+export interface OAuthConfig {
+  clientId?: string;
+  clientSecret?: string;
 }
 
 export interface Config {
   nest: NestConfig;
   cors: CorsConfig;
+  betterAuth: BetterAuthConfig;
+  google: OAuthConfig;
+  github: OAuthConfig;
 }

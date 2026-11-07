@@ -1,94 +1,104 @@
-import { CACHE_MANAGER, Cache, CacheKey, CacheTTL } from "@nestjs/cache-manager";
-import { Inject, Injectable } from "@nestjs/common";
+import { CACHE_MANAGER, Cache } from "@nestjs/cache-manager";
+import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
-import { CreateSavingDto, DeleteSavingDto, GetSavingsDto, UpdateSavingDto } from "./savings.dto";
+import { CreateSavingDto, UpdateSavingDto } from "./savings.dto";
 
 @Injectable()
 export class SavingsService {
   constructor(
-    private prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
-  async newSaving({
-    email,
-    name,
-    targetAmount,
-    currentAmount,
-    startDate,
-    endDate,
-  }: CreateSavingDto) {
-    const saving = await this.prisma.savings_goals.create({
-      data: {
-        user_email: email,
-        name,
-        target_amount: targetAmount,
-        current_amount: currentAmount,
-        start_date: new Date(startDate),
-        end_date: new Date(endDate),
-      },
-      select: { id: true },
-    });
-    const interceptedId = Number(saving.id);
+  async newSaving(userId: string, dto: CreateSavingDto) {
+    const current = dto.currentAmount ?? 0;
+    if (current > dto.targetAmount) {
+      throw new BadRequestException("Current amount cannot exceed target amount");
+    }
 
-    await this.cacheManager.del(`savings_${email}`);
-    return { id: interceptedId };
+    const saving = await this.prisma.savings.create({
+      data: {
+        user_id: userId,
+        name: dto.name,
+        target_amount: dto.targetAmount,
+        current_amount: current,
+        target_date: dto.targetDate ? new Date(dto.targetDate) : null,
+      },
+    });
+
+    await this.cacheManager.del(`savings_${userId}`);
+    return saving;
   }
 
-  @CacheKey("savings")
-  @CacheTTL(60 * 1000)
-  async getSavings({ email }: GetSavingsDto) {
-    const cacheKey = `savings_${email}`;
-    const cacheData = await this.cacheManager.get(cacheKey);
-    if (cacheData) return cacheData;
+  async getSavings(userId: string) {
+    const cacheKey = `savings_${userId}`;
+    const cached = await this.cacheManager.get(cacheKey);
+    if (cached) return cached;
 
-    const savings = await this.prisma.savings_goals.findMany({
-      where: { user_email: email },
-      select: {
-        id: true,
-        name: true,
-        target_amount: true,
-        current_amount: true,
-        end_date: true,
-      },
+    const savings = await this.prisma.savings.findMany({
+      where: { user_id: userId },
+      orderBy: { name: "asc" },
     });
 
     await this.cacheManager.set(cacheKey, savings, 60 * 1000);
     return savings;
   }
 
-  async deleteSaving({ email, id }: DeleteSavingDto) {
-    await this.prisma.savings_goals.delete({
-      where: {
-        user_email: email,
-        id: +id,
-      },
+  async getSavingById(userId: string, id: string) {
+    const saving = await this.prisma.savings.findFirst({
+      where: { id, user_id: userId },
     });
 
-    await this.cacheManager.del(`savings_${email}`);
+    if (!saving) {
+      throw new NotFoundException(`Saving ${id} not found`);
+    }
+
+    return saving;
   }
 
-  async updateSaving({
-    email,
-    id,
-    newSavingName,
-    newTarget,
-    newCurrentAmount,
-    newEndDate,
-  }: UpdateSavingDto) {
-    await this.prisma.savings_goals.updateMany({
-      where: {
-        user_email: email,
-        id: +id,
-      },
+  async updateSaving(userId: string, id: string, dto: UpdateSavingDto) {
+    const existing = await this.prisma.savings.findFirst({
+      where: { id, user_id: userId },
+    });
+
+    if (!existing) {
+      throw new NotFoundException(`Saving ${id} not found`);
+    }
+
+    const targetAmount = dto.targetAmount ?? Number(existing.target_amount);
+    const currentAmount = dto.currentAmount ?? Number(existing.current_amount);
+
+    if (currentAmount > targetAmount) {
+      throw new BadRequestException("Current amount cannot exceed target amount");
+    }
+
+    const updated = await this.prisma.savings.update({
+      where: { id },
       data: {
-        name: newSavingName,
-        target_amount: newTarget,
-        current_amount: newCurrentAmount,
-        end_date: new Date(newEndDate),
+        ...(dto.name !== undefined && { name: dto.name }),
+        ...(dto.targetAmount !== undefined && { target_amount: dto.targetAmount }),
+        ...(dto.currentAmount !== undefined && { current_amount: dto.currentAmount }),
+        ...(dto.targetDate !== undefined && {
+          target_date: dto.targetDate ? new Date(dto.targetDate) : null,
+        }),
       },
     });
 
-    await this.cacheManager.del(`savings_${email}`);
+    await this.cacheManager.del(`savings_${userId}`);
+    return updated;
+  }
+
+  async deleteSaving(userId: string, id: string) {
+    const existing = await this.prisma.savings.findFirst({
+      where: { id, user_id: userId },
+    });
+
+    if (!existing) {
+      throw new NotFoundException(`Saving ${id} not found`);
+    }
+
+    await this.prisma.savings.delete({ where: { id } });
+    await this.cacheManager.del(`savings_${userId}`);
+    return { deleted: true };
   }
 }

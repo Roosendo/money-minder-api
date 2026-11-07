@@ -1,7 +1,8 @@
-import { Controller, Get, Query, UseFilters } from "@nestjs/common";
+import { Controller, Get, Query } from "@nestjs/common";
+import { CurrentUser } from "@/common/decorators/current-user.decorator";
 import { EntryService } from "@/entries/entries.service";
 import { ExitService } from "@/exits/exits.service";
-import { AllExceptionsFilter } from "@/middlewares/errors";
+import type { users } from "@prisma/client";
 import {
   CashFlowDto,
   CategoriesDto,
@@ -11,8 +12,7 @@ import {
 } from "./specials.dto";
 import { SpecialsService } from "./specials.service";
 
-@Controller("api/specials")
-@UseFilters(AllExceptionsFilter)
+@Controller("specials")
 export class SpecialsController {
   constructor(
     private readonly specialsService: SpecialsService,
@@ -21,41 +21,60 @@ export class SpecialsController {
   ) {}
 
   @Get("financial-summary-yearly")
-  async getFinancialSummaryYearly(@Query() financialSummaryYearlyDto: FinancialSummaryYearlyDto) {
-    const entries = await this.entryService.getYearlySummary(financialSummaryYearlyDto);
-    const exits = await this.exitService.getYearlySummary(financialSummaryYearlyDto);
+  async getFinancialSummaryYearly(
+    @CurrentUser() user: users,
+    @Query() dto: FinancialSummaryYearlyDto,
+  ) {
+    const [entries, exits] = await Promise.all([
+      this.entryService.getYearlySummary(user.id, dto) as Promise<{ totalAmount: number }>,
+      this.exitService.getYearlySummary(user.id, dto) as Promise<{ totalAmount: number }>,
+    ]);
 
-    const totalEntries = entries._sum.amount || 0;
-    const totalExits = exits._sum.amount || 0;
+    const totalEntries = entries.totalAmount || 0;
+    const totalExits = exits.totalAmount || 0;
 
-    return { totalEntries, totalExits };
+    return {
+      year: dto.year,
+      totalEntries,
+      totalExits,
+      netBalance: totalEntries - totalExits,
+    };
   }
 
   @Get("financial-summary-monthly")
   async getFinancialSummaryMonthly(
-    @Query() financialSummaryMonthlyDto: FinancialSummaryMonthlyDto,
+    @CurrentUser() user: users,
+    @Query() dto: FinancialSummaryMonthlyDto,
   ) {
-    const entries = await this.entryService.getMonthlySummary(financialSummaryMonthlyDto);
-    const exits = await this.exitService.getMonthlySummary(financialSummaryMonthlyDto);
+    const [entries, exits] = await Promise.all([
+      this.entryService.getMonthlySummary(user.id, dto) as Promise<{ totalAmount: number }>,
+      this.exitService.getMonthlySummary(user.id, dto) as Promise<{ totalAmount: number }>,
+    ]);
 
-    const totalEntries = entries._sum || 0;
-    const totalExits = exits._sum || 0;
+    const totalEntries = entries.totalAmount || 0;
+    const totalExits = exits.totalAmount || 0;
 
-    return { totalEntries, totalExits };
+    return {
+      month: dto.month,
+      year: dto.year,
+      totalEntries,
+      totalExits,
+      netBalance: totalEntries - totalExits,
+    };
   }
 
   @Get("cash-flow")
-  async getCashFlow(@Query() cashFlowDto: CashFlowDto) {
-    return this.specialsService.getCashFlow(cashFlowDto);
+  async getCashFlow(@CurrentUser() user: users, @Query() dto: CashFlowDto) {
+    return this.specialsService.getCashFlow(user.id, dto.year);
   }
 
   @Get("yearly-categories")
-  async getCategories(@Query() categoriesDto: CategoriesDto) {
-    return this.specialsService.getCategories(categoriesDto);
+  async getCategories(@CurrentUser() user: users, @Query() dto: CategoriesDto) {
+    return this.specialsService.getCategories(user.id, dto.year);
   }
 
   @Get("recent-transactions")
-  async getRecentTransactions(@Query() recentTransactionsDto: RecentTransactionsDto) {
-    return this.specialsService.getRecentTransactions(recentTransactionsDto);
+  async getRecentTransactions(@CurrentUser() user: users, @Query() dto: RecentTransactionsDto) {
+    return this.specialsService.getRecentTransactions(user.id, dto.year);
   }
 }

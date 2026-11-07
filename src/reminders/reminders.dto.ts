@@ -1,75 +1,56 @@
-import { IsDateString, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { reminder_recurrence, reminder_status } from "@prisma/client";
+import {
+  IsDateString,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+} from "class-validator";
 
 export class CreateReminderDto {
   @IsString()
-  @IsOptional()
-  description?: string;
-
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
-
-  @IsString()
-  @IsOptional()
-  fullName?: string;
-
-  @IsString()
-  @IsDateString(
-    {},
-    {
-      message:
-        "reminderDate must be a valid ISO 8601 date string (e.g., 2024-06-24 or 2024-06-24T11:25:00).",
-    },
-  )
-  @IsNotEmpty()
-  reminderDate: string;
-
-  @IsString()
   @IsNotEmpty()
   title: string;
-}
 
-export class GetRemindersDto {
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
-}
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  amount?: number;
 
-export class DeleteReminderDto {
-  @IsEmail()
+  @IsDateString()
   @IsNotEmpty()
-  email: string;
+  dueAt: string;
 
-  @IsString()
-  @IsNotEmpty()
-  id: string;
+  @IsEnum(reminder_recurrence)
+  @IsOptional()
+  recurrence?: reminder_recurrence = reminder_recurrence.none;
+
+  @IsEnum(reminder_status)
+  @IsOptional()
+  status?: reminder_status = reminder_status.pending;
 }
 
 export class UpdateReminderDto {
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
+  @IsString()
+  @IsOptional()
+  title?: string;
 
   @IsNumber()
-  @IsNotEmpty()
-  id: number;
+  @IsOptional()
+  @Min(0)
+  amount?: number;
 
-  @IsString()
-  @IsNotEmpty()
-  newDescription: string;
+  @IsDateString()
+  @IsOptional()
+  dueAt?: string;
 
-  @IsString()
-  @IsDateString(
-    {},
-    {
-      message:
-        "newReminderDate must be a valid ISO 8601 date string (e.g., 2024-06-24 or 2024-06-24T11:25:00).",
-    },
-  )
-  @IsNotEmpty()
-  newDate: string;
+  @IsEnum(reminder_recurrence)
+  @IsOptional()
+  recurrence?: reminder_recurrence;
 
-  @IsString()
-  @IsNotEmpty()
-  newTitle: string;
+  @IsEnum(reminder_status)
+  @IsOptional()
+  status?: reminder_status;
 }

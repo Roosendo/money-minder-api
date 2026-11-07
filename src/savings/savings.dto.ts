@@ -1,87 +1,41 @@
-import { IsDateString, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from "class-validator";
 
 export class CreateSavingDto {
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @IsDateString(
-    {},
-    {
-      message:
-        "endDate must be a valid ISO 8601 date string (e.g., 2024-06-24 or 2024-06-24T11:25:00).",
-    },
-  )
-  endDate: string;
-
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @IsString()
-  @IsOptional()
-  fullName?: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @IsDateString()
-  startDate: string;
-
   @IsNumber()
   @IsNotEmpty()
+  @Min(0.01)
   targetAmount: number;
 
   @IsNumber()
-  @IsNotEmpty()
-  currentAmount: number;
-}
+  @IsOptional()
+  @Min(0)
+  currentAmount?: number = 0;
 
-export class GetSavingsDto {
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
-}
-
-export class DeleteSavingDto {
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
-
-  @IsString()
-  @IsNotEmpty()
-  id: string;
+  @IsDateString()
+  @IsOptional()
+  targetDate?: string;
 }
 
 export class UpdateSavingDto {
-  @IsNotEmpty()
-  @IsNumber()
-  newCurrentAmount: number;
-
-  @IsNotEmpty()
-  @IsDateString(
-    {},
-    {
-      message:
-        "newReminderDate must be a valid ISO 8601 date string (e.g., 2024-06-24 or 2024-06-24T11:25:00).",
-    },
-  )
-  newEndDate: string;
-
-  @IsNotEmpty()
   @IsString()
-  newSavingName: string;
+  @IsOptional()
+  name?: string;
 
-  @IsNotEmpty()
   @IsNumber()
-  newTarget: number;
+  @IsOptional()
+  @Min(0.01)
+  targetAmount?: number;
 
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
-
-  @IsNotEmpty()
   @IsNumber()
-  id: number;
+  @IsOptional()
+  @Min(0)
+  currentAmount?: number;
+
+  @IsDateString()
+  @IsOptional()
+  targetDate?: string;
 }

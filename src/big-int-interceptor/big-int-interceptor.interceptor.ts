@@ -1,19 +1,28 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from "@nestjs/common";
+import { Prisma } from "@prisma/client";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 
 @Injectable()
 export class BigIntInterceptor implements NestInterceptor {
   intercept(_context: ExecutionContext, next: CallHandler): Observable<any> {
-    return next.handle().pipe(map((data) => this.handleBigInt(data)));
+    return next.handle().pipe(map((data) => this.transform(data)));
   }
 
-  private handleBigInt(value: any): any {
+  private transform(value: any): any {
     if (value === null || value === undefined) return value;
 
     // Handle BigInt
     if (typeof value === "bigint") {
       return Number(value);
+    }
+
+    // Handle Prisma Decimal
+    if (
+      Prisma.Decimal.isDecimal(value) ||
+      (typeof value === "object" && typeof value.toNumber === "function")
+    ) {
+      return value.toNumber();
     }
 
     // Handle Date objects
@@ -23,13 +32,13 @@ export class BigIntInterceptor implements NestInterceptor {
 
     // Handle Arrays
     if (Array.isArray(value)) {
-      return value.map((item) => this.handleBigInt(item));
+      return value.map((item) => this.transform(item));
     }
 
-    // Handle Objects (excluding Date objects)
+    // Handle Objects
     if (typeof value === "object" && value !== null) {
       return Object.fromEntries(
-        Object.entries(value).map(([key, val]) => [key, this.handleBigInt(val)]),
+        Object.entries(value).map(([key, val]) => [key, this.transform(val)]),
       );
     }
 

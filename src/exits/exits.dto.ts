@@ -1,81 +1,127 @@
+import { Type } from "class-transformer";
 import {
-  IsBoolean,
-  IsEmail,
+  IsDateString,
+  IsIn,
+  IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
-  Matches,
+  Max,
+  Min,
 } from "class-validator";
+import { PaginationDto } from "@/common/dto/pagination.dto";
 
-export class CreateExpenseDto {
+export class CreateExitDto {
   @IsNumber()
   @IsNotEmpty()
+  @Min(0.01)
   amount: number;
 
-  @IsString()
-  @IsNotEmpty()
-  category: string;
-
-  @IsString()
+  @IsDateString()
   @IsNotEmpty()
   date: string;
 
   @IsString()
   @IsOptional()
-  description?: string;
+  categoryId?: string;
 
   @IsString()
   @IsOptional()
-  fullName?: string;
+  category?: string;
 
-  @IsEmail()
-  email: string;
-
-  @IsNumber()
+  @IsString()
   @IsOptional()
-  creditCardId?: number;
+  accountId?: string;
 
+  @IsString()
   @IsOptional()
-  @IsBoolean()
-  isCreditPayment: boolean;
+  creditCardId?: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
 }
 
-export class GetExitsDto {
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
+export class UpdateExitDto {
+  @IsNumber()
+  @IsOptional()
+  @Min(0.01)
+  amount?: number;
+
+  @IsDateString()
+  @IsOptional()
+  date?: string;
+
+  @IsString()
+  @IsOptional()
+  categoryId?: string;
+
+  @IsString()
+  @IsOptional()
+  category?: string;
+
+  @IsString()
+  @IsOptional()
+  accountId?: string;
+
+  @IsString()
+  @IsOptional()
+  creditCardId?: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+}
+
+export class GetExitsDto extends PaginationDto {
+  @IsOptional()
+  @IsString()
+  categoryId?: string;
+
+  @IsOptional()
+  @IsString()
+  creditCardId?: string;
+
+  @IsOptional()
+  @IsString()
+  accountId?: string;
+
+  @IsOptional()
+  @IsDateString()
+  from?: string;
+
+  @IsOptional()
+  @IsDateString()
+  to?: string;
+
+  @IsOptional()
+  @IsIn(["date", "amount"])
+  sortBy?: "date" | "amount" = "date";
+
+  @IsOptional()
+  @IsIn(["asc", "desc"])
+  sortOrder?: "asc" | "desc" = "desc";
 }
 
 export class MonthlyExitDto {
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(12)
+  month: number;
 
-  @IsNotEmpty()
-  @IsString()
-  @Matches(/^(0[1-9]|1[0-2])$/, {
-    message: "Month must be a valid month (e.g., 01, 02, ..., 09, 10, 11, 12)",
-  })
-  month: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @Matches(/^\d{4}$/, {
-    message: "Year must be a valid year (e.g., 2023)",
-  })
-  year: string;
+  @Type(() => Number)
+  @IsInt()
+  @Min(1900)
+  @Max(2100)
+  year: number;
 }
 
 export class YearlyExitDto {
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @Matches(/^\d{4}$/, {
-    message: "Year must be a valid year (e.g., 2023)",
-  })
-  year: string;
+  @Type(() => Number)
+  @IsInt()
+  @Min(1900)
+  @Max(2100)
+  year: number;
 }

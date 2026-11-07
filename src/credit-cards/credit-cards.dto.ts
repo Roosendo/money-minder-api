@@ -1,70 +1,69 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { Type } from "class-transformer";
+import {
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Length,
+  Max,
+  Min,
+} from "class-validator";
 
 export class CreateCreditCardDto {
   @IsString()
-  @IsOptional()
-  fullName?: string;
-
   @IsNotEmpty()
-  @IsEmail()
-  email: string;
-
-  @IsNotEmpty()
-  @IsString()
   name: string;
 
   @IsString()
-  @IsNotEmpty()
-  cutOffDate: string;
+  @IsOptional()
+  @Length(4, 4, { message: "last4 must be exactly 4 digits" })
+  last4?: string;
 
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  paymentDueDate: string;
-}
+  @Min(0)
+  creditLimit: number;
 
-export class GetCreditCardsDto {
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(31)
+  statementDay: number;
+
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(31)
+  dueDay: number;
 }
 
 export class EditCreditCardDto {
+  @IsString()
   @IsOptional()
-  @IsString()
-  creditCardId?: string;
-
-  @IsEmail()
-  @IsNotEmpty()
-  userEmail: string;
-
-  @IsNotEmpty()
-  @IsString()
   name?: string;
 
   @IsString()
-  @IsNotEmpty()
-  cutOffDate?: string;
-
-  @IsString()
   @IsOptional()
-  paymentDueDate?: string;
-}
+  @Length(4, 4)
+  last4?: string;
 
-export class DeleteCreditCardDto {
+  @IsNumber()
   @IsOptional()
-  @IsString()
-  creditCardId?: string;
+  @Min(0)
+  creditLimit?: number;
 
-  @IsEmail()
-  @IsNotEmpty()
-  userEmail: string;
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(31)
+  statementDay?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(31)
+  dueDay?: number;
 }
-
-export type PurchaseRange = {
-  email: string;
-};
-
-export type ApiPurchases = {
-  cut_off_date: string;
-  payment_due_date: string;
-};

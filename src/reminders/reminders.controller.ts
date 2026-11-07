@@ -1,46 +1,39 @@
-import { Body, Controller, Delete, Get, Patch, Post, Query, UseFilters } from "@nestjs/common";
-import { AllExceptionsFilter } from "@/middlewares/errors";
-import { CreateUserDto } from "@/users/users.dto";
-import { UsersService } from "@/users/users.service";
-import {
-  CreateReminderDto,
-  DeleteReminderDto,
-  GetRemindersDto,
-  UpdateReminderDto,
-} from "./reminders.dto";
+import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
+import { CurrentUser } from "@/common/decorators/current-user.decorator";
+import type { users } from "@prisma/client";
+import { CreateReminderDto, UpdateReminderDto } from "./reminders.dto";
 import { RemindersService } from "./reminders.service";
 
-@Controller("api/reminders")
-@UseFilters(AllExceptionsFilter)
+@Controller("reminders")
 export class RemindersController {
-  constructor(
-    private readonly remindersService: RemindersService,
-    private readonly usersService: UsersService,
-  ) {}
+  constructor(private readonly remindersService: RemindersService) {}
 
-  @Post("new-reminder")
-  async newReminder(@Body() createReminderDto: CreateReminderDto) {
-    const createUserDto: CreateUserDto = {
-      email: createReminderDto.email,
-      fullName: createReminderDto.fullName,
-    };
-    await this.usersService.createUser(createUserDto);
-    return this.remindersService.newReminder(createReminderDto);
+  @Post()
+  async newReminder(@CurrentUser() user: users, @Body() createReminderDto: CreateReminderDto) {
+    return this.remindersService.newReminder(user.id, createReminderDto);
   }
 
-  @Get("get-reminders")
-  async getReminders(@Query() getRemindersDto: GetRemindersDto) {
-    const reminders = await this.remindersService.getReminders(getRemindersDto);
-    return reminders;
+  @Get()
+  async getReminders(@CurrentUser() user: users) {
+    return this.remindersService.getReminders(user.id);
   }
 
-  @Delete("delete-reminder")
-  async deleteReminder(@Query() deleteReminderDto: DeleteReminderDto) {
-    return this.remindersService.deleteReminder(deleteReminderDto);
+  @Get(":id")
+  async getReminder(@CurrentUser() user: users, @Param("id") id: string) {
+    return this.remindersService.getReminderById(user.id, id);
   }
 
-  @Patch("update-reminder")
-  async updateReminder(@Body() updateReminderDto: UpdateReminderDto) {
-    return this.remindersService.updateReminder(updateReminderDto);
+  @Patch(":id")
+  async updateReminder(
+    @CurrentUser() user: users,
+    @Param("id") id: string,
+    @Body() updateReminderDto: UpdateReminderDto,
+  ) {
+    return this.remindersService.updateReminder(user.id, id, updateReminderDto);
+  }
+
+  @Delete(":id")
+  async deleteReminder(@CurrentUser() user: users, @Param("id") id: string) {
+    return this.remindersService.deleteReminder(user.id, id);
   }
 }

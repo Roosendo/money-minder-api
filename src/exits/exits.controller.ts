@@ -1,37 +1,56 @@
-import { Body, Controller, Get, Post, Query, UseFilters } from "@nestjs/common";
-import { AllExceptionsFilter } from "@/middlewares/errors";
-import { CreateUserDto } from "@/users/users.dto";
-import { UsersService } from "@/users/users.service";
-import { CreateExpenseDto, GetExitsDto, MonthlyExitDto } from "./exits.dto";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
+import { CurrentUser } from "@/common/decorators/current-user.decorator";
+import type { users } from "@prisma/client";
+import {
+  CreateExitDto,
+  GetExitsDto,
+  MonthlyExitDto,
+  UpdateExitDto,
+  YearlyExitDto,
+} from "./exits.dto";
 import { ExitService } from "./exits.service";
 
-@Controller("api/exits")
-@UseFilters(AllExceptionsFilter)
+@Controller("exits")
 export class ExitController {
-  constructor(
-    private readonly exitService: ExitService,
-    private readonly usersService: UsersService,
-  ) {}
+  constructor(private readonly exitService: ExitService) {}
 
-  @Post("new-exit")
-  async newExpense(@Body() createExpenseDto: CreateExpenseDto) {
-    const createUserDto: CreateUserDto = {
-      email: createExpenseDto.email,
-      fullName: createExpenseDto.fullName,
-    };
-    await this.usersService.createUser(createUserDto);
-    return this.exitService.newExpense(createExpenseDto);
+  @Post()
+  async newExit(@CurrentUser() user: users, @Body() createExitDto: CreateExitDto) {
+    return this.exitService.newExit(user.id, createExitDto);
   }
 
-  @Get("get-exits")
-  async getExits(@Query() getExitsDto: GetExitsDto) {
-    const exits = await this.exitService.getExits(getExitsDto);
-    return exits;
+  @Get()
+  async getExits(@CurrentUser() user: users, @Query() getExitsDto: GetExitsDto) {
+    return this.exitService.getExits(user.id, getExitsDto);
   }
 
-  @Get("get-exits-by-category-monthly")
-  async getExpensesByCategoryMonthly(@Query() monthlyExitDto: MonthlyExitDto) {
-    const exits = await this.exitService.getExpensesByCategoryMonthly(monthlyExitDto);
-    return exits;
+  @Get("summary/monthly")
+  async getMonthlyBreakdown(@CurrentUser() user: users, @Query() monthlyExitDto: MonthlyExitDto) {
+    return this.exitService.getMonthlyBreakdown(user.id, monthlyExitDto);
+  }
+
+  // Yearly summary for exits requested by the user
+  @Get("summary/yearly")
+  async getYearlySummary(@CurrentUser() user: users, @Query() yearlyExitDto: YearlyExitDto) {
+    return this.exitService.getYearlySummary(user.id, yearlyExitDto);
+  }
+
+  @Get(":id")
+  async getExitById(@CurrentUser() user: users, @Param("id") id: string) {
+    return this.exitService.getExitById(user.id, id);
+  }
+
+  @Patch(":id")
+  async updateExit(
+    @CurrentUser() user: users,
+    @Param("id") id: string,
+    @Body() updateExitDto: UpdateExitDto,
+  ) {
+    return this.exitService.updateExit(user.id, id, updateExitDto);
+  }
+
+  @Delete(":id")
+  async deleteExit(@CurrentUser() user: users, @Param("id") id: string) {
+    return this.exitService.deleteExit(user.id, id);
   }
 }

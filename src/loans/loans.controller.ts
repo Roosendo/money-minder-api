@@ -1,77 +1,67 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UseFilters,
-} from "@nestjs/common";
-import { AllExceptionsFilter } from "@/middlewares/errors";
-import { CreateUserDto } from "@/users/users.dto";
-import { UsersService } from "@/users/users.service";
-import {
-  AddPaymentDTO,
-  APIResponse,
-  CreateLoanDto,
-  DeleteLoansDto,
-  EditLoansDto,
-  EditPaymentDto,
-  GetLoansDto,
-} from "./loans.dto";
+import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
+import { CurrentUser } from "@/common/decorators/current-user.decorator";
+import type { users } from "@prisma/client";
+import { AddPaymentDto, CreateLoanDto, EditLoanDto, EditPaymentDto } from "./loans.dto";
 import { LoansService } from "./loans.service";
 
-@Controller("api/loans")
-@UseFilters(AllExceptionsFilter)
+@Controller("loans")
 export class LoansController {
-  constructor(
-    private readonly loansService: LoansService,
-    private readonly usersService: UsersService,
-  ) {}
+  constructor(private readonly loansService: LoansService) {}
 
-  @Post("")
-  async newLoan(@Body() createLoanDto: CreateLoanDto) {
-    const createUserDto: CreateUserDto = {
-      email: createLoanDto.userEmail,
-      fullName: createLoanDto.fullName,
-    };
-    await this.usersService.createUser(createUserDto);
-    return this.loansService.newLoan(createLoanDto);
+  @Post()
+  async newLoan(@CurrentUser() user: users, @Body() createLoanDto: CreateLoanDto) {
+    return this.loansService.newLoan(user.id, createLoanDto);
   }
 
-  @Get("")
-  async getLoans(@Query() getLoansDto: GetLoansDto) {
-    const loans = await this.loansService.getLoans(getLoansDto);
-    return (loans as unknown as APIResponse[]).map((loan) => ({
-      ...loan,
-      last_five_payments: JSON.parse(loan.last_five_payments),
-    }));
+  @Get()
+  async getLoans(@CurrentUser() user: users) {
+    return this.loansService.getLoans(user.id);
   }
 
-  @Patch("/:loanId")
-  async editLoan(@Body() editLoanDto: EditLoansDto, @Param("loanId") loanId: string) {
-    return this.loansService.editLoan({ ...editLoanDto, loanId });
+  @Get(":loanId")
+  async getLoan(@CurrentUser() user: users, @Param("loanId") loanId: string) {
+    return this.loansService.getLoanById(user.id, loanId);
   }
 
-  @Delete("/:loanId")
-  async deleteLoan(@Body() deleteLoanDto: DeleteLoansDto, @Param("loanId") loanId: string) {
-    return this.loansService.deleteLoan({ ...deleteLoanDto, loanId });
+  @Patch(":loanId")
+  async editLoan(
+    @CurrentUser() user: users,
+    @Param("loanId") loanId: string,
+    @Body() editLoanDto: EditLoanDto,
+  ) {
+    return this.loansService.editLoan(user.id, loanId, editLoanDto);
   }
 
-  @Post("/payments")
-  async addPayment(@Body() addPaymentDto: AddPaymentDTO) {
-    return this.loansService.addPayment(addPaymentDto);
+  @Delete(":loanId")
+  async deleteLoan(@CurrentUser() user: users, @Param("loanId") loanId: string) {
+    return this.loansService.deleteLoan(user.id, loanId);
   }
 
-  @Patch("/payments/edit")
-  async editPayment(@Body() editPaymentDto: EditPaymentDto) {
-    return this.loansService.editPayment(editPaymentDto);
+  @Post(":loanId/payments")
+  async addPayment(
+    @CurrentUser() user: users,
+    @Param("loanId") loanId: string,
+    @Body() addPaymentDto: AddPaymentDto,
+  ) {
+    return this.loansService.addPayment(user.id, loanId, addPaymentDto);
   }
 
-  @Delete("/payments/:paymentId")
-  async deletePayment(@Param() paymentId: string, @Query() email: string) {
-    return this.loansService.deletePayment({ paymentId: +paymentId, email });
+  @Patch(":loanId/payments/:paymentId")
+  async editPayment(
+    @CurrentUser() user: users,
+    @Param("loanId") loanId: string,
+    @Param("paymentId") paymentId: string,
+    @Body() editPaymentDto: EditPaymentDto,
+  ) {
+    return this.loansService.editPayment(user.id, loanId, paymentId, editPaymentDto);
+  }
+
+  @Delete(":loanId/payments/:paymentId")
+  async deletePayment(
+    @CurrentUser() user: users,
+    @Param("loanId") loanId: string,
+    @Param("paymentId") paymentId: string,
+  ) {
+    return this.loansService.deletePayment(user.id, loanId, paymentId);
   }
 }
