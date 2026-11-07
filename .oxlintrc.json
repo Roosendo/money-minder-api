@@ -8,5 +8,5 @@
   "env": {
     "builtin": true
   },
-  "ignorePatterns": [".agents/**"]
+  "ignorePatterns": [".agents/**", "dist/**", "node_modules/**"]
 }
