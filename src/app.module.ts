@@ -8,7 +8,6 @@ import { AppService } from './app.service'
 import { AuthModule } from './auth/auth.module'
 import { BigIntInterceptor } from './big-int-interceptor'
 import { CreditCardsModule } from './credit-cards/credit-cards.module'
-import { EmailModule } from './email/email.module'
 import { EntryModule } from './entries/entries.module'
 import { ExitModule } from './exits/exits.module'
 import { LoansModule } from './loans/loans.module'
@@ -31,7 +30,6 @@ import { SpecialsModule } from './specials/specials.module'
     SavingsModule,
     SpecialsModule,
     AuthModule,
-    EmailModule,
     CreditCardsModule,
     LoansModule,
     CacheModule.register({
