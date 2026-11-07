@@ -1,46 +1,46 @@
-import { Body, Controller, Delete, Get, Patch, Post, Query, UseFilters } from '@nestjs/common'
-import { AllExceptionsFilter } from '@/middlewares/errors'
-import { CreateUserDto } from '@/users/users.dto'
-import { UsersService } from '@/users/users.service'
+import { Body, Controller, Delete, Get, Patch, Post, Query, UseFilters } from "@nestjs/common";
+import { AllExceptionsFilter } from "@/middlewares/errors";
+import { CreateUserDto } from "@/users/users.dto";
+import { UsersService } from "@/users/users.service";
 import {
   CreateReminderDto,
   DeleteReminderDto,
   GetRemindersDto,
-  UpdateReminderDto
-} from './reminders.dto'
-import { RemindersService } from './reminders.service'
+  UpdateReminderDto,
+} from "./reminders.dto";
+import { RemindersService } from "./reminders.service";
 
-@Controller('api/reminders')
+@Controller("api/reminders")
 @UseFilters(AllExceptionsFilter)
 export class RemindersController {
   constructor(
     private readonly remindersService: RemindersService,
-    private readonly usersService: UsersService
-  ) { }
+    private readonly usersService: UsersService,
+  ) {}
 
-  @Post('new-reminder')
+  @Post("new-reminder")
   async newReminder(@Body() createReminderDto: CreateReminderDto) {
     const createUserDto: CreateUserDto = {
       email: createReminderDto.email,
-      fullName: createReminderDto.fullName
-    }
-    await this.usersService.createUser(createUserDto)
-    return this.remindersService.newReminder(createReminderDto)
+      fullName: createReminderDto.fullName,
+    };
+    await this.usersService.createUser(createUserDto);
+    return this.remindersService.newReminder(createReminderDto);
   }
 
-  @Get('get-reminders')
+  @Get("get-reminders")
   async getReminders(@Query() getRemindersDto: GetRemindersDto) {
-    const reminders = await this.remindersService.getReminders(getRemindersDto)
-    return reminders
+    const reminders = await this.remindersService.getReminders(getRemindersDto);
+    return reminders;
   }
 
-  @Delete('delete-reminder')
+  @Delete("delete-reminder")
   async deleteReminder(@Query() deleteReminderDto: DeleteReminderDto) {
-    return this.remindersService.deleteReminder(deleteReminderDto)
+    return this.remindersService.deleteReminder(deleteReminderDto);
   }
 
-  @Patch('update-reminder')
+  @Patch("update-reminder")
   async updateReminder(@Body() updateReminderDto: UpdateReminderDto) {
-    return this.remindersService.updateReminder(updateReminderDto)
+    return this.remindersService.updateReminder(updateReminderDto);
   }
 }

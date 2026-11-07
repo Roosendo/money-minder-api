@@ -1,19 +1,19 @@
-import { CACHE_MANAGER, Cache, CacheKey, CacheTTL } from '@nestjs/cache-manager'
-import { Inject, Injectable } from '@nestjs/common'
-import { PrismaService } from '@/prisma.service'
+import { CACHE_MANAGER, Cache, CacheKey, CacheTTL } from "@nestjs/cache-manager";
+import { Inject, Injectable } from "@nestjs/common";
+import { PrismaService } from "@/prisma.service";
 import {
   CreateReminderDto,
   DeleteReminderDto,
   GetRemindersDto,
-  UpdateReminderDto
-} from './reminders.dto'
+  UpdateReminderDto,
+} from "./reminders.dto";
 
 @Injectable()
 export class RemindersService {
   constructor(
     private prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
-  ) { }
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   async newReminder({ email, title, description, reminderDate }: CreateReminderDto) {
     const result = await this.prisma.reminders.create({
@@ -21,44 +21,44 @@ export class RemindersService {
         user_email: email,
         title,
         description,
-        reminder_date: new Date(reminderDate)
+        reminder_date: new Date(reminderDate),
       },
-      select: { id: true }
-    })
+      select: { id: true },
+    });
 
-    await this.cacheManager.del(`reminders_${email}`)
-    return { id: result.id }
+    await this.cacheManager.del(`reminders_${email}`);
+    return { id: result.id };
   }
 
-  @CacheKey('reminders')
+  @CacheKey("reminders")
   @CacheTTL(60 * 1000)
   async getReminders({ email }: GetRemindersDto) {
-    const cacheKey = `reminders_${email}`
-    const cacheData = await this.cacheManager.get(cacheKey)
-    if (cacheData) return cacheData
+    const cacheKey = `reminders_${email}`;
+    const cacheData = await this.cacheManager.get(cacheKey);
+    if (cacheData) return cacheData;
 
     const reminders = await this.prisma.reminders.findMany({
       where: { user_email: email },
-      select: { id: true, title: true, description: true, reminder_date: true }
-    })
+      select: { id: true, title: true, description: true, reminder_date: true },
+    });
 
-    return reminders
+    return reminders;
   }
 
   async deleteReminder({ email, id }: DeleteReminderDto) {
     await this.prisma.reminders.delete({
-      where: { user_email: email, id: +id }
-    })
+      where: { user_email: email, id: +id },
+    });
 
-    await this.cacheManager.del(`reminders_${email}`)
+    await this.cacheManager.del(`reminders_${email}`);
   }
 
   async updateReminder({ email, id, newTitle, newDescription, newDate }: UpdateReminderDto) {
     await this.prisma.reminders.update({
       where: { user_email: email, id: +id },
-      data: { title: newTitle, description: newDescription, reminder_date: new Date(newDate) }
-    })
+      data: { title: newTitle, description: newDescription, reminder_date: new Date(newDate) },
+    });
 
-    await this.cacheManager.del(`reminders_${email}`)
+    await this.cacheManager.del(`reminders_${email}`);
   }
 }

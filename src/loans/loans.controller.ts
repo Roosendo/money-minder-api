@@ -1,59 +1,77 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseFilters } from '@nestjs/common'
-import { AllExceptionsFilter } from '@/middlewares/errors'
-import { CreateUserDto } from '@/users/users.dto'
-import { UsersService } from '@/users/users.service'
-import { AddPaymentDTO, APIResponse, CreateLoanDto, DeleteLoansDto, EditLoansDto, EditPaymentDto, GetLoansDto } from './loans.dto'
-import { LoansService } from './loans.service'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseFilters,
+} from "@nestjs/common";
+import { AllExceptionsFilter } from "@/middlewares/errors";
+import { CreateUserDto } from "@/users/users.dto";
+import { UsersService } from "@/users/users.service";
+import {
+  AddPaymentDTO,
+  APIResponse,
+  CreateLoanDto,
+  DeleteLoansDto,
+  EditLoansDto,
+  EditPaymentDto,
+  GetLoansDto,
+} from "./loans.dto";
+import { LoansService } from "./loans.service";
 
-@Controller('api/loans')
+@Controller("api/loans")
 @UseFilters(AllExceptionsFilter)
 export class LoansController {
   constructor(
     private readonly loansService: LoansService,
-    private readonly usersService: UsersService
-  ) { }
+    private readonly usersService: UsersService,
+  ) {}
 
-  @Post('')
+  @Post("")
   async newLoan(@Body() createLoanDto: CreateLoanDto) {
     const createUserDto: CreateUserDto = {
       email: createLoanDto.userEmail,
-      fullName: createLoanDto.fullName
-    }
-    await this.usersService.createUser(createUserDto)
-    return this.loansService.newLoan(createLoanDto)
+      fullName: createLoanDto.fullName,
+    };
+    await this.usersService.createUser(createUserDto);
+    return this.loansService.newLoan(createLoanDto);
   }
 
-  @Get('')
+  @Get("")
   async getLoans(@Query() getLoansDto: GetLoansDto) {
-    const loans = await this.loansService.getLoans(getLoansDto)
-    return (loans as unknown as APIResponse[]).map(loan => ({
+    const loans = await this.loansService.getLoans(getLoansDto);
+    return (loans as unknown as APIResponse[]).map((loan) => ({
       ...loan,
-      last_five_payments: JSON.parse(loan.last_five_payments)
-    }))
+      last_five_payments: JSON.parse(loan.last_five_payments),
+    }));
   }
 
-  @Patch('/:loanId')
-  async editLoan(@Body() editLoanDto: EditLoansDto, @Param('loanId') loanId: string) {
-    return this.loansService.editLoan({ ...editLoanDto, loanId })
+  @Patch("/:loanId")
+  async editLoan(@Body() editLoanDto: EditLoansDto, @Param("loanId") loanId: string) {
+    return this.loansService.editLoan({ ...editLoanDto, loanId });
   }
 
-  @Delete('/:loanId')
-  async deleteLoan(@Body() deleteLoanDto: DeleteLoansDto, @Param('loanId') loanId: string) {
-    return this.loansService.deleteLoan({ ...deleteLoanDto, loanId })
+  @Delete("/:loanId")
+  async deleteLoan(@Body() deleteLoanDto: DeleteLoansDto, @Param("loanId") loanId: string) {
+    return this.loansService.deleteLoan({ ...deleteLoanDto, loanId });
   }
 
-  @Post('/payments')
+  @Post("/payments")
   async addPayment(@Body() addPaymentDto: AddPaymentDTO) {
-    return this.loansService.addPayment(addPaymentDto)
+    return this.loansService.addPayment(addPaymentDto);
   }
 
-  @Patch('/payments/edit')
+  @Patch("/payments/edit")
   async editPayment(@Body() editPaymentDto: EditPaymentDto) {
-    return this.loansService.editPayment(editPaymentDto)
+    return this.loansService.editPayment(editPaymentDto);
   }
 
-  @Delete('/payments/:paymentId')
+  @Delete("/payments/:paymentId")
   async deletePayment(@Param() paymentId: string, @Query() email: string) {
-    return this.loansService.deletePayment({ paymentId: +paymentId, email })
+    return this.loansService.deletePayment({ paymentId: +paymentId, email });
   }
 }

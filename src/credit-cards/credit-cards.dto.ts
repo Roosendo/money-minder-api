@@ -1,70 +1,70 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreateCreditCardDto {
   @IsString()
   @IsOptional()
-  fullName?: string
+  fullName?: string;
 
   @IsNotEmpty()
   @IsEmail()
-  email: string
+  email: string;
 
   @IsNotEmpty()
   @IsString()
-  name: string
+  name: string;
 
   @IsString()
   @IsNotEmpty()
-  cutOffDate: string
+  cutOffDate: string;
 
   @IsString()
   @IsNotEmpty()
-  paymentDueDate: string
+  paymentDueDate: string;
 }
 
 export class GetCreditCardsDto {
   @IsEmail()
   @IsNotEmpty()
-  email: string
+  email: string;
 }
 
 export class EditCreditCardDto {
   @IsOptional()
   @IsString()
-  creditCardId?: string
+  creditCardId?: string;
 
   @IsEmail()
   @IsNotEmpty()
-  userEmail: string
+  userEmail: string;
 
   @IsNotEmpty()
   @IsString()
-  name?: string
+  name?: string;
 
   @IsString()
   @IsNotEmpty()
-  cutOffDate?: string
+  cutOffDate?: string;
 
   @IsString()
   @IsOptional()
-  paymentDueDate?: string
+  paymentDueDate?: string;
 }
 
 export class DeleteCreditCardDto {
   @IsOptional()
   @IsString()
-  creditCardId?: string
+  creditCardId?: string;
 
   @IsEmail()
   @IsNotEmpty()
-  userEmail: string
+  userEmail: string;
 }
 
 export type PurchaseRange = {
-  email: string
-}
+  email: string;
+};
 
 export type ApiPurchases = {
-  cut_off_date: string
-  payment_due_date: string
-}
+  cut_off_date: string;
+  payment_due_date: string;
+};

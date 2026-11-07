@@ -1,61 +1,61 @@
-import { Controller, Get, Query, UseFilters } from '@nestjs/common'
-import { EntryService } from '@/entries/entries.service'
-import { ExitService } from '@/exits/exits.service'
-import { AllExceptionsFilter } from '@/middlewares/errors'
+import { Controller, Get, Query, UseFilters } from "@nestjs/common";
+import { EntryService } from "@/entries/entries.service";
+import { ExitService } from "@/exits/exits.service";
+import { AllExceptionsFilter } from "@/middlewares/errors";
 import {
   CashFlowDto,
   CategoriesDto,
   FinancialSummaryMonthlyDto,
   FinancialSummaryYearlyDto,
-  RecentTransactionsDto
-} from './specials.dto'
-import { SpecialsService } from './specials.service'
+  RecentTransactionsDto,
+} from "./specials.dto";
+import { SpecialsService } from "./specials.service";
 
-@Controller('api/specials')
+@Controller("api/specials")
 @UseFilters(AllExceptionsFilter)
 export class SpecialsController {
   constructor(
     private readonly specialsService: SpecialsService,
     private readonly entryService: EntryService,
-    private readonly exitService: ExitService
-  ) { }
+    private readonly exitService: ExitService,
+  ) {}
 
-  @Get('financial-summary-yearly')
+  @Get("financial-summary-yearly")
   async getFinancialSummaryYearly(@Query() financialSummaryYearlyDto: FinancialSummaryYearlyDto) {
-    const entries = await this.entryService.getYearlySummary(financialSummaryYearlyDto)
-    const exits = await this.exitService.getYearlySummary(financialSummaryYearlyDto)
+    const entries = await this.entryService.getYearlySummary(financialSummaryYearlyDto);
+    const exits = await this.exitService.getYearlySummary(financialSummaryYearlyDto);
 
-    const totalEntries = entries._sum.amount || 0
-    const totalExits = exits._sum.amount || 0
+    const totalEntries = entries._sum.amount || 0;
+    const totalExits = exits._sum.amount || 0;
 
-    return { totalEntries, totalExits }
+    return { totalEntries, totalExits };
   }
 
-  @Get('financial-summary-monthly')
+  @Get("financial-summary-monthly")
   async getFinancialSummaryMonthly(
-    @Query() financialSummaryMonthlyDto: FinancialSummaryMonthlyDto
+    @Query() financialSummaryMonthlyDto: FinancialSummaryMonthlyDto,
   ) {
-    const entries = await this.entryService.getMonthlySummary(financialSummaryMonthlyDto)
-    const exits = await this.exitService.getMonthlySummary(financialSummaryMonthlyDto)
+    const entries = await this.entryService.getMonthlySummary(financialSummaryMonthlyDto);
+    const exits = await this.exitService.getMonthlySummary(financialSummaryMonthlyDto);
 
-    const totalEntries = entries._sum || 0
-    const totalExits = exits._sum || 0
+    const totalEntries = entries._sum || 0;
+    const totalExits = exits._sum || 0;
 
-    return { totalEntries, totalExits }
+    return { totalEntries, totalExits };
   }
 
-  @Get('cash-flow')
+  @Get("cash-flow")
   async getCashFlow(@Query() cashFlowDto: CashFlowDto) {
-    return this.specialsService.getCashFlow(cashFlowDto)
+    return this.specialsService.getCashFlow(cashFlowDto);
   }
 
-  @Get('yearly-categories')
+  @Get("yearly-categories")
   async getCategories(@Query() categoriesDto: CategoriesDto) {
-    return this.specialsService.getCategories(categoriesDto)
+    return this.specialsService.getCategories(categoriesDto);
   }
 
-  @Get('recent-transactions')
+  @Get("recent-transactions")
   async getRecentTransactions(@Query() recentTransactionsDto: RecentTransactionsDto) {
-    return this.specialsService.getRecentTransactions(recentTransactionsDto)
+    return this.specialsService.getRecentTransactions(recentTransactionsDto);
   }
 }

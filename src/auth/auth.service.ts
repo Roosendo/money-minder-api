@@ -1,17 +1,17 @@
-import { Injectable } from '@nestjs/common'
-import { Request } from 'express'
+import { Injectable } from "@nestjs/common";
+import { Request } from "express";
 
 @Injectable()
 export class AuthService {
   googleLogin(req: Request) {
-    if (!req.user) return 'No user from google'
+    if (!req.user) return "No user from google";
 
-    return { user: req.user }
+    return { user: req.user };
   }
 
   githubLogin(req: Request) {
-    if (!req.user) return 'No user from github'
+    if (!req.user) return "No user from github";
 
-    return { user: req.user }
+    return { user: req.user };
   }
 }

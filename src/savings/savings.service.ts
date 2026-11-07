@@ -1,14 +1,14 @@
-import { CACHE_MANAGER, Cache, CacheKey, CacheTTL } from '@nestjs/cache-manager'
-import { Inject, Injectable } from '@nestjs/common'
-import { PrismaService } from '@/prisma.service'
-import { CreateSavingDto, DeleteSavingDto, GetSavingsDto, UpdateSavingDto } from './savings.dto'
+import { CACHE_MANAGER, Cache, CacheKey, CacheTTL } from "@nestjs/cache-manager";
+import { Inject, Injectable } from "@nestjs/common";
+import { PrismaService } from "@/prisma.service";
+import { CreateSavingDto, DeleteSavingDto, GetSavingsDto, UpdateSavingDto } from "./savings.dto";
 
 @Injectable()
 export class SavingsService {
   constructor(
     private prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
-  ) { }
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   async newSaving({
     email,
@@ -16,7 +16,7 @@ export class SavingsService {
     targetAmount,
     currentAmount,
     startDate,
-    endDate
+    endDate,
   }: CreateSavingDto) {
     const saving = await this.prisma.savings_goals.create({
       data: {
@@ -25,22 +25,22 @@ export class SavingsService {
         target_amount: targetAmount,
         current_amount: currentAmount,
         start_date: new Date(startDate),
-        end_date: new Date(endDate)
+        end_date: new Date(endDate),
       },
-      select: { id: true }
-    })
-    const interceptedId = Number(saving.id)
+      select: { id: true },
+    });
+    const interceptedId = Number(saving.id);
 
-    await this.cacheManager.del(`savings_${email}`)
-    return { id: interceptedId }
+    await this.cacheManager.del(`savings_${email}`);
+    return { id: interceptedId };
   }
 
-  @CacheKey('savings')
+  @CacheKey("savings")
   @CacheTTL(60 * 1000)
   async getSavings({ email }: GetSavingsDto) {
-    const cacheKey = `savings_${email}`
-    const cacheData = await this.cacheManager.get(cacheKey)
-    if (cacheData) return cacheData
+    const cacheKey = `savings_${email}`;
+    const cacheData = await this.cacheManager.get(cacheKey);
+    if (cacheData) return cacheData;
 
     const savings = await this.prisma.savings_goals.findMany({
       where: { user_email: email },
@@ -49,23 +49,23 @@ export class SavingsService {
         name: true,
         target_amount: true,
         current_amount: true,
-        end_date: true
-      }
-    })
+        end_date: true,
+      },
+    });
 
-    await this.cacheManager.set(cacheKey, savings, 60 * 1000)
-    return savings
+    await this.cacheManager.set(cacheKey, savings, 60 * 1000);
+    return savings;
   }
 
   async deleteSaving({ email, id }: DeleteSavingDto) {
     await this.prisma.savings_goals.delete({
       where: {
         user_email: email,
-        id: +id
-      }
-    })
+        id: +id,
+      },
+    });
 
-    await this.cacheManager.del(`savings_${email}`)
+    await this.cacheManager.del(`savings_${email}`);
   }
 
   async updateSaving({
@@ -74,21 +74,21 @@ export class SavingsService {
     newSavingName,
     newTarget,
     newCurrentAmount,
-    newEndDate
+    newEndDate,
   }: UpdateSavingDto) {
     await this.prisma.savings_goals.updateMany({
       where: {
         user_email: email,
-        id: +id
+        id: +id,
       },
       data: {
         name: newSavingName,
         target_amount: newTarget,
         current_amount: newCurrentAmount,
-        end_date: new Date(newEndDate)
-      }
-    })
+        end_date: new Date(newEndDate),
+      },
+    });
 
-    await this.cacheManager.del(`savings_${email}`)
+    await this.cacheManager.del(`savings_${email}`);
   }
 }

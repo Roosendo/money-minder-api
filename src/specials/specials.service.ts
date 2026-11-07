@@ -1,50 +1,52 @@
-import { CACHE_MANAGER, Cache, CacheKey, CacheTTL } from '@nestjs/cache-manager'
-import { Inject, Injectable } from '@nestjs/common'
-import { CashFlowDto, CategoriesDto, RecentTransactionsDto } from './specials.dto'
-import { getCategoryTotalsDetailed, getLatestTransactions, getMonthlyBalance } from './specials.utils'
+import { CACHE_MANAGER, Cache, CacheKey, CacheTTL } from "@nestjs/cache-manager";
+import { Inject, Injectable } from "@nestjs/common";
+import { CashFlowDto, CategoriesDto, RecentTransactionsDto } from "./specials.dto";
+import {
+  getCategoryTotalsDetailed,
+  getLatestTransactions,
+  getMonthlyBalance,
+} from "./specials.utils";
 
 @Injectable()
 export class SpecialsService {
-  constructor(
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
-  ) { }
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
-  @CacheKey('financialSummaryYearly')
+  @CacheKey("financialSummaryYearly")
   @CacheTTL(60 * 1000)
   async getCashFlow({ email, year }: CashFlowDto) {
-    const cacheKey = `financialSummaryYearly_${email}_${year}`
-    const cacheData = await this.cacheManager.get(cacheKey)
-    if (cacheData) return cacheData
+    const cacheKey = `financialSummaryYearly_${email}_${year}`;
+    const cacheData = await this.cacheManager.get(cacheKey);
+    if (cacheData) return cacheData;
 
-    const result = await getMonthlyBalance(year, email)
+    const result = await getMonthlyBalance(year, email);
 
-    await this.cacheManager.set(cacheKey, result, 60 * 1000)
-    return result
+    await this.cacheManager.set(cacheKey, result, 60 * 1000);
+    return result;
   }
 
-  @CacheKey('categories')
+  @CacheKey("categories")
   @CacheTTL(60 * 1000)
   async getCategories({ email, year }: CategoriesDto) {
-    const cacheKey = `categories_${email}_${year}`
-    const cacheData = await this.cacheManager.get(cacheKey)
-    if (cacheData) return cacheData
+    const cacheKey = `categories_${email}_${year}`;
+    const cacheData = await this.cacheManager.get(cacheKey);
+    if (cacheData) return cacheData;
 
-    const categories = await getCategoryTotalsDetailed(year, email)
+    const categories = await getCategoryTotalsDetailed(year, email);
 
-    await this.cacheManager.set(cacheKey, categories, 60 * 1000)
-    return categories
+    await this.cacheManager.set(cacheKey, categories, 60 * 1000);
+    return categories;
   }
 
-  @CacheKey('recentTransactions')
+  @CacheKey("recentTransactions")
   @CacheTTL(60 * 1000)
   async getRecentTransactions({ email, year }: RecentTransactionsDto) {
-    const cacheKey = `recentTransactions_${email}_${year}`
-    const cacheData = await this.cacheManager.get(cacheKey)
-    if (cacheData) return cacheData
+    const cacheKey = `recentTransactions_${email}_${year}`;
+    const cacheData = await this.cacheManager.get(cacheKey);
+    if (cacheData) return cacheData;
 
-    const transactions = await getLatestTransactions(year, email)
+    const transactions = await getLatestTransactions(year, email);
 
-    await this.cacheManager.set(cacheKey, transactions, 60 * 1000)
-    return transactions
+    await this.cacheManager.set(cacheKey, transactions, 60 * 1000);
+    return transactions;
   }
 }

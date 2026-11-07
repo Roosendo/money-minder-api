@@ -1,1 +1,1 @@
-export * from './big-int-interceptor.interceptor'
+export * from "./big-int-interceptor.interceptor";

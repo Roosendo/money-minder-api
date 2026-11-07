@@ -1,41 +1,41 @@
-import { Body, Controller, Delete, Get, Patch, Post, Query, UseFilters } from '@nestjs/common'
-import { AllExceptionsFilter } from '@/middlewares/errors'
-import { CreateUserDto } from '@/users/users.dto'
-import { UsersService } from '@/users/users.service'
-import { CreateSavingDto, DeleteSavingDto, GetSavingsDto, UpdateSavingDto } from './savings.dto'
-import { SavingsService } from './savings.service'
+import { Body, Controller, Delete, Get, Patch, Post, Query, UseFilters } from "@nestjs/common";
+import { AllExceptionsFilter } from "@/middlewares/errors";
+import { CreateUserDto } from "@/users/users.dto";
+import { UsersService } from "@/users/users.service";
+import { CreateSavingDto, DeleteSavingDto, GetSavingsDto, UpdateSavingDto } from "./savings.dto";
+import { SavingsService } from "./savings.service";
 
-@Controller('api/savings')
+@Controller("api/savings")
 @UseFilters(AllExceptionsFilter)
 export class SavingsController {
   constructor(
     private readonly savingsService: SavingsService,
-    private readonly usersService: UsersService
-  ) { }
+    private readonly usersService: UsersService,
+  ) {}
 
-  @Post('new-saving')
+  @Post("new-saving")
   async newSaving(@Body() createSavingDto: CreateSavingDto) {
     const createUserDto: CreateUserDto = {
       email: createSavingDto.email,
-      fullName: createSavingDto.fullName
-    }
-    await this.usersService.createUser(createUserDto)
-    return this.savingsService.newSaving(createSavingDto)
+      fullName: createSavingDto.fullName,
+    };
+    await this.usersService.createUser(createUserDto);
+    return this.savingsService.newSaving(createSavingDto);
   }
 
-  @Get('get-savings')
+  @Get("get-savings")
   async getSavings(@Query() getSavingsDto: GetSavingsDto) {
-    const savings = await this.savingsService.getSavings(getSavingsDto)
-    return savings
+    const savings = await this.savingsService.getSavings(getSavingsDto);
+    return savings;
   }
 
-  @Delete('delete-saving')
+  @Delete("delete-saving")
   async deleteSaving(@Query() deleteSavingDto: DeleteSavingDto) {
-    return this.savingsService.deleteSaving(deleteSavingDto)
+    return this.savingsService.deleteSaving(deleteSavingDto);
   }
 
-  @Patch('update-saving')
+  @Patch("update-saving")
   async updateSaving(@Body() updateSavingDto: UpdateSavingDto) {
-    return this.savingsService.updateSaving(updateSavingDto)
+    return this.savingsService.updateSaving(updateSavingDto);
   }
 }

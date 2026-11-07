@@ -1,12 +1,12 @@
-import type { Config } from './config.interface'
+import type { Config } from "./config.interface";
 
 const config: Config = {
   nest: {
-    port: +(process.env.PORT || '7373')
+    port: +(process.env.PORT || "7373"),
   },
   cors: {
-    enabled: true
-  }
-}
+    enabled: true,
+  },
+};
 
-export default (): Config => config
+export default (): Config => config;
