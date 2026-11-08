@@ -94,5 +94,10 @@
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     }
+  },
+  "pnpm": {
+    "overrides": {
+      "ora": "^5.4.1"
+    }
   }
 }
