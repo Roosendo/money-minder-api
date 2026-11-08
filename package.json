@@ -41,12 +41,8 @@
     "cache-manager": "7.2.9",
     "class-transformer": "0.5.1",
     "class-validator": "0.15.1",
-    "passport": "0.7.0",
-    "passport-github2": "0.1.12",
-    "passport-google-oauth20": "2.0.0",
     "pg": "^8.23.1",
     "reflect-metadata": "0.2.2",
-    "resend": "6.18.1",
     "rxjs": "7.8.2"
   },
   "devDependencies": {
@@ -59,13 +55,11 @@
     "@types/cors": "2.8.19",
     "@types/express": "5.0.6",
     "@types/jest": "30.0.0",
-    "@types/node": "26.1.2",
-    "@types/passport-github2": "1.2.9",
-    "@types/passport-google-oauth20": "2.0.17",
+    "@types/node": "26.6.6",
     "@types/pg": "^8.23.1",
     "@types/supertest": "7.2.1",
-    "dotenv": "17.4.2",
-    "jest": "30.4.2",
+    "dotenv": "18.0.9",
+    "jest": "30.5.2",
     "lefthook": "^2.2.2",
     "oxfmt": "^0.77.0",
     "oxlint": "^1.92.0",
@@ -93,11 +87,6 @@
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
-    }
-  },
-  "pnpm": {
-    "overrides": {
-      "ora": "^5.4.1"
     }
   }
 }
