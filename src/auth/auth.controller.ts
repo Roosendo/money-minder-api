@@ -60,17 +60,27 @@ export class AuthController {
     }
 
     try {
-      const result = await auth.api.signInSocial({
+      const { headers, response } = await auth.api.signInSocial({
         body: { provider, callbackURL },
         headers: fromNodeHeaders(req.headers),
+        returnHeaders: true,
       });
 
-      if (!result?.url) {
+      // `signInSocial` persists the OAuth state in a signed cookie. Because it
+      // is invoked directly (not through `toNodeHandler`), the cookie is only
+      // available on the returned headers and must be forwarded manually.
+      // Without it the provider callback fails with `state_mismatch`.
+      const cookies = headers.getSetCookie?.() ?? [];
+      if (cookies.length > 0) {
+        res.setHeader("set-cookie", cookies);
+      }
+
+      if (!response?.url) {
         res.status(502).json({ message: "The OAuth provider did not return a redirect URL" });
         return;
       }
 
-      res.redirect(result.url);
+      res.redirect(response.url);
     } catch (error) {
       if (isAPIError(error)) {
         res.status(error.statusCode).json({ message: error.body?.message ?? error.message });
