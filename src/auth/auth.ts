@@ -12,6 +12,7 @@ export const getBetterAuthInstance = () => {
 
   authInstance = betterAuth({
     baseURL: process.env.BETTER_AUTH_URL || "http://localhost:7373",
+    basePath: process.env.BETTER_AUTH_BASE_PATH || "/api/v1/auth",
     secret: process.env.BETTER_AUTH_SECRET || "money-minder-better-auth-secret-key-32chars",
     database: pool,
     socialProviders: {
