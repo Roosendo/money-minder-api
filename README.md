@@ -58,6 +58,47 @@ $ pnpm run test:e2e
 $ pnpm run test:cov
 ```
 
+## Authentication & Health Endpoint
+
+This API uses **Better Auth** with OAuth (Google/GitHub) and email/password.
+
+### Keep the free service awake 🏓
+
+The API provides a **public health endpoint** that you can ping periodically to prevent free tiers from idling:
+
+- `GET /api/v1/ping` → returns `"pong 🎾"` — **no authentication required**
+- `GET /api/v1/hello` → returns `"Hi there you fantastic person!"` — **no authentication required**
+
+Call these endpoints every few minutes (e.g., via a cron job, uptime robot, or your frontend scheduler) to keep the instance warm.
+
+### Protected vs Public Endpoints
+
+- **Protected**: All routes under `api/v1/` **except** `/hello` and `/ping` require authentication via Bearer token or session cookie.
+- **Public**: `GET /api/v1/hello` and `GET /api/v1/ping` are open — no auth needed.
+
+### OAuth Login
+
+| Provider | Endpoint                  |
+| -------- | ------------------------- |
+| Google   | `GET /api/v1/auth/google` |
+| GitHub   | `GET /api/v1/auth/github` |
+
+Callback URLs are handled automatically at `/api/v1/auth/callback/{provider}`.
+
+### Getting a Token
+
+After OAuth login, extract the `access_token` from the session/callback response and include it in the `Authorization` header:
+
+```http
+Authorization: Bearer <access_token>
+```
+
+The global `AuthGuard` validates sessions via Better Auth API or fallback to the `prisma.sessions` table.
+
+### Current User
+
+Protected endpoints use the `@CurrentUser()` decorator to receive the authenticated user object (contains `id`, `name`, `email`, `avatar_url`, and OAuth provider info).
+
 ## Support
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
