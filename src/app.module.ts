@@ -20,6 +20,7 @@ import { SpecialsModule } from "@/specials/specials.module";
 import { UsersModule } from "@/users/users.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
+import { HealthModule } from "./health/health.module";
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { AppService } from "./app.service";
     SavingsModule,
     SpecialsModule,
     PhrasesModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [

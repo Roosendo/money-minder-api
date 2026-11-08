@@ -14,7 +14,7 @@ const bootstrap = async () => {
 
   // RESTful URL versioning / Global Prefix
   app.setGlobalPrefix("api/v1", {
-    exclude: ["api", "api/docs", "api/docs/(.*)", "hello", "ping"],
+    exclude: ["api", "api/docs", "api/docs/(.*)", "hello", "ping", "health"],
   });
 
   // Strict ValidationPipe
