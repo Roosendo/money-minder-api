@@ -1,37 +1,55 @@
-import { Body, Controller, Get, Post, Query, UseFilters } from '@nestjs/common'
-import { AllExceptionsFilter } from '@/middlewares/errors'
-import { CreateUserDto } from '@/users/users.dto'
-import { UsersService } from '@/users/users.service'
-import { CreateEntryDto, GetEntriesDto, MonthlyEntryDto } from './entries.dto'
-import { EntryService } from './entries.service'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
+import { CurrentUser } from "@/common/decorators/current-user.decorator";
+import type { users } from "@prisma/client";
+import {
+  CreateEntryDto,
+  GetEntriesDto,
+  MonthlyEntryDto,
+  UpdateEntryDto,
+  YearlyEntryDto,
+} from "./entries.dto";
+import { EntryService } from "./entries.service";
 
-@Controller('api/entries')
-@UseFilters(AllExceptionsFilter)
+@Controller("entries")
 export class EntryController {
-  constructor(
-    private readonly entryService: EntryService,
-    private readonly usersService: UsersService
-  ) { }
+  constructor(private readonly entryService: EntryService) {}
 
-  @Post('new-entry')
-  async newEntry(@Body() createEntryDto: CreateEntryDto) {
-    const createUserDto: CreateUserDto = {
-      email: createEntryDto.email,
-      fullName: createEntryDto.fullName
-    }
-    await this.usersService.createUser(createUserDto)
-    return this.entryService.newEntry(createEntryDto)
+  @Post()
+  async newEntry(@CurrentUser() user: users, @Body() createEntryDto: CreateEntryDto) {
+    return this.entryService.newEntry(user.id, createEntryDto);
   }
 
-  @Get('get-entries')
-  async getEntries(@Query() getEntriesDto: GetEntriesDto) {
-    const entries = await this.entryService.getEntries(getEntriesDto)
-    return entries
+  @Get()
+  async getEntries(@CurrentUser() user: users, @Query() getEntriesDto: GetEntriesDto) {
+    return this.entryService.getEntries(user.id, getEntriesDto);
   }
 
-  @Get('get-entries-by-category-monthly')
-  async getEntriesByCategoryMonthly(@Query() monthlyEntryDto: MonthlyEntryDto) {
-    const entries = await this.entryService.getEntriesByCategoryMonthly(monthlyEntryDto)
-    return entries
+  @Get("summary/monthly")
+  async getMonthlyBreakdown(@CurrentUser() user: users, @Query() monthlyEntryDto: MonthlyEntryDto) {
+    return this.entryService.getMonthlyBreakdown(user.id, monthlyEntryDto);
+  }
+
+  @Get("summary/yearly")
+  async getYearlySummary(@CurrentUser() user: users, @Query() yearlyEntryDto: YearlyEntryDto) {
+    return this.entryService.getYearlySummary(user.id, yearlyEntryDto);
+  }
+
+  @Get(":id")
+  async getEntryById(@CurrentUser() user: users, @Param("id") id: string) {
+    return this.entryService.getEntryById(user.id, id);
+  }
+
+  @Patch(":id")
+  async updateEntry(
+    @CurrentUser() user: users,
+    @Param("id") id: string,
+    @Body() updateEntryDto: UpdateEntryDto,
+  ) {
+    return this.entryService.updateEntry(user.id, id, updateEntryDto);
+  }
+
+  @Delete(":id")
+  async deleteEntry(@CurrentUser() user: users, @Param("id") id: string) {
+    return this.entryService.deleteEntry(user.id, id);
   }
 }

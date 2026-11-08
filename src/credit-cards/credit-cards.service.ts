@@ -1,131 +1,176 @@
-import { CACHE_MANAGER, Cache, CacheKey, CacheTTL } from '@nestjs/cache-manager'
-import { Inject, Injectable } from '@nestjs/common'
-import { PrismaService } from '@/prisma.service'
-import { CreateCreditCardDto, EditCreditCardDto, GetCreditCardsDto, PurchaseRange } from './credit-cards.dto'
+import { CACHE_MANAGER, Cache } from "@nestjs/cache-manager";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "@/prisma.service";
+import { CreateCreditCardDto, EditCreditCardDto } from "./credit-cards.dto";
 
 @Injectable()
 export class CreditCardsService {
   constructor(
-    private prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
-  ) { }
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+  ) {}
 
-  async newCreditCard({ email, name, cutOffDate, paymentDueDate }: CreateCreditCardDto) {
-    await this.prisma.credit_cards.create({
+  async newCreditCard(userId: string, dto: CreateCreditCardDto) {
+    const card = await this.prisma.credit_cards.create({
       data: {
-        user_email: email,
-        name,
-        cut_off_date: +cutOffDate,
-        payment_due_date: +paymentDueDate
+        user_id: userId,
+        name: dto.name,
+        last4: dto.last4,
+        credit_limit: dto.creditLimit,
+        statement_day: dto.statementDay,
+        due_day: dto.dueDay,
       },
-      select: { credit_card_id: true }
-    })
+    });
 
-    await this.cacheManager.del(`credit_cards_${email}`)
+    await this.cacheManager.del(`credit_cards_${userId}`);
+    return card;
   }
 
-  @CacheKey('credit_cards')
-  @CacheTTL(60 * 1000)
-  async getCreditCards({ email }: GetCreditCardsDto) {
-    const cacheKey = `credit_cards_${email}`
-    const cacheData = await this.cacheManager.get(cacheKey)
-    if (cacheData) return cacheData
+  async getCreditCards(userId: string) {
+    const cacheKey = `credit_cards_${userId}`;
+    const cached = await this.cacheManager.get(cacheKey);
+    if (cached) return cached;
 
-    const creditCards = await this.prisma.credit_cards.findMany({
-      where: { user_email: email },
-      select: { credit_card_id: true, name: true, cut_off_date: true, payment_due_date: true }
-    })
+    const cards = await this.prisma.credit_cards.findMany({
+      where: { user_id: userId },
+      orderBy: { name: "asc" },
+    });
 
-    await this.cacheManager.set(cacheKey, creditCards, 60 * 1000)
-    return creditCards
+    await this.cacheManager.set(cacheKey, cards, 60 * 1000);
+    return cards;
   }
 
-  async editCreditCard({ creditCardId, userEmail, name, cutOffDate, paymentDueDate }: EditCreditCardDto) {
-    await this.prisma.credit_cards.update({
-      where: { credit_card_id: +creditCardId, user_email: userEmail },
-      data: { name, cut_off_date: +cutOffDate, payment_due_date: +paymentDueDate }
-    })
+  async getCreditCardById(userId: string, creditCardId: string) {
+    const card = await this.prisma.credit_cards.findFirst({
+      where: { id: creditCardId, user_id: userId },
+    });
 
-    await this.cacheManager.del(`credit_cards_${userEmail}`)
+    if (!card) {
+      throw new NotFoundException(`Credit card ${creditCardId} not found`);
+    }
+
+    return card;
   }
 
-  async deleteCreditCard({ creditCardId, userEmail }: EditCreditCardDto) {
+  async editCreditCard(userId: string, creditCardId: string, dto: EditCreditCardDto) {
+    const existing = await this.prisma.credit_cards.findFirst({
+      where: { id: creditCardId, user_id: userId },
+    });
+
+    if (!existing) {
+      throw new NotFoundException(`Credit card ${creditCardId} not found`);
+    }
+
+    const updated = await this.prisma.credit_cards.update({
+      where: { id: creditCardId },
+      data: {
+        ...(dto.name !== undefined && { name: dto.name }),
+        ...(dto.last4 !== undefined && { last4: dto.last4 }),
+        ...(dto.creditLimit !== undefined && { credit_limit: dto.creditLimit }),
+        ...(dto.statementDay !== undefined && { statement_day: dto.statementDay }),
+        ...(dto.dueDay !== undefined && { due_day: dto.dueDay }),
+      },
+    });
+
+    await this.cacheManager.del(`credit_cards_${userId}`);
+    return updated;
+  }
+
+  async deleteCreditCard(userId: string, creditCardId: string) {
+    const existing = await this.prisma.credit_cards.findFirst({
+      where: { id: creditCardId, user_id: userId },
+    });
+
+    if (!existing) {
+      throw new NotFoundException(`Credit card ${creditCardId} not found`);
+    }
+
     await this.prisma.credit_cards.delete({
-      where: { credit_card_id: +creditCardId, user_email: userEmail }
-    })
+      where: { id: creditCardId },
+    });
 
-    await this.cacheManager.del(`credit_cards_${userEmail}`)
+    await this.cacheManager.del(`credit_cards_${userId}`);
+    return { deleted: true };
   }
 
-  async getPurchasesRange({ email }: PurchaseRange) {
-    // 1. Primero, obtenemos las tarjetas y calculamos las fechas de corte
-    const now = new Date()
-    const currentDay = now.getDate()
+  async getPurchasesRange(userId: string, creditCardId?: string) {
+    const now = new Date();
+    const currentDay = now.getDate();
 
-    const creditCards = await this.prisma.credit_cards.findMany({
+    const cards = await this.prisma.credit_cards.findMany({
       where: {
-        user_email: email
+        user_id: userId,
+        ...(creditCardId ? { id: creditCardId } : {}),
+      },
+      select: {
+        id: true,
+        name: true,
+        statement_day: true,
+        due_day: true,
+        credit_limit: true,
+      },
+    });
+
+    if (!cards.length) {
+      return [];
+    }
+
+    // Build ranges per card
+    const cardCalculations = cards.map((card) => {
+      const cutOff = card.statement_day;
+      let startCutOffDate: Date;
+      let endCutOffDate: Date;
+
+      if (currentDay > cutOff) {
+        startCutOffDate = new Date(now.getFullYear(), now.getMonth() - 1, cutOff + 1);
+        endCutOffDate = new Date(now.getFullYear(), now.getMonth(), cutOff, 23, 59, 59, 999);
+      } else {
+        startCutOffDate = new Date(now.getFullYear(), now.getMonth() - 2, cutOff + 1);
+        endCutOffDate = new Date(now.getFullYear(), now.getMonth() - 1, cutOff, 23, 59, 59, 999);
+      }
+
+      return {
+        ...card,
+        startDate: startCutOffDate,
+        endDate: endCutOffDate,
+      };
+    });
+
+    // Single query groupBy across all cards (eliminates N+1)
+    const minStart = new Date(Math.min(...cardCalculations.map((c) => c.startDate.getTime())));
+    const maxEnd = new Date(Math.max(...cardCalculations.map((c) => c.endDate.getTime())));
+
+    const purchases = await this.prisma.exits.findMany({
+      where: {
+        user_id: userId,
+        credit_card_id: { in: cards.map((c) => c.id) },
+        date: { gte: minStart, lte: maxEnd },
       },
       select: {
         credit_card_id: true,
-        name: true,
-        cut_off_date: true,
-      }
-    })
+        amount: true,
+        date: true,
+      },
+    });
 
-    // 2. Calculamos las fechas de corte para cada tarjeta
-    const cardsWithDates = creditCards.map(card => {
-      const cutOffDate = card.cut_off_date
+    return cardCalculations.map((card) => {
+      const cardPurchases = purchases.filter(
+        (p) => p.credit_card_id === card.id && p.date >= card.startDate && p.date <= card.endDate,
+      );
 
-      let endCutOffDate: Date
-      let startCutOffDate: Date
-
-      if (currentDay > cutOffDate) {
-        // Fecha actual
-        endCutOffDate = new Date(now.getFullYear(), now.getMonth(), cutOffDate)
-        // Mes anterior
-        startCutOffDate = new Date(now.getFullYear(), now.getMonth() - 1, cutOffDate + 1)
-      } else {
-        // Mes anterior
-        endCutOffDate = new Date(now.getFullYear(), now.getMonth() - 1, cutOffDate)
-        // Dos meses atrás
-        startCutOffDate = new Date(now.getFullYear(), now.getMonth() - 2, cutOffDate + 1)
-      }
+      const totalSpent = cardPurchases.reduce((acc, p) => acc + Number(p.amount), 0);
 
       return {
-        ...card,
-        start_cut_off_date: startCutOffDate,
-        end_cut_off_date: endCutOffDate
-      }
-    })
-
-    // 3. Obtenemos los movimientos y calculamos totales
-    const result = await Promise.all(cardsWithDates.map(async card => {
-      const exits = await this.prisma.money_exits.findMany({
-        where: {
-          credit_card_id: card.credit_card_id,
-          date: {
-            gte: card.start_cut_off_date,
-            lte: card.end_cut_off_date
-          }
-        },
-        select: {
-          exit_id: true,
-          amount: true,
-          description: true,
-          date: true
-        }
-      })
-
-      const total_amount = exits.reduce((sum, exit) => sum + (+exit.amount || 0), 0)
-
-      return {
-        ...card,
-        exits,
-        total_amount
-      }
-    }))
-
-    return result
+        id: card.id,
+        name: card.name,
+        statementDay: card.statement_day,
+        dueDay: card.due_day,
+        creditLimit: Number(card.credit_limit),
+        startDate: card.startDate.toISOString().split("T")[0],
+        endDate: card.endDate.toISOString().split("T")[0],
+        totalSpent,
+        availableCredit: Math.max(0, Number(card.credit_limit) - totalSpent),
+      };
+    });
   }
 }

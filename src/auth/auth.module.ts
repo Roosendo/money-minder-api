@@ -1,12 +1,12 @@
-import { Module } from '@nestjs/common'
-import { AuthController } from './auth.controller'
-import { AuthService } from './auth.service'
-import { GitHubStrategy } from './strategies/github.strategy'
-import { GoogleStrategy } from './strategies/google.strategy'
+import { Module } from "@nestjs/common";
+import { PrismaService } from "@/prisma.service";
+import { AuthController } from "./auth.controller";
+import { AuthGuard } from "./auth.guard";
+import { AuthService } from "./auth.service";
 
 @Module({
-  imports: [],
   controllers: [AuthController],
-  providers: [AuthService, GoogleStrategy, GitHubStrategy]
+  providers: [AuthService, AuthGuard, PrismaService],
+  exports: [AuthService, AuthGuard],
 })
-export class AuthModule { }
+export class AuthModule {}

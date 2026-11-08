@@ -1,12 +1,14 @@
-import { Module } from '@nestjs/common'
-import { EntryService } from '@/entries/entries.service'
-import { ExitService } from '@/exits/exits.service'
-import { PrismaService } from '@/prisma.service'
-import { SpecialsController } from './specials.controller'
-import { SpecialsService } from './specials.service'
+import { Module } from "@nestjs/common";
+import { EntryModule } from "@/entries/entries.module";
+import { ExitModule } from "@/exits/exits.module";
+import { PrismaService } from "@/prisma.service";
+import { SpecialsController } from "./specials.controller";
+import { SpecialsService } from "./specials.service";
 
 @Module({
-  providers: [SpecialsService, EntryService, ExitService, PrismaService],
-  controllers: [SpecialsController]
+  imports: [EntryModule, ExitModule],
+  controllers: [SpecialsController],
+  providers: [SpecialsService, PrismaService],
+  exports: [SpecialsService],
 })
-export class SpecialsModule { }
+export class SpecialsModule {}

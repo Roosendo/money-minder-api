@@ -8,4 +8,4 @@
 export const getLastDayOfMonth = (year: number, month: number): Date => {
   // El truco: el día 0 del mes siguiente es el último día del mes actual
   return new Date(year, month, 0);
-}
+};

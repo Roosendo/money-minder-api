@@ -1,64 +1,92 @@
-import { CACHE_MANAGER, Cache, CacheKey, CacheTTL } from '@nestjs/cache-manager'
-import { Inject, Injectable } from '@nestjs/common'
-import { PrismaService } from '@/prisma.service'
-import {
-  CreateReminderDto,
-  DeleteReminderDto,
-  GetRemindersDto,
-  UpdateReminderDto
-} from './reminders.dto'
+import { CACHE_MANAGER, Cache } from "@nestjs/cache-manager";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "@/prisma.service";
+import { CreateReminderDto, UpdateReminderDto } from "./reminders.dto";
 
 @Injectable()
 export class RemindersService {
   constructor(
-    private prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
-  ) { }
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+  ) {}
 
-  async newReminder({ email, title, description, reminderDate }: CreateReminderDto) {
-    const result = await this.prisma.reminders.create({
+  async newReminder(userId: string, dto: CreateReminderDto) {
+    const reminder = await this.prisma.reminders.create({
       data: {
-        user_email: email,
-        title,
-        description,
-        reminder_date: new Date(reminderDate)
+        user_id: userId,
+        title: dto.title,
+        amount: dto.amount ?? null,
+        due_at: new Date(dto.dueAt),
+        recurrence: dto.recurrence ?? "none",
+        status: dto.status ?? "pending",
       },
-      select: { id: true }
-    })
+    });
 
-    await this.cacheManager.del(`reminders_${email}`)
-    return { id: result.id }
+    await this.cacheManager.del(`reminders_${userId}`);
+    return reminder;
   }
 
-  @CacheKey('reminders')
-  @CacheTTL(60 * 1000)
-  async getReminders({ email }: GetRemindersDto) {
-    const cacheKey = `reminders_${email}`
-    const cacheData = await this.cacheManager.get(cacheKey)
-    if (cacheData) return cacheData
+  async getReminders(userId: string) {
+    const cacheKey = `reminders_${userId}`;
+    const cached = await this.cacheManager.get(cacheKey);
+    if (cached) return cached;
 
     const reminders = await this.prisma.reminders.findMany({
-      where: { user_email: email },
-      select: { id: true, title: true, description: true, reminder_date: true }
-    })
+      where: { user_id: userId },
+      orderBy: { due_at: "asc" },
+    });
 
-    return reminders
+    await this.cacheManager.set(cacheKey, reminders, 60 * 1000);
+    return reminders;
   }
 
-  async deleteReminder({ email, id }: DeleteReminderDto) {
-    await this.prisma.reminders.delete({
-      where: { user_email: email, id: +id }
-    })
+  async getReminderById(userId: string, id: string) {
+    const reminder = await this.prisma.reminders.findFirst({
+      where: { id, user_id: userId },
+    });
 
-    await this.cacheManager.del(`reminders_${email}`)
+    if (!reminder) {
+      throw new NotFoundException(`Reminder ${id} not found`);
+    }
+
+    return reminder;
   }
 
-  async updateReminder({ email, id, newTitle, newDescription, newDate }: UpdateReminderDto) {
-    await this.prisma.reminders.update({
-      where: { user_email: email, id: +id },
-      data: { title: newTitle, description: newDescription, reminder_date: new Date(newDate) }
-    })
+  async updateReminder(userId: string, id: string, dto: UpdateReminderDto) {
+    const existing = await this.prisma.reminders.findFirst({
+      where: { id, user_id: userId },
+    });
 
-    await this.cacheManager.del(`reminders_${email}`)
+    if (!existing) {
+      throw new NotFoundException(`Reminder ${id} not found`);
+    }
+
+    const updated = await this.prisma.reminders.update({
+      where: { id },
+      data: {
+        ...(dto.title !== undefined && { title: dto.title }),
+        ...(dto.amount !== undefined && { amount: dto.amount ?? null }),
+        ...(dto.dueAt && { due_at: new Date(dto.dueAt) }),
+        ...(dto.recurrence !== undefined && { recurrence: dto.recurrence }),
+        ...(dto.status !== undefined && { status: dto.status }),
+      },
+    });
+
+    await this.cacheManager.del(`reminders_${userId}`);
+    return updated;
+  }
+
+  async deleteReminder(userId: string, id: string) {
+    const existing = await this.prisma.reminders.findFirst({
+      where: { id, user_id: userId },
+    });
+
+    if (!existing) {
+      throw new NotFoundException(`Reminder ${id} not found`);
+    }
+
+    await this.prisma.reminders.delete({ where: { id } });
+    await this.cacheManager.del(`reminders_${userId}`);
+    return { deleted: true };
   }
 }

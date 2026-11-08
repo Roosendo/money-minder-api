@@ -1,100 +1,219 @@
-
-import { CACHE_MANAGER, Cache, CacheKey, CacheTTL } from '@nestjs/cache-manager'
-import { Inject, Injectable } from '@nestjs/common'
-import { PrismaService } from '@/prisma.service'
-import { AddPaymentDTO, CreateLoanDto, DeleteLoansDto, DeletePaymentDto, EditLoansDto, EditPaymentDto, GetLoansDto } from './loans.dto'
-import { getLoanDetails } from './loans.utils'
+import { CACHE_MANAGER, Cache } from "@nestjs/cache-manager";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "@/prisma.service";
+import { AddPaymentDto, CreateLoanDto, EditLoanDto, EditPaymentDto } from "./loans.dto";
 
 @Injectable()
 export class LoansService {
   constructor(
-    private prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
-  ) { }
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+  ) {}
 
-  async newLoan({ userEmail, loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate }: CreateLoanDto) {
-    const newLoanId = await this.prisma.loans.create({
+  async newLoan(userId: string, dto: CreateLoanDto) {
+    const loan = await this.prisma.loans.create({
       data: {
-        user_email: userEmail,
-        loan_title: loanTitle,
-        bank_name: bankName,
-        interest_rate: interestRate,
-        loan_amount: loanAmount,
-        loan_start_date: new Date(loanStartDate),
-        loan_end_date: new Date(loanEndDate)
+        user_id: userId,
+        name: dto.name,
+        direction: dto.direction,
+        principal: dto.principal,
+        interest_rate: dto.interestRate ?? 0,
+        start_date: new Date(dto.startDate),
+        due_date: dto.dueDate ? new Date(dto.dueDate) : null,
+        status: dto.status ?? "active",
       },
-      select: { id: true }
-    })
+    });
 
-    await this.cacheManager.del(`loans_${userEmail}`)
-    return { id: newLoanId.id }
+    await this.cacheManager.del(`loans_${userId}`);
+    return loan;
   }
 
-  @CacheKey('loans')
-  @CacheTTL(60 * 1000)
-  async getLoans({ email }: GetLoansDto) {
-    const cacheKey = `loans_${email}`
-    const cacheData = await this.cacheManager.get(cacheKey)
-    if (cacheData) return cacheData
+  async getLoans(userId: string) {
+    const cacheKey = `loans_${userId}`;
+    const cached = await this.cacheManager.get(cacheKey);
+    if (cached) return cached;
 
-    const loans = await getLoanDetails(email)
+    const loans = await this.prisma.loans.findMany({
+      where: { user_id: userId },
+      include: {
+        loan_payments: {
+          orderBy: { paid_at: "desc" },
+        },
+      },
+      orderBy: { start_date: "desc" },
+    });
 
-    await this.cacheManager.set(cacheKey, loans, 60 * 1000)
-    return loans
+    const result = loans.map((loan) => {
+      const totalPaid = loan.loan_payments.reduce((sum, p) => sum + Number(p.amount), 0);
+      const principal = Number(loan.principal);
+      const remaining = Math.max(0, principal - totalPaid);
+
+      return {
+        id: loan.id,
+        name: loan.name,
+        direction: loan.direction,
+        principal,
+        interestRate: Number(loan.interest_rate),
+        startDate: loan.start_date.toISOString().split("T")[0],
+        dueDate: loan.due_date ? loan.due_date.toISOString().split("T")[0] : null,
+        status: loan.status,
+        totalPaid,
+        remaining,
+        lastFivePayments: loan.loan_payments.slice(0, 5).map((p) => ({
+          id: p.id,
+          amount: Number(p.amount),
+          paidAt: p.paid_at.toISOString(),
+          note: p.note,
+        })),
+      };
+    });
+
+    await this.cacheManager.set(cacheKey, result, 60 * 1000);
+    return result;
   }
 
-  async editLoan({ loanId, userEmail, loanTitle, bankName, interestRate, loanAmount, loanStartDate, loanEndDate }: EditLoansDto) {
-    await this.prisma.loans.update({
-      where: { id: +loanId, user_email: userEmail },
+  async getLoanById(userId: string, loanId: string) {
+    const loan = await this.prisma.loans.findFirst({
+      where: { id: loanId, user_id: userId },
+      include: {
+        loan_payments: {
+          orderBy: { paid_at: "desc" },
+        },
+      },
+    });
+
+    if (!loan) {
+      throw new NotFoundException(`Loan ${loanId} not found`);
+    }
+
+    const totalPaid = loan.loan_payments.reduce((sum, p) => sum + Number(p.amount), 0);
+    const principal = Number(loan.principal);
+
+    return {
+      ...loan,
+      principal,
+      interest_rate: Number(loan.interest_rate),
+      totalPaid,
+      remaining: Math.max(0, principal - totalPaid),
+    };
+  }
+
+  async editLoan(userId: string, loanId: string, dto: EditLoanDto) {
+    const existing = await this.prisma.loans.findFirst({
+      where: { id: loanId, user_id: userId },
+    });
+
+    if (!existing) {
+      throw new NotFoundException(`Loan ${loanId} not found`);
+    }
+
+    const updated = await this.prisma.loans.update({
+      where: { id: loanId },
       data: {
-        loan_title: loanTitle,
-        bank_name: bankName,
-        interest_rate: interestRate,
-        loan_amount: loanAmount,
-        loan_start_date: new Date(loanStartDate),
-        loan_end_date: new Date(loanEndDate)
-      }
-    })
+        ...(dto.name !== undefined && { name: dto.name }),
+        ...(dto.direction !== undefined && { direction: dto.direction }),
+        ...(dto.principal !== undefined && { principal: dto.principal }),
+        ...(dto.interestRate !== undefined && { interest_rate: dto.interestRate }),
+        ...(dto.startDate && { start_date: new Date(dto.startDate) }),
+        ...(dto.dueDate !== undefined && {
+          due_date: dto.dueDate ? new Date(dto.dueDate) : null,
+        }),
+        ...(dto.status !== undefined && { status: dto.status }),
+      },
+    });
 
-    await this.cacheManager.del(`loans_${userEmail}`)
+    await this.cacheManager.del(`loans_${userId}`);
+    return updated;
   }
 
-  async deleteLoan({ loanId, userEmail }: DeleteLoansDto) {
-    await this.prisma.loans.delete({
-      where: { id: +loanId, user_email: userEmail }
-    })
+  async deleteLoan(userId: string, loanId: string) {
+    const existing = await this.prisma.loans.findFirst({
+      where: { id: loanId, user_id: userId },
+    });
 
-    await this.cacheManager.del(`loans_${userEmail}`)
+    if (!existing) {
+      throw new NotFoundException(`Loan ${loanId} not found`);
+    }
+
+    await this.prisma.loans.delete({ where: { id: loanId } });
+    await this.cacheManager.del(`loans_${userId}`);
+    return { deleted: true };
   }
 
-  async addPayment({ loanId, paymentDate, paymentAmount }: AddPaymentDTO) {
-    return await this.prisma.payments.create({
+  async addPayment(userId: string, loanId: string, dto: AddPaymentDto) {
+    const loan = await this.prisma.loans.findFirst({
+      where: { id: loanId, user_id: userId },
+    });
+
+    if (!loan) {
+      throw new NotFoundException(`Loan ${loanId} not found`);
+    }
+
+    const payment = await this.prisma.loan_payments.create({
       data: {
         loan_id: loanId,
-        payment_date: new Date(paymentDate),
-        payment_amount: paymentAmount
+        amount: dto.amount,
+        paid_at: dto.paidAt ? new Date(dto.paidAt) : new Date(),
+        note: dto.note || null,
       },
-      select: { id: true }
-    })
+    });
+
+    await this.cacheManager.del(`loans_${userId}`);
+    return payment;
   }
 
-  async editPayment({ paymentId, paymentDate, paymentAmount, email }: EditPaymentDto) {
-    await this.prisma.payments.update({
-      where: { id: +paymentId },
+  async editPayment(userId: string, loanId: string, paymentId: string, dto: EditPaymentDto) {
+    const loan = await this.prisma.loans.findFirst({
+      where: { id: loanId, user_id: userId },
+    });
+
+    if (!loan) {
+      throw new NotFoundException(`Loan ${loanId} not found`);
+    }
+
+    const payment = await this.prisma.loan_payments.findFirst({
+      where: { id: paymentId, loan_id: loanId },
+    });
+
+    if (!payment) {
+      throw new NotFoundException(`Payment ${paymentId} not found for loan ${loanId}`);
+    }
+
+    const updated = await this.prisma.loan_payments.update({
+      where: { id: paymentId },
       data: {
-        payment_date: new Date(paymentDate),
-        payment_amount: paymentAmount
-      }
-    })
+        ...(dto.amount !== undefined && { amount: dto.amount }),
+        ...(dto.paidAt ? { paid_at: new Date(dto.paidAt) } : {}),
+        ...(dto.note !== undefined && { note: dto.note || null }),
+      },
+    });
 
-    await this.cacheManager.del(`loans_${email}`)
+    await this.cacheManager.del(`loans_${userId}`);
+    return updated;
   }
 
-  async deletePayment({ paymentId, email }: DeletePaymentDto) {
-    await this.prisma.payments.delete({
-      where: { id: +paymentId }
-    })
+  async deletePayment(userId: string, loanId: string, paymentId: string) {
+    const loan = await this.prisma.loans.findFirst({
+      where: { id: loanId, user_id: userId },
+    });
 
-    await this.cacheManager.del(`loans_${email}`)
+    if (!loan) {
+      throw new NotFoundException(`Loan ${loanId} not found`);
+    }
+
+    const payment = await this.prisma.loan_payments.findFirst({
+      where: { id: paymentId, loan_id: loanId },
+    });
+
+    if (!payment) {
+      throw new NotFoundException(`Payment ${paymentId} not found for loan ${loanId}`);
+    }
+
+    await this.prisma.loan_payments.delete({
+      where: { id: paymentId },
+    });
+
+    await this.cacheManager.del(`loans_${userId}`);
+    return { deleted: true };
   }
 }

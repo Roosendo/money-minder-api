@@ -22,7 +22,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@middlewares/*": ["./src/middlewares/*"],
-      "@config/*": ["./src/config/*"],
+      "@config/*": ["./src/config/*"]
     }
   }
 }

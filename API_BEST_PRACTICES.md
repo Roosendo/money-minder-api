@@ -13,19 +13,19 @@ the recommended shape.
 
 The API mixes resource endpoints with RPC-style "verb" endpoints:
 
-| Method | Current URL | Notes |
-|---|---|---|
-| POST | `/api/entries/new-entry` | verb in URL |
-| GET | `/api/entries/get-entries` | verb in URL |
-| GET | `/api/entries/get-entries-by-category-monthly` | long, RPC-style |
-| POST | `/api/credit-cards` | good (bare) |
-| GET | `/api/credit-cards/purchases` | fine (sub-resource) |
-| PATCH | `/api/credit-cards/:creditCardId` | good |
-| GET | `/api/exits/get-exits` | verb in URL |
-| POST | `/api/emails/send-email` | action, acceptable |
-| GET | `/api/specials/financial-summary-yearly` | action, acceptable |
-| GET | `/api/auth/google` | ok |
-| GET | `/api/hello`, `/api/ping` | demo leftovers |
+| Method | Current URL                                    | Notes               |
+| ------ | ---------------------------------------------- | ------------------- |
+| POST   | `/api/entries/new-entry`                       | verb in URL         |
+| GET    | `/api/entries/get-entries`                     | verb in URL         |
+| GET    | `/api/entries/get-entries-by-category-monthly` | long, RPC-style     |
+| POST   | `/api/credit-cards`                            | good (bare)         |
+| GET    | `/api/credit-cards/purchases`                  | fine (sub-resource) |
+| PATCH  | `/api/credit-cards/:creditCardId`              | good                |
+| GET    | `/api/exits/get-exits`                         | verb in URL         |
+| POST   | `/api/emails/send-email`                       | action, acceptable  |
+| GET    | `/api/specials/financial-summary-yearly`       | action, acceptable  |
+| GET    | `/api/auth/google`                             | ok                  |
+| GET    | `/api/hello`, `/api/ping`                      | demo leftovers      |
 
 ### Why REST conventions matter
 
@@ -84,7 +84,7 @@ api/v1/
   `@Post('new-entry')`.
 - Add versioning so you can evolve the API without breaking consumers:
   ```ts
-  app.enableVersioning({ type: VersioningType.URI })
+  app.enableVersioning({ type: VersioningType.URI });
   ```
 - Only use "action" style paths for non-CRUD operations that don't fit a
   resource: `send-email`, `financial-summary-yearly` are legitimate.
@@ -110,6 +110,7 @@ Object Reference) — one of the most common critical API vulnerabilities. Email
 is not a credential; it's public knowledge.
 
 **What to do (in order):**
+
 1. Real login (OAuth is already there) issues a **JWT** signed on the server.
 2. A global `AuthGuard` verifies the token and injects the authenticated user.
 3. A `@CurrentUser()` parameter decorator replaces every `email` query param:
@@ -126,11 +127,12 @@ is not a credential; it's public knowledge.
 
 ```ts
 // auth.controller.ts
-const frontendURL = `https://money-minder-xi.vercel.app/login?user=${encodeURIComponent(JSON.stringify(user))}`
-res.redirect(frontendURL)
+const frontendURL = `https://money-minder-xi.vercel.app/login?user=${encodeURIComponent(JSON.stringify(user))}`;
+res.redirect(frontendURL);
 ```
 
 **Why it's broken:**
+
 - The profile (name, email, photo) lands in the URL → visible in browser
   history, proxy logs, and server access logs.
 - Anyone with the URL can impersonate that identity on your frontend.
@@ -182,8 +184,8 @@ response call and still want interceptors to run.
 
 ```ts
 // google.strategy.ts — current
-callbackURL: 'https://money-minder-api-mqz9.onrender.com/api/google/redirect'
-profile: any
+callbackURL: "https://money-minder-api-mqz9.onrender.com/api/google/redirect";
+profile: any;
 ```
 
 - **Move `callbackURL` (and client IDs/secrets) to env vars.** Hardcoded URLs
@@ -202,7 +204,7 @@ profile: any
 `main.ts` currently registers a bare pipe:
 
 ```ts
-app.useGlobalPipes(new ValidationPipe())
+app.useGlobalPipes(new ValidationPipe());
 ```
 
 Recommended options:
@@ -210,12 +212,12 @@ Recommended options:
 ```ts
 app.useGlobalPipes(
   new ValidationPipe({
-    transform: true,                // auto-convert types (string -> number, Date)
-    whitelist: true,                // strip properties without decorators
-    forbidNonWhitelisted: true,     // reject unknown properties (typo protection)
-    transformOptions: { enableImplicitConversion: true }
-  })
-)
+    transform: true, // auto-convert types (string -> number, Date)
+    whitelist: true, // strip properties without decorators
+    forbidNonWhitelisted: true, // reject unknown properties (typo protection)
+    transformOptions: { enableImplicitConversion: true },
+  }),
+);
 ```
 
 With `transform: true`, `@Query('month')` can be `number` instead of parsing
@@ -235,7 +237,8 @@ date: string
 
 Also note `EditCreditCardDto` uses `@IsNotEmpty()` on `name` while declaring it
 optional — a contradiction. Optional fields must use only `@IsOptional()`
-+ type validators.
+
+- type validators.
 
 ### One source of truth for the resource identity
 
@@ -267,7 +270,7 @@ input — safer than `+creditCardId` coercion in the service.
 `auth.controller.ts` line 4 has:
 
 ```ts
-import type { AuthService } from './auth.service'
+import type { AuthService } from "./auth.service";
 ```
 
 NestJS resolves constructor dependencies at runtime from TypeScript's emitted
@@ -275,7 +278,7 @@ metadata (`emitDecoratorMetadata`). For that to work the class must be imported
 as a **value**, not a type:
 
 ```ts
-import { AuthService } from './auth.service'
+import { AuthService } from "./auth.service";
 ```
 
 This is exactly why Biome's `useImportType` rule must stay off for NestJS (see
@@ -301,26 +304,28 @@ Recommended shape:
 ```ts
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
-  private readonly logger = new Logger(AllExceptionsFilter.name)
+  private readonly logger = new Logger(AllExceptionsFilter.name);
 
   catch(exception: unknown, host: ArgumentsHost) {
-    const ctx = host.switchToHttp()
-    const response = ctx.getResponse<Response>()
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
 
     if (exception instanceof HttpException) {
-      const status = exception.getStatus()
-      const message = exception.getResponse()
-      response.status(status).json({ statusCode: status, message, timestamp: new Date().toISOString() })
-      return
+      const status = exception.getStatus();
+      const message = exception.getResponse();
+      response
+        .status(status)
+        .json({ statusCode: status, message, timestamp: new Date().toISOString() });
+      return;
     }
 
     // unexpected error: log with stack, return a generic 500
-    this.logger.error(exception)
+    this.logger.error(exception);
     response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       statusCode: 500,
-      message: 'Internal server error',
-      timestamp: new Date().toISOString()
-    })
+      message: "Internal server error",
+      timestamp: new Date().toISOString(),
+    });
   }
 }
 ```
@@ -335,10 +340,10 @@ Wrap Prisma calls and translate known codes:
 
 ```ts
 try {
-  return await this.prisma.credit_cards.update({ where: { credit_card_id: id }, data })
+  return await this.prisma.credit_cards.update({ where: { credit_card_id: id }, data });
 } catch (e) {
-  if (e.code === 'P2025') throw new NotFoundException(`Credit card ${id} not found`)
-  throw e
+  if (e.code === "P2025") throw new NotFoundException(`Credit card ${id} not found`);
+  throw e;
 }
 ```
 
@@ -373,8 +378,8 @@ Current schema (`prisma/schema.prisma`) highlights:
 
 ```ts
 // entries.controller.ts — current (two separate writes, can half-fail)
-await this.usersService.createUser(createUserDto)
-return this.entryService.newEntry(createEntryDto)
+await this.usersService.createUser(createUserDto);
+return this.entryService.newEntry(createEntryDto);
 ```
 
 If the entry insert fails, the user is still created. Wrap them:
@@ -396,10 +401,10 @@ small counts that's fine; to scale it, use a single `groupBy`:
 
 ```ts
 const rows = await this.prisma.money_exits.groupBy({
-  by: ['credit_card_id'],
+  by: ["credit_card_id"],
   where: { user_email: email, date: { gte: start, lte: end } },
-  _sum: { amount: true }
-})
+  _sum: { amount: true },
+});
 ```
 
 Also double-check the cut-off date math — when `currentDay <= cutOffDate` the
@@ -410,6 +415,7 @@ edges to avoid off-by-one overlaps.
 
 The `BigIntInterceptor` converts BigInt ids to `Number` before JSON serialization
 (this is required — `JSON.stringify` throws on BigInt). Keep in mind:
+
 - `Number()` silently loses precision above 2^53 — fine for autoincrement ids,
   dangerous for `BigInt` money. Prefer `Decimal`/`Float` columns for amounts.
 - Since the interceptor converts objects/arrays recursively but returns `Date`
@@ -449,6 +455,7 @@ async getEntries(dto: GetEntriesDto) { ... }
 ```
 
 Whichever you choose:
+
 - Invalidate cache keys consistently (you already do `del(`entries_${email}`)`
   — keep that pattern).
 - `CacheModule.register({ ttl: 60 * 1000 })` — the `// seconds` comment is
@@ -465,8 +472,8 @@ category, or limit by date range.
 
 ```ts
 export class PaginationDto {
-  @IsOptional() @Type(() => Number) @IsInt() @Min(1) page: number = 1
-  @IsOptional() @Type(() => Number) @IsInt() @Min(1) @Max(100) pageSize: number = 15
+  @IsOptional() @Type(() => Number) @IsInt() @Min(1) page: number = 1;
+  @IsOptional() @Type(() => Number) @IsInt() @Min(1) @Max(100) pageSize: number = 15;
 }
 ```
 
@@ -474,12 +481,12 @@ And a filter DTO for entries:
 
 ```ts
 export class GetEntriesDto extends PaginationDto {
-  @IsEmail() @IsNotEmpty() email: string
-  @IsOptional() @IsString() category?: string
-  @IsOptional() @IsDateString() from?: string
-  @IsOptional() @IsDateString() to?: string
-  @IsOptional() @IsString() sortBy?: 'date' | 'amount'
-  @IsOptional() @IsIn(['asc', 'desc']) sortOrder?: 'asc' | 'desc'
+  @IsEmail() @IsNotEmpty() email: string;
+  @IsOptional() @IsString() category?: string;
+  @IsOptional() @IsDateString() from?: string;
+  @IsOptional() @IsDateString() to?: string;
+  @IsOptional() @IsString() sortBy?: "date" | "amount";
+  @IsOptional() @IsIn(["asc", "desc"]) sortOrder?: "asc" | "desc";
 }
 ```
 
@@ -523,9 +530,9 @@ The same pattern applies to exits, reminders, savings, and credit cards.
 
 ```ts
 const config: Config = {
-  nest: { port: +(process.env.PORT || '7373') },
-  cors: { enabled: true }
-}
+  nest: { port: +(process.env.PORT || "7373") },
+  cors: { enabled: true },
+};
 ```
 
 - Add **typed env validation** at boot so a missing/mistyped variable fails fast.
@@ -543,9 +550,9 @@ ConfigModule.forRoot({
     GITHUB_CLIENT_ID: Joi.string().required(),
     GITHUB_CLIENT_SECRET: Joi.string().required(),
     JWT_SECRET: Joi.string().required(),
-    CORS_ORIGINS: Joi.string().default('')
-  })
-})
+    CORS_ORIGINS: Joi.string().default(""),
+  }),
+});
 ```
 
 - **Move the hardcoded CORS origins out of `main.ts`** into `CORS_ORIGINS`
@@ -567,12 +574,12 @@ Only `app.controller.spec.ts` exists today. At minimum add:
 Example unit test pattern:
 
 ```ts
-describe('CreditCardsService', () => {
-  it('calculates the cut-off window', () => {
-    const service = new CreditCardsService(prismaMock, cacheMock)
+describe("CreditCardsService", () => {
+  it("calculates the cut-off window", () => {
+    const service = new CreditCardsService(prismaMock, cacheMock);
     // inject mocked PrismaService + cache manager
-  })
-})
+  });
+});
 ```
 
 ---

@@ -1,138 +1,104 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator'
+import { loan_direction, loan_status } from "@prisma/client";
+import {
+  IsDateString,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+} from "class-validator";
 
 export class CreateLoanDto {
   @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsEnum(loan_direction)
+  @IsNotEmpty()
+  direction: loan_direction;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @Min(0.01)
+  principal: number;
+
+  @IsNumber()
   @IsOptional()
-  fullName: string
+  @Min(0)
+  interestRate?: number = 0;
 
-  @IsString()
+  @IsDateString()
   @IsNotEmpty()
-  userEmail: string
+  startDate: string;
 
-  @IsString()
-  @IsNotEmpty()
-  loanTitle: string
+  @IsDateString()
+  @IsOptional()
+  dueDate?: string;
 
-  @IsString()
-  @IsNotEmpty()
-  bankName: string
-
-  @IsNumber()
-  @IsNotEmpty()
-  interestRate: number
-
-  @IsNumber()
-  @IsNotEmpty()
-  loanAmount: number
-
-  @IsString()
-  @IsNotEmpty()
-  loanStartDate: string
-
-  @IsString()
-  @IsNotEmpty()
-  loanEndDate: string
+  @IsEnum(loan_status)
+  @IsOptional()
+  status?: loan_status = loan_status.active;
 }
 
-export class GetLoansDto {
-  @IsString()
-  @IsNotEmpty()
-  email: string
-}
-
-export class EditLoansDto {
-  @IsString()
-  @IsNotEmpty()
-  loanId: string
-
-  @IsString()
-  @IsNotEmpty()
-  userEmail: string
-
-  @IsString()
-  @IsNotEmpty()
-  loanTitle: string
-
-  @IsString()
-  @IsNotEmpty()
-  bankName: string
-
-  @IsNumber()
-  @IsNotEmpty()
-  interestRate: number
-
-  @IsNumber()
-  @IsNotEmpty()
-  loanAmount: number
-
-  @IsString()
-  @IsNotEmpty()
-  loanStartDate: string
-
-  @IsString()
-  @IsNotEmpty()
-  loanEndDate: string
-}
-
-export class DeleteLoansDto {
+export class EditLoanDto {
   @IsString()
   @IsOptional()
-  loanId?: string
+  name?: string;
 
-  @IsString()
-  @IsNotEmpty()
-  userEmail: string
+  @IsEnum(loan_direction)
+  @IsOptional()
+  direction?: loan_direction;
+
+  @IsNumber()
+  @IsOptional()
+  @Min(0.01)
+  principal?: number;
+
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  interestRate?: number;
+
+  @IsDateString()
+  @IsOptional()
+  startDate?: string;
+
+  @IsDateString()
+  @IsOptional()
+  dueDate?: string;
+
+  @IsEnum(loan_status)
+  @IsOptional()
+  status?: loan_status;
 }
 
-export class AddPaymentDTO {
+export class AddPaymentDto {
   @IsNumber()
   @IsNotEmpty()
-  loanId: number
+  @Min(0.01)
+  amount: number;
+
+  @IsDateString()
+  @IsOptional()
+  paidAt?: string;
 
   @IsString()
-  @IsNotEmpty()
-  paymentDate: string
-
-  @IsNumber()
-  @IsNotEmpty()
-  paymentAmount: number
+  @IsOptional()
+  note?: string;
 }
 
 export class EditPaymentDto {
   @IsNumber()
-  @IsNotEmpty()
-  paymentId: number
+  @IsOptional()
+  @Min(0.01)
+  amount?: number;
+
+  @IsDateString()
+  @IsOptional()
+  paidAt?: string;
 
   @IsString()
-  @IsNotEmpty()
-  paymentDate: string
-
-  @IsNumber()
-  @IsNotEmpty()
-  paymentAmount: number
-
-  @IsString()
-  @IsNotEmpty()
-  email: string
-}
-
-export class DeletePaymentDto {
-  @IsNumber()
-  @IsNotEmpty()
-  paymentId: number
-
-  @IsString()
-  @IsNotEmpty()
-  email: string
-}
-
-export interface APIResponse {
-  loan_title: string
-  bank_name: string
-  interest_rate: number
-  loan_amount: number
-  loan_start_date: string
-  loan_end_date: string
-  last_five_payments: string
-  total_payments: number
+  @IsOptional()
+  note?: string;
 }

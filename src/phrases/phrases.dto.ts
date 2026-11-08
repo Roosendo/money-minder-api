@@ -1,5 +1,5 @@
 export interface Quote {
-  phrase: string
-  movie: string
-  character: string
+  phrase: string;
+  movie: string;
+  character: string;
 }
