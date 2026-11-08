@@ -43,12 +43,17 @@ const bootstrap = async () => {
   SwaggerModule.setup("api/docs", app, document);
 
   // CORS configuration
-  const corsOrigins = configService.get<string[]>("cors.origins") || [
+  const defaultCorsOrigins = [
     "http://localhost:4321",
     "http://localhost:4200",
+    "http://127.0.0.1:4200",
     "http://localhost:3000",
     "https://money-minder-xi.vercel.app",
     "https://rosendo-garcia.vercel.app",
+  ];
+  const corsOrigins = [
+    ...(configService.get<string[]>("cors.origins") || defaultCorsOrigins),
+    ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
   ];
 
   app.enableCors({
