@@ -95,7 +95,6 @@ export class CreditCardsService {
 
   async getPurchasesRange(userId: string, creditCardId?: string) {
     const now = new Date();
-    const currentDay = now.getDate();
 
     const cards = await this.prisma.credit_cards.findMany({
       where: {
@@ -115,24 +114,55 @@ export class CreditCardsService {
       return [];
     }
 
-    // Build ranges per card
-    const cardCalculations = cards.map((card) => {
-      const cutOff = card.statement_day;
-      let startCutOffDate: Date;
-      let endCutOffDate: Date;
+    const daysInMonth = (year: number, month: number): number =>
+      new Date(year, month + 1, 0).getDate();
 
-      if (currentDay > cutOff) {
-        startCutOffDate = new Date(now.getFullYear(), now.getMonth() - 1, cutOff + 1);
-        endCutOffDate = new Date(now.getFullYear(), now.getMonth(), cutOff, 23, 59, 59, 999);
-      } else {
-        startCutOffDate = new Date(now.getFullYear(), now.getMonth() - 2, cutOff + 1);
-        endCutOffDate = new Date(now.getFullYear(), now.getMonth() - 1, cutOff, 23, 59, 59, 999);
+    // Statement days above the length of the month fall back to the last day.
+    const cutOffIn = (year: number, month: number, day: number): Date =>
+      new Date(year, month, Math.min(day, daysInMonth(year, month)), 23, 59, 59, 999);
+
+    const startOfNextDay = (date: Date): Date =>
+      new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+
+    // The payment is due on the first `due_day` after the statement closes.
+    const dueDateFor = (cutOff: Date, dueDay: number): Date => {
+      const sameMonth = new Date(
+        cutOff.getFullYear(),
+        cutOff.getMonth(),
+        Math.min(dueDay, daysInMonth(cutOff.getFullYear(), cutOff.getMonth())),
+      );
+
+      if (sameMonth > cutOff) {
+        return sameMonth;
       }
+
+      return new Date(
+        cutOff.getFullYear(),
+        cutOff.getMonth() + 1,
+        Math.min(dueDay, daysInMonth(cutOff.getFullYear(), cutOff.getMonth() + 1)),
+      );
+    };
+
+    // Build ranges per card. The range is the currently open billing cycle: it
+    // starts the day after the previous cut-off and ends on the next one.
+    const cardCalculations = cards.map((card) => {
+      const thisMonthCutOff = cutOffIn(now.getFullYear(), now.getMonth(), card.statement_day);
+      const previousMonthCutOff = cutOffIn(
+        now.getFullYear(),
+        now.getMonth() - 1,
+        card.statement_day,
+      );
+      const nextMonthCutOff = cutOffIn(now.getFullYear(), now.getMonth() + 1, card.statement_day);
+
+      const pastCutOff = now > thisMonthCutOff;
+      const endDate = pastCutOff ? nextMonthCutOff : thisMonthCutOff;
+      const startDate = startOfNextDay(pastCutOff ? thisMonthCutOff : previousMonthCutOff);
 
       return {
         ...card,
-        startDate: startCutOffDate,
-        endDate: endCutOffDate,
+        startDate,
+        endDate,
+        dueDate: dueDateFor(endDate, card.due_day),
       };
     });
 
@@ -153,6 +183,11 @@ export class CreditCardsService {
       },
     });
 
+    const toIsoDate = (date: Date): string =>
+      `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
+        date.getDate(),
+      ).padStart(2, "0")}`;
+
     return cardCalculations.map((card) => {
       const cardPurchases = purchases.filter(
         (p) => p.credit_card_id === card.id && p.date >= card.startDate && p.date <= card.endDate,
@@ -166,8 +201,9 @@ export class CreditCardsService {
         statementDay: card.statement_day,
         dueDay: card.due_day,
         creditLimit: Number(card.credit_limit),
-        startDate: card.startDate.toISOString().split("T")[0],
-        endDate: card.endDate.toISOString().split("T")[0],
+        startDate: toIsoDate(card.startDate),
+        endDate: toIsoDate(card.endDate),
+        dueDate: toIsoDate(card.dueDate),
         totalSpent,
         availableCredit: Math.max(0, Number(card.credit_limit) - totalSpent),
       };
