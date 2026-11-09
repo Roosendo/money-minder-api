@@ -1,6 +1,8 @@
 import { CACHE_MANAGER, Cache } from "@nestjs/cache-manager";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { getLastDayOfMonth } from "@/common";
+import { money } from "@/common/money";
+import { AccountsService } from "@/accounts/accounts.service";
 import { CategoriesService } from "@/categories/categories.service";
 import { PrismaService } from "@/prisma.service";
 import {
@@ -16,6 +18,7 @@ export class EntryService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly categoriesService: CategoriesService,
+    private readonly accountsService: AccountsService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
@@ -28,7 +31,13 @@ export class EntryService {
       const existing = await this.prisma.categories.findFirst({
         where: { id: categoryId, OR: [{ user_id: userId }, { user_id: null }] },
       });
-      if (existing) return existing.id;
+      if (existing) {
+        if (existing.type !== "income") {
+          throw new NotFoundException("Income category not found");
+        }
+        return existing.id;
+      }
+      throw new NotFoundException("Income category not found");
     }
 
     const name = categoryName || "General Income";
@@ -36,14 +45,21 @@ export class EntryService {
     return category.id;
   }
 
+  private async resolveAccountId(userId: string, accountId?: string) {
+    if (!accountId) return null;
+    const account = await this.accountsService.requireOwnedAccount(userId, accountId);
+    return account.id;
+  }
+
   async newEntry(userId: string, dto: CreateEntryDto) {
     const categoryId = await this.resolveCategoryId(userId, dto.categoryId, dto.category);
+    const accountId = await this.resolveAccountId(userId, dto.accountId);
 
     const entry = await this.prisma.entries.create({
       data: {
         user_id: userId,
         category_id: categoryId,
-        account_id: dto.accountId || null,
+        account_id: accountId,
         amount: dto.amount,
         date: new Date(dto.date),
         description: dto.description || null,
@@ -135,13 +151,16 @@ export class EntryService {
       categoryId = await this.resolveCategoryId(userId, dto.categoryId, dto.category);
     }
 
+    const accountId =
+      dto.accountId !== undefined ? await this.resolveAccountId(userId, dto.accountId) : undefined;
+
     const updated = await this.prisma.entries.update({
       where: { id },
       data: {
         ...(dto.amount !== undefined ? { amount: dto.amount } : {}),
         ...(dto.date ? { date: new Date(dto.date) } : {}),
         ...(categoryId ? { category_id: categoryId } : {}),
-        ...(dto.accountId !== undefined ? { account_id: dto.accountId || null } : {}),
+        ...(accountId !== undefined ? { account_id: accountId } : {}),
         ...(dto.description !== undefined ? { description: dto.description || null } : {}),
       },
       include: {
@@ -197,7 +216,7 @@ export class EntryService {
     const result = breakdown.map((b) => ({
       categoryId: b.category_id,
       categoryName: categoryMap.get(b.category_id) || "Unknown",
-      totalAmount: Number(b._sum.amount || 0),
+      totalAmount: money(b._sum.amount || 0),
       count: b._count.id,
     }));
 
@@ -226,7 +245,7 @@ export class EntryService {
     const result = {
       month,
       year,
-      totalAmount: Number(agg._sum.amount || 0),
+      totalAmount: money(agg._sum.amount || 0),
       count: agg._count.id,
     };
 
@@ -253,7 +272,7 @@ export class EntryService {
 
     const result = {
       year,
-      totalAmount: Number(agg._sum.amount || 0),
+      totalAmount: money(agg._sum.amount || 0),
       count: agg._count.id,
     };
 

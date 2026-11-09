@@ -1,14 +1,13 @@
 import { Module } from "@nestjs/common";
-import { EntryModule } from "@/entries/entries.module";
-import { ExitModule } from "@/exits/exits.module";
-import { PrismaService } from "@/prisma.service";
+import { ReportsModule } from "@/reports/reports.module";
+import { TransactionsModule } from "@/transactions/transactions.module";
 import { SpecialsController } from "./specials.controller";
 import { SpecialsService } from "./specials.service";
 
 @Module({
-  imports: [EntryModule, ExitModule],
+  imports: [ReportsModule, TransactionsModule],
   controllers: [SpecialsController],
-  providers: [SpecialsService, PrismaService],
+  providers: [SpecialsService],
   exports: [SpecialsService],
 })
 export class SpecialsModule {}

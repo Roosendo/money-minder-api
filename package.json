@@ -81,6 +81,11 @@
       "json",
       "ts"
     ],
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/$1",
+      "^@middlewares/(.*)$": "<rootDir>/middlewares/$1",
+      "^@config/(.*)$": "<rootDir>/config/$1"
+    },
     "rootDir": "src",
     "testEnvironment": "node",
     "testRegex": ".*\\.spec\\.ts$",

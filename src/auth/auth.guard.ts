@@ -1,4 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
+import { createHash } from "crypto";
 import { Reflector } from "@nestjs/core";
 import { fromNodeHeaders } from "better-auth/node";
 import { IS_PUBLIC_KEY } from "@/common/decorators/public.decorator";
@@ -60,11 +61,13 @@ export class AuthGuard implements CanActivate {
       // Better auth session lookup failed or threw, fall through to direct token check
     }
 
-    // 2. Fall back to sessions table lookup (e.g. token_hash)
+    // 2. Fall back to the application sessions table. The table stores a hash of
+    // the bearer token, so hash the presented token before comparing it.
     if (token) {
+      const tokenHash = createHash("sha256").update(token).digest("hex");
       const sessionRecord = await this.prisma.sessions.findFirst({
         where: {
-          token_hash: token,
+          token_hash: tokenHash,
           expires_at: { gt: new Date() },
         },
         include: {

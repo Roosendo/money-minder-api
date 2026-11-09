@@ -19,6 +19,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "resolveJsonModule": true,
+    "types": ["node", "jest"],
     "paths": {
       "@/*": ["./src/*"],
       "@middlewares/*": ["./src/middlewares/*"],

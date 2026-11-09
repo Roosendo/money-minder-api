@@ -3,6 +3,7 @@ import { bearer } from "better-auth/plugins";
 import { Pool } from "pg";
 
 let authInstance: any = null;
+let authPool: Pool | null = null;
 
 /**
  * Origins allowed to start and complete the OAuth flow.
@@ -24,6 +25,7 @@ export const getBetterAuthInstance = () => {
 
   const connectionString = process.env.DATABASE_URL;
   const pool = new Pool({ connectionString });
+  authPool = pool;
 
   const baseURL = process.env.BETTER_AUTH_URL || "http://localhost:7373";
   const isSecure = baseURL.startsWith("https://");
@@ -68,4 +70,16 @@ export const getBetterAuthInstance = () => {
   });
 
   return authInstance;
+};
+
+/**
+ * Releases the Better Auth connection pool so tests and scripts can exit
+ * without dangling database handles.
+ */
+export const closeBetterAuthInstance = async () => {
+  if (authPool) {
+    await authPool.end();
+    authPool = null;
+  }
+  authInstance = null;
 };

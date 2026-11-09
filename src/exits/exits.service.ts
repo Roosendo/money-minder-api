@@ -3,6 +3,7 @@ import { BadRequestException, Inject, Injectable, NotFoundException } from "@nes
 import { AccountsService } from "@/accounts/accounts.service";
 import { CategoriesService } from "@/categories/categories.service";
 import { getLastDayOfMonth } from "@/common";
+import { money } from "@/common/money";
 import { PrismaService } from "@/prisma.service";
 import {
   CreateExitDto,
@@ -30,7 +31,13 @@ export class ExitService {
       const existing = await this.prisma.categories.findFirst({
         where: { id: categoryId, OR: [{ user_id: userId }, { user_id: null }] },
       });
-      if (existing) return existing.id;
+      if (existing) {
+        if (existing.type !== "expense") {
+          throw new NotFoundException("Expense category not found");
+        }
+        return existing.id;
+      }
+      throw new NotFoundException("Expense category not found");
     }
 
     const name = categoryName || "General Expense";
@@ -42,7 +49,7 @@ export class ExitService {
     userId: string,
     accountId?: string,
     creditCardId?: string,
-  ): Promise<{ account_id: string | null; credit_card_id: string | null }> {
+  ): Promise<{ account_id: string }> {
     if (accountId && creditCardId) {
       throw new BadRequestException(
         "An exit cannot have both an account and a credit card as payment source",
@@ -50,13 +57,19 @@ export class ExitService {
     }
 
     if (creditCardId) {
-      const card = await this.prisma.credit_cards.findFirst({
-        where: { id: creditCardId, user_id: userId },
+      // In the new schema a credit card is an account. Legacy clients can keep
+      // sending creditCardId; it is resolved to the owned credit card account.
+      const details = await this.prisma.credit_card_details.findFirst({
+        where: { account_id: creditCardId, user_id: userId },
+        include: { accounts_credit_card_details_account_id_user_idToaccounts: true },
       });
-      if (!card) {
+      if (!details || !details.accounts_credit_card_details_account_id_user_idToaccounts) {
         throw new NotFoundException(`Credit card ${creditCardId} not found`);
       }
-      return { account_id: null, credit_card_id: creditCardId };
+      if (!details.accounts_credit_card_details_account_id_user_idToaccounts.is_active) {
+        throw new BadRequestException("Credit card account is archived");
+      }
+      return { account_id: details.account_id };
     }
 
     if (accountId) {
@@ -66,36 +79,44 @@ export class ExitService {
       if (!account) {
         throw new NotFoundException(`Account ${accountId} not found`);
       }
-      return { account_id: accountId, credit_card_id: null };
+      if (!account.is_active) {
+        throw new BadRequestException("Account is archived");
+      }
+      return { account_id: account.id };
     }
 
     // Default to user's default account to satisfy check constraints
     const defaultAccount = await this.accountsService.getOrCreateDefaultAccount(userId);
-    return { account_id: defaultAccount.id, credit_card_id: null };
+    return { account_id: defaultAccount.id };
+  }
+
+  private async resolveCreditCardAccountId(userId: string, creditCardId: string) {
+    const details = await this.prisma.credit_card_details.findFirst({
+      where: { account_id: creditCardId, user_id: userId },
+      select: { account_id: true },
+    });
+    if (!details) {
+      throw new NotFoundException(`Credit card ${creditCardId} not found`);
+    }
+    return details.account_id;
   }
 
   async newExit(userId: string, dto: CreateExitDto) {
     const categoryId = await this.resolveCategoryId(userId, dto.categoryId, dto.category);
-    const { account_id, credit_card_id } = await this.resolvePaymentSource(
-      userId,
-      dto.accountId,
-      dto.creditCardId,
-    );
+    const { account_id } = await this.resolvePaymentSource(userId, dto.accountId, dto.creditCardId);
 
     const exit = await this.prisma.exits.create({
       data: {
         user_id: userId,
         category_id: categoryId,
         account_id,
-        credit_card_id,
         amount: dto.amount,
         date: new Date(dto.date),
         description: dto.description || null,
       },
       include: {
         categories: { select: { id: true, name: true, type: true } },
-        accounts: { select: { id: true, name: true } },
-        credit_cards: { select: { id: true, name: true, last4: true } },
+        accounts: { select: { id: true, name: true, type: true } },
       },
     });
 
@@ -110,11 +131,19 @@ export class ExitService {
     const cached = await this.cacheManager.get(cacheKey);
     if (cached) return cached;
 
+    if (creditCardId && accountId) {
+      throw new BadRequestException("Filter by either an account or a credit card, not both");
+    }
+
+    // Legacy exits have no credit_card_id column; a credit card is an account.
+    const paymentAccountId = creditCardId
+      ? await this.resolveCreditCardAccountId(userId, creditCardId)
+      : accountId;
+
     const where: any = {
       user_id: userId,
       ...(categoryId ? { category_id: categoryId } : {}),
-      ...(creditCardId ? { credit_card_id: creditCardId } : {}),
-      ...(accountId ? { account_id: accountId } : {}),
+      ...(paymentAccountId ? { account_id: paymentAccountId } : {}),
       ...(from || to
         ? {
             date: {
@@ -135,8 +164,7 @@ export class ExitService {
         take: pageSize,
         include: {
           categories: { select: { id: true, name: true, type: true } },
-          accounts: { select: { id: true, name: true } },
-          credit_cards: { select: { id: true, name: true, last4: true } },
+          accounts: { select: { id: true, name: true, type: true } },
         },
       }),
       this.prisma.exits.count({ where }),
@@ -159,8 +187,7 @@ export class ExitService {
       where: { id, user_id: userId },
       include: {
         categories: { select: { id: true, name: true, type: true } },
-        accounts: { select: { id: true, name: true } },
-        credit_cards: { select: { id: true, name: true, last4: true } },
+        accounts: { select: { id: true, name: true, type: true } },
       },
     });
 
@@ -186,12 +213,10 @@ export class ExitService {
     }
 
     let account_id = existing.account_id;
-    let credit_card_id = existing.credit_card_id;
 
     if (dto.accountId !== undefined || dto.creditCardId !== undefined) {
       const resolved = await this.resolvePaymentSource(userId, dto.accountId, dto.creditCardId);
       account_id = resolved.account_id;
-      credit_card_id = resolved.credit_card_id;
     }
 
     const updated = await this.prisma.exits.update({
@@ -201,13 +226,11 @@ export class ExitService {
         ...(dto.date ? { date: new Date(dto.date) } : {}),
         ...(categoryId ? { category_id: categoryId } : {}),
         account_id,
-        credit_card_id,
         ...(dto.description !== undefined ? { description: dto.description || null } : {}),
       },
       include: {
         categories: { select: { id: true, name: true, type: true } },
-        accounts: { select: { id: true, name: true } },
-        credit_cards: { select: { id: true, name: true, last4: true } },
+        accounts: { select: { id: true, name: true, type: true } },
       },
     });
 
@@ -258,7 +281,7 @@ export class ExitService {
     const result = breakdown.map((b) => ({
       categoryId: b.category_id,
       categoryName: categoryMap.get(b.category_id) || "Unknown",
-      totalAmount: Number(b._sum.amount || 0),
+      totalAmount: money(b._sum.amount || 0),
       count: b._count.id,
     }));
 
@@ -287,7 +310,7 @@ export class ExitService {
     const result = {
       month,
       year,
-      totalAmount: Number(agg._sum.amount || 0),
+      totalAmount: money(agg._sum.amount || 0),
       count: agg._count.id,
     };
 
@@ -315,7 +338,7 @@ export class ExitService {
 
     const result = {
       year,
-      totalAmount: Number(agg._sum.amount || 0),
+      totalAmount: money(agg._sum.amount || 0),
       count: agg._count.id,
     };
 
