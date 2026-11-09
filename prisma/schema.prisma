@@ -6,20 +6,6 @@ datasource db {
   provider = "postgresql"
 }
 
-model credit_cards {
-  id            String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id       String  @db.Uuid
-  name          String  @db.VarChar(100)
-  last4         String? @db.Char(4)
-  credit_limit  Decimal @db.Decimal(12, 2)
-  statement_day Int     @db.SmallInt
-  due_day       Int     @db.SmallInt
-  users         users   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  exits         exits[]
-
-  @@index([user_id], map: "idx_credit_cards_user_id")
-}
-
 model loans {
   id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id       String          @db.Uuid
@@ -57,7 +43,6 @@ model users {
   created_at     DateTime         @default(now()) @db.Timestamptz(6)
   accounts       accounts[]
   categories     categories[]
-  credit_cards   credit_cards[]
   entries        entries[]
   exits          exits[]
   loans          loans[]
@@ -65,29 +50,42 @@ model users {
   reminders      reminders[]
   savings        savings[]
   sessions       sessions[]
+  transactions   transactions[]
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model accounts {
-  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id         String    @db.Uuid
-  name            String    @db.VarChar(100)
-  opening_balance Decimal   @default(0) @db.Decimal(12, 2)
-  users           users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  entries         entries[]
-  exits           exits[]
+  id                                                                           String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id                                                                      String                @db.Uuid
+  name                                                                         String                @db.VarChar(100)
+  opening_balance                                                              Decimal               @default(0) @db.Decimal(12, 2)
+  type                                                                         account_type          @default(bank)
+  opening_balance_date                                                         DateTime              @default(now()) @db.Timestamptz(6)
+  is_active                                                                    Boolean               @default(true)
+  account_movements                                                            account_movements[]
+  users                                                                        users                 @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  credit_card_details_credit_card_details_account_id_user_idToaccounts         credit_card_details?  @relation("credit_card_details_account_id_user_idToaccounts")
+  credit_card_details_credit_card_details_payment_account_id_user_idToaccounts credit_card_details[] @relation("credit_card_details_payment_account_id_user_idToaccounts")
+  debit_cards                                                                  debit_cards[]
+  entries                                                                      entries[]
+  exits                                                                        exits[]
+  transfers_transfers_from_account_id_user_idToaccounts                        transfers[]           @relation("transfers_from_account_id_user_idToaccounts")
+  transfers_transfers_to_account_id_user_idToaccounts                          transfers[]           @relation("transfers_to_account_id_user_idToaccounts")
 
+  @@unique([id, user_id], map: "uq_accounts_id_user")
   @@index([user_id], map: "idx_accounts_user_id")
 }
 
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model categories {
-  id      String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id String?       @db.Uuid
-  name    String        @db.VarChar(100)
-  type    category_type
-  users   users?        @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  entries entries[]
-  exits   exits[]
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id      String?        @db.Uuid
+  name         String         @db.VarChar(100)
+  type         category_type
+  users        users?         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  entries      entries[]
+  exits        exits[]
+  transactions transactions[]
 
   @@index([user_id], map: "idx_categories_user_id")
   @@index([user_id, type], map: "idx_categories_user_type")
@@ -114,23 +112,20 @@ model entries {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model exits {
-  id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id        String        @db.Uuid
-  category_id    String        @db.Uuid
-  account_id     String?       @db.Uuid
-  credit_card_id String?       @db.Uuid
-  amount         Decimal       @db.Decimal(12, 2)
-  date           DateTime      @db.Date
-  description    String?
-  created_at     DateTime      @default(now()) @db.Timestamptz(6)
-  accounts       accounts?     @relation(fields: [account_id], references: [id], onUpdate: NoAction)
-  categories     categories    @relation(fields: [category_id], references: [id], onUpdate: NoAction)
-  credit_cards   credit_cards? @relation(fields: [credit_card_id], references: [id], onUpdate: NoAction)
-  users          users         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id     String     @db.Uuid
+  category_id String     @db.Uuid
+  account_id  String?    @db.Uuid
+  amount      Decimal    @db.Decimal(12, 2)
+  date        DateTime   @db.Date
+  description String?
+  created_at  DateTime   @default(now()) @db.Timestamptz(6)
+  accounts    accounts?  @relation(fields: [account_id], references: [id], onUpdate: NoAction)
+  categories  categories @relation(fields: [category_id], references: [id], onUpdate: NoAction)
+  users       users      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([account_id], map: "idx_exits_account_id")
   @@index([category_id], map: "idx_exits_category_id")
-  @@index([credit_card_id], map: "idx_exits_credit_card_id")
   @@index([user_id, date], map: "idx_exits_user_date")
 }
 
@@ -181,6 +176,87 @@ model sessions {
   @@index([user_id], map: "idx_sessions_user_id")
 }
 
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model account_movements {
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id        String       @db.Uuid
+  transaction_id String       @db.Uuid
+  account_id     String       @db.Uuid
+  amount         Decimal      @db.Decimal(12, 2)
+  created_at     DateTime     @default(now()) @db.Timestamptz(6)
+  accounts       accounts     @relation(fields: [account_id, user_id], references: [id, user_id], onUpdate: NoAction, map: "fk_movement_account")
+  transactions   transactions @relation(fields: [transaction_id, user_id], references: [id, user_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_movement_transaction")
+
+  @@index([account_id], map: "idx_movements_account")
+  @@index([transaction_id], map: "idx_movements_transaction")
+  @@index([user_id, account_id], map: "idx_movements_user_account")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model credit_card_details {
+  id                                                                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  account_id                                                        String    @unique @db.Uuid
+  last4                                                             String?   @db.Char(4)
+  credit_limit                                                      Decimal   @db.Decimal(12, 2)
+  statement_day                                                     Int       @db.SmallInt
+  due_day                                                           Int       @db.SmallInt
+  payment_account_id                                                String?   @db.Uuid
+  user_id                                                           String    @db.Uuid
+  accounts_credit_card_details_account_id_user_idToaccounts         accounts  @relation("credit_card_details_account_id_user_idToaccounts", fields: [account_id, user_id], references: [id, user_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_ccd_account")
+  accounts_credit_card_details_payment_account_id_user_idToaccounts accounts? @relation("credit_card_details_payment_account_id_user_idToaccounts", fields: [payment_account_id, user_id], references: [id, user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ccd_payment_account")
+
+  @@unique([account_id, user_id], map: "uq_ccd_account_user")
+  @@index([payment_account_id], map: "idx_ccd_payment_account")
+}
+
+model debit_cards {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  account_id String   @db.Uuid
+  name       String   @db.VarChar(100)
+  last4      String?  @db.Char(4)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  accounts   accounts @relation(fields: [account_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([account_id], map: "idx_debit_cards_account")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model transactions {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id           String              @db.Uuid
+  type              transaction_type
+  category_id       String?             @db.Uuid
+  amount            Decimal             @db.Decimal(12, 2)
+  description       String?
+  occurred_at       DateTime            @default(now()) @db.Timestamptz(6)
+  created_at        DateTime            @default(now()) @db.Timestamptz(6)
+  account_movements account_movements[]
+  users             users               @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_transactions_user")
+  categories        categories?         @relation(fields: [category_id], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  transfers         transfers?
+
+  @@unique([id, user_id], map: "uq_transactions_id_user")
+  @@index([user_id, occurred_at], map: "idx_transactions_user_date")
+  @@index([user_id, type, occurred_at], map: "idx_transactions_user_type_date")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model transfers {
+  transaction_id                                       String       @id @db.Uuid
+  from_account_id                                      String       @db.Uuid
+  to_account_id                                        String       @db.Uuid
+  fee                                                  Decimal      @default(0) @db.Decimal(12, 2)
+  user_id                                              String       @db.Uuid
+  accounts_transfers_from_account_id_user_idToaccounts accounts     @relation("transfers_from_account_id_user_idToaccounts", fields: [from_account_id, user_id], references: [id, user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_transfers_from_account")
+  accounts_transfers_to_account_id_user_idToaccounts   accounts     @relation("transfers_to_account_id_user_idToaccounts", fields: [to_account_id, user_id], references: [id, user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_transfers_to_account")
+  transactions                                         transactions @relation(fields: [transaction_id, user_id], references: [id, user_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_transfers_transaction")
+
+  @@unique([transaction_id, user_id], map: "uq_transfers_transaction_user")
+  @@index([from_account_id], map: "idx_transfers_from_account")
+  @@index([to_account_id], map: "idx_transfers_to_account")
+  @@index([user_id], map: "idx_transfers_user")
+}
+
 enum category_type {
   income
   expense
@@ -210,4 +286,18 @@ enum reminder_recurrence {
 enum reminder_status {
   pending
   done
+}
+
+enum account_type {
+  cash
+  bank
+  savings
+  credit_card
+}
+
+enum transaction_type {
+  income
+  expense
+  transfer
+  adjustment
 }
