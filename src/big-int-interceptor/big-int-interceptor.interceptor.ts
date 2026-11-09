@@ -3,6 +3,13 @@ import { Prisma } from "@prisma/client";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 
+/**
+ * Serializes non-JSON-safe database values.
+ *
+ * Financial values are emitted as decimal strings so the frontend never has to
+ * parse money through IEEE-754 floating point. BigInt values are also strings
+ * to avoid precision loss.
+ */
 @Injectable()
 export class BigIntInterceptor implements NestInterceptor {
   intercept(_context: ExecutionContext, next: CallHandler): Observable<any> {
@@ -12,31 +19,23 @@ export class BigIntInterceptor implements NestInterceptor {
   private transform(value: any): any {
     if (value === null || value === undefined) return value;
 
-    // Handle BigInt
     if (typeof value === "bigint") {
-      return Number(value);
+      return value.toString();
     }
 
-    // Handle Prisma Decimal
-    if (
-      Prisma.Decimal.isDecimal(value) ||
-      (typeof value === "object" && typeof value.toNumber === "function")
-    ) {
-      return value.toNumber();
+    if (Prisma.Decimal.isDecimal(value)) {
+      return value.toString();
     }
 
-    // Handle Date objects
     if (value instanceof Date) {
       return value;
     }
 
-    // Handle Arrays
     if (Array.isArray(value)) {
       return value.map((item) => this.transform(item));
     }
 
-    // Handle Objects
-    if (typeof value === "object" && value !== null) {
+    if (typeof value === "object") {
       return Object.fromEntries(
         Object.entries(value).map(([key, val]) => [key, this.transform(val)]),
       );

@@ -1,49 +1,91 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  DefaultValuePipe,
+  Delete,
+  Get,
+  Param,
+  ParseBoolPipe,
+  Patch,
+  Post,
+  Query,
+} from "@nestjs/common";
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { CurrentUser } from "@/common/decorators/current-user.decorator";
 import type { users } from "@prisma/client";
-import { CreateCreditCardDto, EditCreditCardDto } from "./credit-cards.dto";
+import {
+  CreateCreditCardDto,
+  CreditCardPaymentDto,
+  GetCreditCardsDto,
+  UpdateCreditCardDto,
+} from "./credit-cards.dto";
 import { CreditCardsService } from "./credit-cards.service";
 
+@ApiTags("credit-cards")
+@ApiBearerAuth()
 @Controller("credit-cards")
 export class CreditCardsController {
   constructor(private readonly creditCardsService: CreditCardsService) {}
 
   @Post()
-  async newCreditCard(@CurrentUser() user: users, @Body() dto: CreateCreditCardDto) {
-    return this.creditCardsService.newCreditCard(user.id, dto);
+  @ApiOperation({ summary: "Create a credit card account with its metadata" })
+  async create(@CurrentUser() user: users, @Body() dto: CreateCreditCardDto) {
+    return this.creditCardsService.create(user.id, dto);
   }
 
   @Get()
-  async getCreditCards(@CurrentUser() user: users) {
-    return this.creditCardsService.getCreditCards(user.id);
+  async list(@CurrentUser() user: users, @Query() dto: GetCreditCardsDto) {
+    return this.creditCardsService.list(user.id, dto);
   }
 
   @Get("purchases")
+  @ApiOperation({ summary: "Current billing cycle purchases for every card" })
   async getAllPurchases(@CurrentUser() user: users) {
     return this.creditCardsService.getPurchasesRange(user.id);
   }
 
-  @Get(":creditCardId")
-  async getCreditCard(@CurrentUser() user: users, @Param("creditCardId") creditCardId: string) {
-    return this.creditCardsService.getCreditCardById(user.id, creditCardId);
+  @Get(":accountId")
+  async getById(@CurrentUser() user: users, @Param("accountId") accountId: string) {
+    return this.creditCardsService.getById(user.id, accountId);
   }
 
-  @Patch(":creditCardId")
-  async editCreditCard(
+  @Get(":accountId/summary")
+  @ApiOperation({ summary: "Credit limit, outstanding debt and available credit" })
+  async getSummary(@CurrentUser() user: users, @Param("accountId") accountId: string) {
+    return this.creditCardsService.getById(user.id, accountId);
+  }
+
+  @Get(":accountId/purchases")
+  async getPurchases(@CurrentUser() user: users, @Param("accountId") accountId: string) {
+    return this.creditCardsService.getPurchasesRange(user.id, accountId);
+  }
+
+  @Patch(":accountId")
+  async update(
     @CurrentUser() user: users,
-    @Param("creditCardId") creditCardId: string,
-    @Body() dto: EditCreditCardDto,
+    @Param("accountId") accountId: string,
+    @Body() dto: UpdateCreditCardDto,
   ) {
-    return this.creditCardsService.editCreditCard(user.id, creditCardId, dto);
+    return this.creditCardsService.update(user.id, accountId, dto);
   }
 
-  @Delete(":creditCardId")
-  async deleteCreditCard(@CurrentUser() user: users, @Param("creditCardId") creditCardId: string) {
-    return this.creditCardsService.deleteCreditCard(user.id, creditCardId);
+  @Post(":accountId/payments")
+  @ApiOperation({ summary: "Pay a credit card from one of the user's asset accounts" })
+  async pay(
+    @CurrentUser() user: users,
+    @Param("accountId") accountId: string,
+    @Body() dto: CreditCardPaymentDto,
+  ) {
+    return this.creditCardsService.pay(user.id, accountId, dto);
   }
 
-  @Get(":creditCardId/purchases")
-  async getCardPurchases(@CurrentUser() user: users, @Param("creditCardId") creditCardId: string) {
-    return this.creditCardsService.getPurchasesRange(user.id, creditCardId);
+  @Delete(":accountId")
+  @ApiOperation({ summary: "Archive a credit card; hard delete only with ?hard=true" })
+  async remove(
+    @CurrentUser() user: users,
+    @Param("accountId") accountId: string,
+    @Query("hard", new DefaultValuePipe(false), ParseBoolPipe) hard: boolean,
+  ) {
+    return this.creditCardsService.remove(user.id, accountId, hard);
   }
 }

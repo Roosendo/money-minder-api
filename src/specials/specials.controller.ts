@@ -1,7 +1,6 @@
 import { Controller, Get, Query } from "@nestjs/common";
 import { CurrentUser } from "@/common/decorators/current-user.decorator";
-import { EntryService } from "@/entries/entries.service";
-import { ExitService } from "@/exits/exits.service";
+import { ReportsService } from "@/reports/reports.service";
 import type { users } from "@prisma/client";
 import {
   CashFlowDto,
@@ -16,8 +15,7 @@ import { SpecialsService } from "./specials.service";
 export class SpecialsController {
   constructor(
     private readonly specialsService: SpecialsService,
-    private readonly entryService: EntryService,
-    private readonly exitService: ExitService,
+    private readonly reportsService: ReportsService,
   ) {}
 
   @Get("financial-summary-yearly")
@@ -25,19 +23,16 @@ export class SpecialsController {
     @CurrentUser() user: users,
     @Query() dto: FinancialSummaryYearlyDto,
   ) {
-    const [entries, exits] = await Promise.all([
-      this.entryService.getYearlySummary(user.id, dto) as Promise<{ totalAmount: number }>,
-      this.exitService.getYearlySummary(user.id, dto) as Promise<{ totalAmount: number }>,
-    ]);
-
-    const totalEntries = entries.totalAmount || 0;
-    const totalExits = exits.totalAmount || 0;
+    const report = await this.reportsService.getYearlyReport(user.id, {
+      year: dto.year,
+      includeTransferFees: true,
+    });
 
     return {
       year: dto.year,
-      totalEntries,
-      totalExits,
-      netBalance: totalEntries - totalExits,
+      totalEntries: report.summary.income,
+      totalExits: report.summary.expensesIncludingTransferFees,
+      netBalance: report.summary.net,
     };
   }
 
@@ -46,20 +41,18 @@ export class SpecialsController {
     @CurrentUser() user: users,
     @Query() dto: FinancialSummaryMonthlyDto,
   ) {
-    const [entries, exits] = await Promise.all([
-      this.entryService.getMonthlySummary(user.id, dto) as Promise<{ totalAmount: number }>,
-      this.exitService.getMonthlySummary(user.id, dto) as Promise<{ totalAmount: number }>,
-    ]);
-
-    const totalEntries = entries.totalAmount || 0;
-    const totalExits = exits.totalAmount || 0;
+    const report = await this.reportsService.getMonthlyReport(user.id, {
+      month: dto.month,
+      year: dto.year,
+      includeTransferFees: true,
+    });
 
     return {
       month: dto.month,
       year: dto.year,
-      totalEntries,
-      totalExits,
-      netBalance: totalEntries - totalExits,
+      totalEntries: report.summary.income,
+      totalExits: report.summary.expensesIncludingTransferFees,
+      netBalance: report.summary.net,
     };
   }
 

@@ -9,14 +9,18 @@ import { BigIntInterceptor } from "@/big-int-interceptor";
 import { CategoriesModule } from "@/categories/categories.module";
 import configure from "@/common/configs/config";
 import { CreditCardsModule } from "@/credit-cards/credit-cards.module";
+import { DebitCardsModule } from "@/debit-cards/debit-cards.module";
 import { EntryModule } from "@/entries/entries.module";
 import { ExitModule } from "@/exits/exits.module";
 import { LoansModule } from "@/loans/loans.module";
 import { PhrasesModule } from "@/phrases/phrases.module";
-import { PrismaService } from "@/prisma.service";
+import { PrismaModule } from "@/prisma.module";
 import { RemindersModule } from "@/reminders/reminders.module";
+import { ReportsModule } from "@/reports/reports.module";
 import { SavingsModule } from "@/savings/savings.module";
 import { SpecialsModule } from "@/specials/specials.module";
+import { TransactionsModule } from "@/transactions/transactions.module";
+import { TransfersModule } from "@/transfers/transfers.module";
 import { UsersModule } from "@/users/users.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
@@ -33,11 +37,16 @@ import { HealthModule } from "./health/health.module";
       max: 200,
       isGlobal: true,
     }),
+    PrismaModule,
     AuthModule,
     UsersModule,
     CategoriesModule,
     AccountsModule,
+    DebitCardsModule,
     CreditCardsModule,
+    TransactionsModule,
+    TransfersModule,
+    ReportsModule,
     EntryModule,
     ExitModule,
     LoansModule,
@@ -50,7 +59,6 @@ import { HealthModule } from "./health/health.module";
   controllers: [AppController],
   providers: [
     AppService,
-    PrismaService,
     {
       provide: APP_INTERCEPTOR,
       useClass: BigIntInterceptor,
@@ -60,6 +68,5 @@ import { HealthModule } from "./health/health.module";
       useClass: AuthGuard,
     },
   ],
-  exports: [PrismaService],
 })
 export class AppModule {}
