@@ -92,7 +92,6 @@ export class LedgerService {
         category_id: input.categoryId ?? null,
         account_movements: {
           create: movements.map((movement) => ({
-            user_id: userId,
             account_id: movement.accountId,
             amount: dec(movement.amount),
           })),
