@@ -15,6 +15,10 @@ outside the prefix:
 Everything under `/api/v1` requires an authenticated session unless marked public
 (`/api/v1/auth/*` OAuth entry points and Better Auth handler).
 
+The deprecated `/api/v1/entries` and `/api/v1/exits` routes have been retired. Use
+`/api/v1/transactions` for income, expenses, and adjustments. Transfers use
+`/api/v1/transfers`.
+
 ---
 
 ## 1. Authentication
@@ -547,9 +551,9 @@ All reports read from the ledger, exclude reversed originals, and return money a
 
 ---
 
-## 11. Specials (legacy dashboard endpoints)
+## 11. Dashboard compatibility endpoints
 
-These endpoints keep their old URLs but now read from the unified ledger:
+These endpoints retain their existing URLs and response field names, but read exclusively from the unified ledger (`transactions` and `account_movements`):
 
 | Method | Path                                                      | Description                                      |
 | ------ | --------------------------------------------------------- | ------------------------------------------------ |
@@ -560,35 +564,13 @@ These endpoints keep their old URLs but now read from the unified ledger:
 | `GET`  | `/api/v1/specials/recent-transactions?year=`              | Last 15 income/expense items                     |
 
 `totalEntries` maps to income, `totalExits` maps to expenses including transfer fees, and
-`netBalance` maps to net.
-
-Legacy `entries`/`exits` rows are **not** included here until the migration scripts in
-`prisma/sql/` are run.
-
----
-
-## 12. Legacy entries and exits (deprecated)
-
-| Method             | Path                              | Description               |
-| ------------------ | --------------------------------- | ------------------------- |
-| `POST`             | `/api/v1/entries`                 | Create legacy income row  |
-| `GET`              | `/api/v1/entries`                 | List legacy income rows   |
-| `GET`              | `/api/v1/entries/summary/monthly` | Legacy monthly summary    |
-| `GET`              | `/api/v1/entries/summary/yearly`  | Legacy yearly summary     |
-| `GET/PATCH/DELETE` | `/api/v1/entries/:id`             | Legacy CRUD               |
-| `POST`             | `/api/v1/exits`                   | Create legacy expense row |
-| `GET`              | `/api/v1/exits`                   | List legacy expense rows  |
-| `GET`              | `/api/v1/exits/summary/monthly`   | Legacy monthly summary    |
-| `GET`              | `/api/v1/exits/summary/yearly`    | Legacy yearly summary     |
-| `GET/PATCH/DELETE` | `/api/v1/exits/:id`               | Legacy CRUD               |
-
-These routes still write `public.entries` / `public.exits` and are kept for compatibility. They
-are **deprecated**; new clients must use `/transactions`. Their category/account ownership checks
-are hardened, but their data does not participate in ledger balances or `/reports`.
+`netBalance` maps to net. These are compatibility response names only; the legacy
+`entries` and `exits` tables and API routes have been retired. All historical financial
+records are now represented in the unified ledger.
 
 ---
 
-## 13. Other modules
+## 12. Other modules
 
 Loans, reminders, savings, and phrases retain their existing APIs:
 
@@ -603,7 +585,7 @@ They are user-scoped but are not part of the account ledger.
 
 ---
 
-## 14. Pagination
+## 13. Pagination
 
 List endpoints accept `page` (default `1`) and `pageSize` (default `15`, maximum `100`) and return:
 
