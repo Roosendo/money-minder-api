@@ -96,24 +96,21 @@ export class AccountsService {
       return this.archiveAccount(userId, account.id);
     }
 
-    const [movements, debitCards, creditDetails, transfers, legacyEntries, legacyExits] =
-      await Promise.all([
-        this.prisma.account_movements.count({ where: { account_id: account.id, user_id: userId } }),
-        this.prisma.debit_cards.count({ where: { account_id: account.id } }),
-        this.prisma.credit_card_details.count({
-          where: { account_id: account.id, user_id: userId },
-        }),
-        this.prisma.transfers.count({
-          where: {
-            user_id: userId,
-            OR: [{ from_account_id: account.id }, { to_account_id: account.id }],
-          },
-        }),
-        this.prisma.entries.count({ where: { account_id: account.id, user_id: userId } }),
-        this.prisma.exits.count({ where: { account_id: account.id, user_id: userId } }),
-      ]);
+    const [movements, debitCards, creditDetails, transfers] = await Promise.all([
+      this.prisma.account_movements.count({ where: { account_id: account.id, user_id: userId } }),
+      this.prisma.debit_cards.count({ where: { account_id: account.id } }),
+      this.prisma.credit_card_details.count({
+        where: { account_id: account.id, user_id: userId },
+      }),
+      this.prisma.transfers.count({
+        where: {
+          user_id: userId,
+          OR: [{ from_account_id: account.id }, { to_account_id: account.id }],
+        },
+      }),
+    ]);
 
-    if (movements || debitCards || creditDetails || transfers || legacyEntries || legacyExits) {
+    if (movements || debitCards || creditDetails || transfers) {
       throw new BadRequestException(
         "Account has financial history or linked cards and cannot be hard-deleted; archive it instead",
       );

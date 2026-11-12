@@ -11,7 +11,6 @@ import configure from "@/common/configs/config";
 import { CreditCardsModule } from "@/credit-cards/credit-cards.module";
 import { DebitCardsModule } from "@/debit-cards/debit-cards.module";
 import { EntryModule } from "@/entries/entries.module";
-import { ExitModule } from "@/exits/exits.module";
 import { LoansModule } from "@/loans/loans.module";
 import { PhrasesModule } from "@/phrases/phrases.module";
 import { PrismaModule } from "@/prisma.module";
@@ -48,7 +47,6 @@ import { HealthModule } from "./health/health.module";
     TransfersModule,
     ReportsModule,
     EntryModule,
-    ExitModule,
     LoansModule,
     RemindersModule,
     SavingsModule,
